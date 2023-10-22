@@ -1,3 +1,4 @@
-import VButton from "./VButton.vue";
+import { VDropdown } from "./Dropdown";
+import { VButton } from "./Button";
 
-export default { VButton };
+export default { VButton, VDropdown };

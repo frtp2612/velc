@@ -1,5 +1,5 @@
 <template>
-  <button>
+  <button class="bg-red-300">
     {{ text }}
     <slot />
   </button>
@@ -9,4 +9,3 @@ defineProps({
   text: String,
 });
 </script>
-<style lang=""></style>
