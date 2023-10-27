@@ -1,20 +1,38 @@
 <template>
-  <div>
-    <VDropdown :values="values" v-model="dropDownSelection"></VDropdown>
-    <!-- <VirtualScroller :item-height="30" :items="values">
-      <template v-slot="{ item, index }">
-        <div>{{ item }} -- {{ index }}</div>
-      </template>
-    </VirtualScroller> -->
-  </div>
+	<div
+		class="grid grid-cols-[1fr,_4fr] h-full w-full items-start divide-x divide-theme-bg-100"
+	>
+		<div class="min-h-0 h-full overflow-auto">
+			<ul class="flex flex-col gap-1">
+				<router-link
+					v-for="route in routes"
+					:to="route.path"
+					class="h-full w-full px-4 py-2"
+				>
+					{{ route.name }}
+				</router-link>
+			</ul>
+		</div>
+		<div class="min-h-0 h-full overflow-auto">
+			<router-view></router-view>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import VDropdown from "../components/Dropdown/VDropdown.vue";
+import { computed } from "vue";
+import { RouteRecordNormalized, useRouter } from "vue-router";
 
-const values = Array.from(Array(1000)).map((_, i) => "item-" + i);
-const dropDownSelection = ref("three");
+const router = useRouter();
+const { getRoutes } = router;
+
+const routes = computed(() =>
+	getRoutes()
+		.sort((a: RouteRecordNormalized, b: RouteRecordNormalized) =>
+			a.name!.toString().localeCompare(b.name!.toString())
+		)
+		.filter((route: RouteRecordNormalized) => route)
+);
 </script>
 
 <style scoped></style>

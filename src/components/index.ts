@@ -1,4 +1,25 @@
-import { VDropdown } from "./Dropdown";
-import { VButton } from "./Button";
+import { VButton } from "./VButton";
 
-export default { VButton, VDropdown };
+import { VDropdown } from "./VDropdown";
+
+import { VButtonGroup } from "./VButtonGroup";
+
+import { VDataGrid } from "./VDataGrid";
+
+import { VModalWindow } from "./VModalWindow";
+
+import { VPopover } from "./VPopover";
+
+import { VSplitView } from "./VSplitView";
+
+import { VLabel } from "./VLabel";
+
+export default {
+	VButton,
+	VDropdown,
+	VButtonGroup,
+	VDataGrid,
+	VModalWindow,
+	VPopover,
+	VSplitView,
+};
