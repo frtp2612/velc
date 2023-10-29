@@ -12,14 +12,12 @@ import { VPopover } from "./VPopover";
 
 import { VSplitView } from "./VSplitView";
 
-import { VLabel } from "./VLabel";
-
 export default {
-	VButton,
-	VDropdown,
-	VButtonGroup,
-	VDataGrid,
-	VModalWindow,
-	VPopover,
-	VSplitView,
+  VButton,
+  VDropdown,
+  VButtonGroup,
+  VDataGrid,
+  VModalWindow,
+  VPopover,
+  VSplitView,
 };

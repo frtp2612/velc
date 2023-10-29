@@ -1,28 +1,37 @@
 <template>
-	<VButton ref="dropdown" class="relative" :on-click="toggle">
-		<VLabel class="text-theme-text">{{ formattedSelectedItem }}</VLabel>
-		<Teleport to="body" :disabled="true">
-			<slot :items="filteredItems">
-				<div
-					class="absolute z-50 left-0 top-full border border-slate-100 shadow-sm flex flex-col max-h-32 min-w-[16rem] w-max max-w-max bg-white"
-					v-show="open"
-				>
-					<VirtualScroller :items="filteredItems" :item-height="30">
-						<template v-slot="{ item }">
-							<div
-								class="px-2 hover:bg-blue-200 overflow-ellipsis whitespace-nowrap h-full"
-								@click.capture="selectedItem = item"
-							>
-								<KeepAlive>
-									<ItemTest :item="item"></ItemTest>
-								</KeepAlive>
-							</div>
-						</template>
-					</VirtualScroller>
-				</div>
-			</slot>
-		</Teleport>
-	</VButton>
+  <div class="relative">
+    <div ref="dropdown" @click="toggle">
+      <slot :events="{ toggle }">
+        <VButton
+          ><VLabel class="text-theme-text">{{
+            formattedSelectedItem
+          }}</VLabel></VButton
+        >
+      </slot>
+    </div>
+
+    <Teleport to="body" :disabled="true">
+      <slot :items="filteredItems" name="item">
+        <div
+          class="absolute z-50 left-0 top-full border border-slate-100 shadow-sm flex flex-col max-h-32 min-w-[16rem] w-max max-w-max bg-white"
+          v-show="open"
+        >
+          <VirtualScroller :items="filteredItems" :item-height="30">
+            <template v-slot="{ item }">
+              <div
+                class="px-2 hover:bg-blue-200 overflow-ellipsis whitespace-nowrap h-full"
+                @click.capture="selectedItem = item"
+              >
+                <KeepAlive>
+                  <ItemTest :item="item" :formatter="formatter"></ItemTest>
+                </KeepAlive>
+              </div>
+            </template>
+          </VirtualScroller>
+        </div>
+      </slot>
+    </Teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -34,23 +43,23 @@ import VirtualScroller from "../VirtualScroller/VirtualScroller.vue";
 import ItemTest from "./ItemTest.vue";
 
 const props = defineProps<{
-	values: any[];
-	modelValue?: any;
-	formatter?: Function;
-	appendTo?: string | RendererElement;
+  values: any[];
+  modelValue?: any;
+  formatter?: Function;
+  appendTo?: string | RendererElement;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
 
 const selectedItem = useVModel(
-	props,
-	"modelValue",
-	emit,
-	props.modelValue
-		? {}
-		: {
-				passive: true,
-		  }
+  props,
+  "modelValue",
+  emit,
+  props.modelValue
+    ? {}
+    : {
+        passive: true,
+      }
 );
 
 const searchTerm = ref("");
@@ -65,56 +74,60 @@ selectedItem.value = props.modelValue;
 onClickOutside(dropdown, () => (open.value = false));
 
 function startTimer() {
-	timer.value = setTimeout(() => {
-		searchTerm.value = "";
-	}, 2000);
+  timer.value = setTimeout(() => {
+    searchTerm.value = "";
+  }, 2000);
 }
 
 function toggle() {
-	open.value = !open.value;
+  open.value = !open.value;
 
-	if (open.value) {
-		startTimer();
-		document.addEventListener("keyup", inputListener);
-	} else {
-		document.removeEventListener("keyup", inputListener);
-		searchTerm.value = "";
-		filter.value = "";
-	}
+  if (open.value) {
+    startTimer();
+    document.addEventListener("keyup", inputListener);
+  } else {
+    document.removeEventListener("keyup", inputListener);
+    searchTerm.value = "";
+    filter.value = "";
+  }
 }
 
 function inputListener(event: KeyboardEvent) {
-	const name = event.key;
-	const code = event.code;
+  const name = event.key;
+  const code = event.code;
 
-	if (name === "Control") {
-		return;
-	}
+  if (name === "Control") {
+    return;
+  }
 
-	if (event.ctrlKey) {
-		console.log(`Combination of ctrlKey + ${name} \n Key code Value: ${code}`);
-	} else {
-		console.log(`Key pressed ${name} \n Key code Value: ${code}`);
+  if (event.ctrlKey) {
+    console.log(`Combination of ctrlKey + ${name} \n Key code Value: ${code}`);
+  } else {
+    console.log(`Key pressed ${name} \n Key code Value: ${code}`);
 
-		if (code === "Backspace") {
-			searchTerm.value = searchTerm.value.slice(0, -1);
-		} else {
-			searchTerm.value += event.key;
-		}
+    if (code === "Backspace") {
+      searchTerm.value = searchTerm.value.slice(0, -1);
+    } else {
+      searchTerm.value += event.key;
+    }
 
-		filter.value = searchTerm.value;
-	}
+    filter.value = searchTerm.value;
+  }
 
-	clearTimeout(timer.value);
-	startTimer();
+  clearTimeout(timer.value);
+  startTimer();
 }
 
 const filteredItems = computed(() =>
-	props.values.filter((value: String) => value.includes(filter.value))
+  props.values.filter((value: any) =>
+    props.formatter
+      ? props.formatter(value).includes(filter.value)
+      : value.includes(filter.value)
+  )
 );
 
 const formattedSelectedItem = computed(() =>
-	props.formatter ? props.formatter(selectedItem.value) : selectedItem.value
+  props.formatter ? props.formatter(selectedItem.value) : selectedItem.value
 );
 
 onMounted(() => {});

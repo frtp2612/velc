@@ -30,6 +30,9 @@
 		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css"
 	},
 	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^6.4.2",
+		"@fortawesome/free-solid-svg-icons": "^6.4.2",
+		"@fortawesome/vue-fontawesome": "^3.0.3",
 		"@vueuse/core": "^10.5.0",
 		"path": "^0.12.7",
 		"vite-plugin-dts": "^3.6.0",
