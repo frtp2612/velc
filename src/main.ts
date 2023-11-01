@@ -15,18 +15,20 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 /* import specific icons */
 import {
-	faArrowDownWideShort,
-	faArrowUpShortWide,
-	faEllipsisVertical,
-	faLock,
+  faArrowDownWideShort,
+  faArrowUpShortWide,
+  faEllipsisVertical,
+  faLeftRight,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
 library.add(
-	faEllipsisVertical,
-	faLock,
-	faArrowDownWideShort,
-	faArrowUpShortWide
+  faEllipsisVertical,
+  faLock,
+  faArrowDownWideShort,
+  faArrowUpShortWide,
+  faLeftRight
 );
 
 const app = createApp(App);
