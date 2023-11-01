@@ -14,10 +14,20 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 /* import specific icons */
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import {
+	faArrowDownWideShort,
+	faArrowUpShortWide,
+	faEllipsisVertical,
+	faLock,
+} from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
-library.add(faEllipsisVertical);
+library.add(
+	faEllipsisVertical,
+	faLock,
+	faArrowDownWideShort,
+	faArrowUpShortWide
+);
 
 const app = createApp(App);
 

@@ -1,13 +1,13 @@
 <template>
 	<div
-		class="rounded-xl flex flex-col bg-theme-bg-50 border border-transparent hover:border-theme-secondary-200 p-2 gap-4"
+		class="rounded-xl flex flex-col min-h-0 bg-theme-bg-50 border border-transparent hover:border-theme-secondary-200 p-2 gap-4"
 	>
 		<div
 			class="px-2 py-1 bg-theme-bg-100/50 self-start rounded-md border border-theme-secondary"
 		>
 			<VLabel class="font-semibold text-sm">{{ title }}</VLabel>
 		</div>
-		<div class="self-center">
+		<div class="self-center min-h-0 min-w-0 w-full">
 			<slot></slot>
 		</div>
 
@@ -37,7 +37,6 @@
 
 <script setup lang="ts">
 import VLabel from "@/components/VLabel/index";
-import { applyHighlightRules } from "@/directives/VCodeHighlighter";
 import { computed } from "vue";
 const props = defineProps<{
 	title: string;
@@ -45,8 +44,6 @@ const props = defineProps<{
 }>();
 
 const codeSnippet = computed(() => {
-	console.log(applyHighlightRules(props.example));
-
 	return props.example.split("\n");
 });
 </script>

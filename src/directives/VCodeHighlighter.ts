@@ -20,7 +20,7 @@ const rules: Rule[] = [
 	},
 	{
 		id: "import",
-		lookFor: /import|from|map|const/gm,
+		lookFor: /import|from|map|const|function/gm,
 		substituteWith: () => `<p class='font-semibold text-theme-tag-100'>$&</p>`,
 	},
 	{

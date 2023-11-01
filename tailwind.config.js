@@ -1,7 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
 const generateColorClass = (variable) => {
-	console.log(variable);
 	return `rgb(var(--${variable})
    / <alpha-value>)`;
 };

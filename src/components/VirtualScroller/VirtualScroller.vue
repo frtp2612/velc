@@ -1,12 +1,14 @@
 <template>
 	<div
 		:class="[
-			containerClass ? containerClass : 'overflow-auto min-h-0 h-full border',
+			containerClass ? containerClass : 'overflow-auto min-h-0 h-full relative',
 		]"
 		ref="container"
 	>
+		<slot name="prepend"></slot>
 		<div
-			class="overflow-hidden will-change-transform"
+			class="will-change-transform"
+			:class="[wrapperClass ? wrapperClass : 'w-full']"
 			:style="{ height: `${totalContentHeight}px` }"
 		>
 			<div
@@ -35,9 +37,14 @@ type Props = {
 	itemHeight: number;
 	items: any[];
 	containerClass?: string;
+	wrapperClass?: string;
+	itemClass?: string;
+	renderAhead?: number;
 };
 
-const props = withDefaults(defineProps<Props>(), {});
+const props = withDefaults(defineProps<Props>(), {
+	renderAhead: 6,
+});
 
 const container = ref<HTMLElement | null>(null);
 
@@ -45,6 +52,6 @@ const { list, totalContentHeight, offsetY, currentIndex } = VirtualScroll({
 	container,
 	items: computed(() => props.items),
 	itemHeight: props.itemHeight,
-	renderAhead: 10,
+	renderAhead: props.renderAhead,
 });
 </script>
