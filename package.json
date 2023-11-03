@@ -19,15 +19,20 @@
 		"./dist/styles.css": {
 			"import": "./dist/styles.css",
 			"require": "./dist/styles.css"
+		},
+		"./dist/icons.ts": {
+			"import": "./dist/icons.ts",
+			"require": "./dist/icons.ts"
 		}
 	},
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"dev": "vite",
-		"build": "vue-tsc && vite build && npm run build:styles",
+		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons",
 		"preview": "vite preview",
 		"build:lib": "vue-tsc && vite build --target lib --name velct-components src/index.ts",
-		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css"
+		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css",
+		"build:icons": "@powershell copy ./src/fontawesome/index.ts ./dist/icons.ts"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.2",

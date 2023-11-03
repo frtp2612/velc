@@ -2,7 +2,12 @@
 	<ComponentExampleTemplate title="VDropdown" component-name="VDropdown">
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
-				<VDropdown :values="values" v-model="dropDownSelection" />
+				<VDropdown
+					:values="values"
+					v-model="dropDownSelection"
+					append-to="body"
+				>
+				</VDropdown>
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>

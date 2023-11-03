@@ -40,14 +40,33 @@ const routes = [
 		component: () =>
 			import("@/views/examples/VSplitView/VSplitViewExample.vue"),
 	},
-{
-    path: "/VLabel",
-    name: "VLabel",
-    component: () =>
-    import(
-        "@/views/examples/VLabel/VLabelExample.vue"
-    )
-},
+	{
+		path: "/VLabel",
+		name: "VLabel",
+		component: () => import("@/views/examples/VLabel/VLabelExample.vue"),
+	},
+	{
+		path: "/VCheckBox",
+		name: "VCheckBox",
+		component: () => import("@/views/examples/VCheckBox/VCheckBoxExample.vue"),
+	},
+	{
+		path: "/VTextField",
+		name: "VTextField",
+		component: () =>
+			import("@/views/examples/VTextField/VTextFieldExample.vue"),
+	},
+	{
+		path: "/VTextArea",
+		name: "VTextArea",
+		component: () => import("@/views/examples/VTextArea/VTextAreaExample.vue"),
+	},
+	{
+		path: "/VDatePicker",
+		name: "VDatePicker",
+		component: () =>
+			import("@/views/examples/VDatePicker/VDatePickerExample.vue"),
+	},
 ];
 
 const router = createRouter({
