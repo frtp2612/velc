@@ -1,49 +1,49 @@
 <template>
-	<div
-		class="flex flex-col border bg-theme-bg border-theme-bg-200 min-h-0 min-w-0 h-full w-full overflow-auto"
-	>
-		<div class="relative min-h-0 flex flex-col h-full" ref="tableContainer">
-			<!--GRID LEADING CONTENT-->
+  <div
+    class="flex flex-col border bg-color-bg border-color-border-200 min-h-0 min-w-0 h-full w-full overflow-auto"
+  >
+    <div class="relative min-h-0 flex flex-col h-full" ref="tableContainer">
+      <!--GRID LEADING CONTENT-->
 
-			<!-- GRID CONTENT -->
-			<VirtualScroller
-				:item-height="34"
-				:items="data"
-				:wrapper-class="initialized ? 'w-fit' : ''"
-				ref="content"
-			>
-				<template #prepend>
-					<!-- GRID HEADER -->
-					<div
-						class="sticky grid top-0 bg-theme-bg-50 z-10 border-b"
-						:class="{ 'w-fit': initialized }"
-						:style="{
-							gridTemplateColumns: columnsLayout || columnsGridLayout,
-						}"
-						ref="columnsContainer"
-					>
-						<VDataGridColumn
-							v-for="(column, index) in columns"
-							:data="column"
-							:index="index"
-							class="px-3 leading-[32px]"
-						/>
-					</div>
-				</template>
-				<!-- GRID ROWS -->
-				<template v-slot="{ item, index }">
-					<VDataGridRow
-						:data="item"
-						:index="index"
-						:style="{
-							gridTemplateColumns: columnsLayout || columnsGridLayout,
-						}"
-					/>
-				</template>
-			</VirtualScroller>
-			<!--GRID TRAILING CONTENT-->
-		</div>
-	</div>
+      <!-- GRID CONTENT -->
+      <VirtualScroller
+        :item-height="34"
+        :items="data"
+        :wrapper-class="initialized ? 'w-fit' : ''"
+        ref="content"
+      >
+        <template #prepend>
+          <!-- GRID HEADER -->
+          <div
+            class="sticky grid top-0 bg-color-bg-50 z-10 border-b border-color-border-200"
+            :class="{ 'w-fit': initialized }"
+            :style="{
+              gridTemplateColumns: columnsLayout || columnsGridLayout,
+            }"
+            ref="columnsContainer"
+          >
+            <VDataGridColumn
+              v-for="(column, index) in columns"
+              :data="column"
+              :index="index"
+              class="px-3 leading-[32px]"
+            />
+          </div>
+        </template>
+        <!-- GRID ROWS -->
+        <template v-slot="{ item, index }">
+          <VDataGridRow
+            :data="item"
+            :index="index"
+            :style="{
+              gridTemplateColumns: columnsLayout || columnsGridLayout,
+            }"
+          />
+        </template>
+      </VirtualScroller>
+      <!--GRID TRAILING CONTENT-->
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -55,21 +55,21 @@ import VDataGridState from "./VDataGridState";
 import { VDataColumn, VDataRow } from "./VDataGridTypes";
 
 const props = defineProps<{
-	columns: Array<VDataColumn>;
-	rows: Array<VDataRow>;
-	defaultSortKey?: string;
-	defaultSortDirection?: string;
+  columns: Array<VDataColumn>;
+  rows: Array<VDataRow>;
+  defaultSortKey?: string;
+  defaultSortDirection?: string;
 }>();
 
 const columnsGridLayout = computed(
-	() => `repeat(${props.columns.length}, 1fr)`
+  () => `repeat(${props.columns.length}, 1fr)`
 );
 
 const state = VDataGridState(
-	ref(props.rows),
-	props.columns,
-	props.defaultSortKey,
-	props.defaultSortDirection
+  ref(props.rows),
+  props.columns,
+  props.defaultSortKey,
+  props.defaultSortDirection
 );
 
 const { initialized, columnsLayout, data } = state;
@@ -83,12 +83,12 @@ provide("state", state);
 defineExpose({ rows: data });
 
 onMounted(() => {
-	if (
-		tableContainer.value !== null &&
-		columnsContainer.value !== null &&
-		content.value !== null
-	) {
-		state.init(tableContainer.value, columnsContainer.value, content.value);
-	}
+  if (
+    tableContainer.value !== null &&
+    columnsContainer.value !== null &&
+    content.value !== null
+  ) {
+    state.init(tableContainer.value, columnsContainer.value, content.value);
+  }
 });
 </script>
