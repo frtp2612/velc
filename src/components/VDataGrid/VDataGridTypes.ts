@@ -44,6 +44,7 @@ type VDataGridStateType = {
 	sort: (key: string) => void;
 
 	changeSelectedCell: (rowId: string, columnId: string, cellId: string) => void;
+	onCellEditEnd: () => void;
 
 	columnsLayout: ComputedRef<string>;
 
@@ -63,11 +64,19 @@ type VDataGridStateType = {
 	isDirty: ComputedRef<boolean>;
 };
 
+type VDataGridEmits = {
+	(
+		event: "cellValueChanged",
+		data: { row: VDataRow; column: VDataColumn; newValue: any }
+	): void;
+};
+
 export type {
 	BaseElementSize,
 	CalculatedElementSize,
 	ElementSize,
 	VDataColumn,
+	VDataGridEmits,
 	VDataGridStateType,
 	VDataRow,
 };

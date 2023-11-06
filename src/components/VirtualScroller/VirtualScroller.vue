@@ -47,12 +47,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const container = ref<HTMLElement | null>(null);
 
-const { list, totalContentHeight, offsetY, currentIndex } = VirtualScroll({
-	container,
-	items: computed(() => props.items),
-	itemHeight: props.itemHeight,
-	renderAhead: props.renderAhead,
-});
+const { list, totalContentHeight, offsetY, currentIndex, scrollToIndex } =
+	VirtualScroll({
+		container,
+		items: computed(() => props.items),
+		itemHeight: props.itemHeight,
+		renderAhead: props.renderAhead,
+	});
 
-defineExpose({ container });
+defineExpose({ container, scrollToIndex });
 </script>

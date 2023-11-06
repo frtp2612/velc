@@ -1,10 +1,11 @@
 <template>
-	<input type="checkbox" v-model="model" :id="id" />
+	<input type="number" v-model.number.lazy="model" :class="elementClass" />
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
+import { inputBaseClass } from "@/constants/index";
 import { useVModel } from "@vueuse/core";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const props = defineProps<{
 	id: string;
@@ -23,11 +24,15 @@ const model = useVModel(
 		? {}
 		: {
 				passive: true,
-				defaultValue: false,
+				defaultValue: 0,
 		  }
 );
 
 const input = ref<HTMLElement | null>(null);
+
+const elementClass = computed(() =>
+	props.customClass ? props.customClass : inputBaseClass
+);
 
 onMounted(() => {
 	if (props.autoFocus && input.value) {

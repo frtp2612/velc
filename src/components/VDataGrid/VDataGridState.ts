@@ -1,11 +1,12 @@
 import {
 	CalculatedElementSize,
 	VDataColumn,
+	VDataGridEmits,
 	VDataRow,
 } from "@/components/VDataGrid/VDataGridTypes";
 import { useSorter } from "@/composables/UseSorter";
 import { clamp, onKeyStroke, useElementSize } from "@vueuse/core";
-import { Ref, computed, nextTick, ref } from "vue";
+import { ComputedRef, computed, nextTick, ref, watch } from "vue";
 
 type DataGridColumnData = {
 	id: string;
@@ -15,10 +16,11 @@ type DataGridColumnData = {
 };
 
 function VDataGridState(
-	rows: Ref<VDataRow[]>,
+	rows: ComputedRef<VDataRow[]>,
 	columns: VDataColumn[],
 	defaultSortKey: string | undefined,
-	defaultSortDirection: string | undefined
+	defaultSortDirection: string | undefined,
+	emit: VDataGridEmits
 ) {
 	const tableContainerRef = ref<HTMLElement>();
 	const columnsContainerRef = ref<HTMLElement>();
@@ -36,8 +38,10 @@ function VDataGridState(
 	// const { width, height } = useElementBounding(tableContainerRef);
 	const { width, height } = useElementSize(contentContainerRef);
 
+	const filteredRows = computed(() => rows.value);
+
 	const { sortedData, sort, sortKey, sortOrder } = useSorter<VDataRow>(
-		rows,
+		filteredRows,
 		defaultSortKey,
 		defaultSortDirection
 	);
@@ -195,6 +199,7 @@ function VDataGridState(
 					} else {
 						direction.x = 1;
 					}
+					onCellEditEnd();
 				} else if (e.key === "Escape") {
 					editMode.value = false;
 				} else {
@@ -254,6 +259,34 @@ function VDataGridState(
 		);
 	}
 
+	function onCellEditEnd() {
+		const column: VDataColumn = columns[getColumnIndex()];
+
+		if (column && column.editable) {
+			const row: VDataRow | undefined = rows.value.find(
+				(row: VDataRow) => row.id === selectedRowId.value
+			);
+			if (row) {
+				console.log("NEW VALUE", row[column.id]);
+
+				emit("cellValueChanged", {
+					row,
+					column,
+					newValue: row[column.id],
+				});
+			}
+		}
+	}
+
+	watch(
+		() => editMode.value,
+		(current: boolean, previous: boolean) => {
+			if (previous !== current && !current) {
+				onCellEditEnd();
+			}
+		}
+	);
+
 	return {
 		// methods
 		init,
@@ -262,6 +295,8 @@ function VDataGridState(
 		changeSelectedCell,
 
 		sort,
+
+		onCellEditEnd,
 
 		// computed properties
 		columnsLayout,

@@ -13,7 +13,7 @@ import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlo
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
 import { ref } from "vue";
 
-const text = ref("I have an inital text!");
+const text = ref("I have an initial text!");
 
 const example1 = "";
 </script>

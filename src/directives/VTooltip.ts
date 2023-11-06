@@ -154,7 +154,7 @@ const tooltipDirective = (app: any) => {
 			: defaultContainerStyle;
 		tooltipContentWrapper.classList.add(...containerClasses);
 
-		const defaultArrowStyle = ["w-3", "h-3", "bg-white", "border-inherit"];
+		const defaultArrowStyle = ["w-3", "h-3", "bg-color-bg", "border-inherit"];
 
 		const arrowClasses = properties.arrowClasses
 			? properties.arrowClasses.concat(defaultArrowStyle)

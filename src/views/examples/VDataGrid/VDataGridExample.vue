@@ -2,11 +2,17 @@
 	<ComponentExampleTemplate title="VDataGrid" component-name="VDataGrid">
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" example="">
+				<VButton :on-click="() => (filterOdd = !filterOdd)">Filter odd</VButton>
+				<VNumericField
+					id="jump-to"
+					@update:model-value="(value: number) => table!.scrollTo(value)"
+				/>
 				<VDataGrid
 					:columns="columns"
-					:rows="rows"
+					:rows="filteredRows"
 					default-sort-direction="desc"
 					default-sort-key="col1"
+					ref="table"
 				>
 				</VDataGrid>
 			</ComponentExampleBlockTemplate>
@@ -16,12 +22,21 @@
 
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
-import { VDataColumn, VDataRow } from "@/components/VDataGrid/VDataGridTypes";
+import {
+	VDataColumn,
+	VDataRow,
+	VDataType,
+} from "@/components/VDataGrid/VDataGridTypes";
+import VNumericField from "@/components/VNumericField/VNumericField.vue";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
-import { VDataType } from "../../../components/VDataGrid/VDataGridTypes";
+import { computed, ref } from "vue";
+import VButton from "../../../components/VButton/index";
 
-const columnsAmount = 17;
+const table = ref<InstanceType<typeof VDataGrid> | null>(null);
+const filterOdd = ref(false);
+
+const columnsAmount = 20;
 const values = Array.from(Array(8)).map((_, i) => ({
 	id: "user" + i,
 	name: "user" + Math.floor(Math.random() * Date.now()).toString(36),
@@ -58,7 +73,10 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 			: undefined,
 	locked: i === 0 || i === 1,
 	type: getType(i),
-	editable: Math.round(Math.random() * 10) >= 4 || i === columnsAmount - 8,
+	editable:
+		Math.round(Math.random() * 10) >= 4 ||
+		i === columnsAmount - 8 ||
+		i % columnsAmount === columnsAmount - 6,
 	editor:
 		i === columnsAmount - 8
 			? {
@@ -68,7 +86,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 			: undefined,
 }));
 
-const rows = Array.from(Array(30)).map((_, i) => {
+const rows = Array.from(Array(1000)).map((_, i) => {
 	let row: VDataRow = {
 		id: "row-" + i,
 	};
@@ -86,5 +104,13 @@ const rows = Array.from(Array(30)).map((_, i) => {
 	});
 
 	return row;
+});
+
+const filteredRows = computed(() => {
+	const filter = rows.filter((_row: VDataRow, index: number) =>
+		filterOdd.value ? index % 2 === 0 : true
+	);
+	console.log(filter.length);
+	return filter;
 });
 </script>
