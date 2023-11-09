@@ -1,11 +1,20 @@
 <template>
-	<input
-		type="text"
-		v-model="model"
-		:class="elementClass"
-		:id="id"
-		ref="input"
-	/>
+	<div class="relative outline-inherit">
+		<input
+			v-model="model"
+			class="w-full"
+			:class="elementClass"
+			:type="fieldType"
+			:id="id"
+			ref="input"
+		/>
+		<font-awesome-icon
+			:icon="icon"
+			class="cursor-pointer absolute right-0 m-2 h-5 w-5 text-color-text/50 hover:text-color-text"
+			@click="showPassword = !showPassword"
+			v-if="isPassword"
+		/>
+	</div>
 </template>
 
 <script lang="ts" setup>
@@ -18,6 +27,7 @@ const props = defineProps<{
 	modelValue: any;
 	customClass?: string;
 	autoFocus?: boolean;
+	isPassword?: boolean;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
@@ -28,6 +38,14 @@ const input = ref<HTMLElement | null>(null);
 
 const elementClass = computed(() =>
 	props.customClass ? props.customClass : inputBaseClass
+);
+
+const showPassword = ref(false);
+
+const icon = computed(() => (showPassword.value ? "fa-eye" : "fa-eye-slash"));
+
+const fieldType = computed(() =>
+	!props.isPassword || showPassword.value ? "text" : "password"
 );
 
 onMounted(() => {

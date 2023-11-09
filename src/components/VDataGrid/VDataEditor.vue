@@ -13,7 +13,7 @@
 		class="w-full px-2"
 		:id="id"
 	/>
-	<VDropdown
+	<VSelect
 		v-model="model"
 		:values="values!"
 		:formatter="formatter"
@@ -21,7 +21,7 @@
 		class="w-full"
 		auto-focus
 		@update:model-value="(newValue) => (model = newValue)"
-		v-else-if="isDropdown"
+		v-else-if="isSelect"
 	>
 		<template v-slot="{ selection }">
 			<VLabel
@@ -29,7 +29,7 @@
 				>{{ selection }}</VLabel
 			>
 		</template>
-	</VDropdown>
+	</VSelect>
 	<VTextField
 		v-model="model"
 		v-else
@@ -42,18 +42,23 @@
 <script setup lang="ts">
 import VLabel from "@/components/VLabel/index";
 import VTextField from "@/components/VTextField/VTextField.vue";
+import { VDataType } from "@/enums";
 import { useVModel } from "@vueuse/core";
 import VCheckBox from "../VCheckBox/index";
-import VDropdown from "../VDropdown/index";
-import { VDataType } from "./VDataGridTypes";
+import VSelect from "../VSelect/index";
 
-const props = defineProps<{
-	id: string;
-	type?: VDataType;
-	values?: any[];
-	modelValue: any;
-	formatter?: Function;
-}>();
+const props = withDefaults(
+	defineProps<{
+		id: string;
+		type?: VDataType;
+		values?: any[];
+		modelValue: any;
+		formatter?: Function;
+	}>(),
+	{
+		formatter: (value: any) => value,
+	}
+);
 
 const emit = defineEmits(["update:modelValue"]);
 
@@ -63,6 +68,6 @@ const isBoolean =
 	props.type !== undefined && (props.type as VDataType) === VDataType.BOOLEAN;
 const isDate =
 	props.type !== undefined && (props.type as VDataType) === VDataType.DATE;
-const isDropdown =
-	props.type !== undefined && (props.type as VDataType) === VDataType.DROPDOWN;
+const isSelect =
+	props.type !== undefined && (props.type as VDataType) === VDataType.SELECT;
 </script>

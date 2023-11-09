@@ -1,5 +1,5 @@
 <template>
-	<component :is="component">
+	<component :is="component" class="text-inherit">
 		<slot></slot>
 	</component>
 </template>

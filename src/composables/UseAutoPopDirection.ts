@@ -1,8 +1,19 @@
-// Generic hook for detecting resize:
+export enum PopAlignment {
+	LEFT = "LEFT",
+	RIGHT = "RIGHT",
+}
+
+export type AutoPopOptions = {
+	align?: PopAlignment;
+};
+
+const SAFE_MARGIN = 8;
+
 export const useAutoPopDirection = (
 	container: HTMLElement,
 	target: HTMLElement,
-	arrow?: HTMLElement
+	arrow?: HTMLElement,
+	options?: AutoPopOptions
 ) => {
 	function calculatePosition() {
 		const containerRect = container.getBoundingClientRect();
@@ -13,26 +24,39 @@ export const useAutoPopDirection = (
 		const targetWidth = targetRect.width;
 		const targetHeight = targetRect.height;
 
+		let overflowX = 0;
+		// let overflowY = 0;
+
 		let adjustedPositionX =
 			containerRect.left + (containerWidth - targetWidth) * 0.5;
 		let adjustedPositionY = containerRect.top + containerHeight;
 
-		// check if overflowing on the right side
+		if (options) {
+			if (options.align && options.align === PopAlignment.LEFT) {
+				adjustedPositionX = containerRect.left;
+			} else if (options.align && options.align === PopAlignment.RIGHT) {
+				adjustedPositionX = containerRect.right - targetWidth;
+			}
+		}
 
-		const overflowsLeft = containerRect.left + adjustedPositionX < 0;
-		const overflowsRight = adjustedPositionX + targetWidth > window.innerWidth;
-		const overflowsTop = containerRect.top < 0;
+		// check if overflowing on the right side
+		const overflowsLeft = containerRect.left + adjustedPositionX <= SAFE_MARGIN;
+
+		const overflowsRight =
+			adjustedPositionX + targetWidth > window.innerWidth - SAFE_MARGIN;
+		const overflowsTop = containerRect.top + adjustedPositionY <= SAFE_MARGIN;
 		const overflowsBottom =
-			adjustedPositionY + targetHeight > window.innerHeight;
+			adjustedPositionY + targetHeight > window.innerHeight - SAFE_MARGIN;
 
 		if (overflowsRight) {
+			overflowX = containerRect.right + adjustedPositionX;
 			adjustedPositionX =
 				window.innerWidth -
 				targetWidth +
 				(containerRect.right - window.innerWidth);
 		} else if (overflowsLeft) {
-			adjustedPositionX =
-				window.innerWidth - (targetWidth + containerRect.right);
+			overflowX = adjustedPositionX - containerRect.left;
+			adjustedPositionX = containerRect.left;
 		}
 
 		if (overflowsTop) {
@@ -46,20 +70,16 @@ export const useAutoPopDirection = (
 		target.style.top = adjustedPositionY + "px";
 
 		if (arrow) {
-			arrow.style.left = containerRect.left + containerWidth * 0.5 + "px";
+			arrow.style.left = overflowX + targetWidth * 0.5 + "px";
 
 			if (overflowsBottom) {
 				arrow.classList.replace("border-t", "border-b");
 				arrow.classList.replace("border-l", "border-r");
-				arrow.classList.replace("mt-0", "-mt-1.5");
-				target.classList.replace("mt-1.5", "mb-1.5");
-				arrow.style.top = containerRect.top + "px";
+				arrow.classList.replace("-top-0.5", "-bottom-0.5");
 			} else {
 				arrow.classList.replace("border-b", "border-t");
 				arrow.classList.replace("border-r", "border-l");
-				arrow.classList.replace("-mt-1.5", "mt-0");
-				target.classList.replace("mb-1.5", "mt-1.5");
-				arrow.style.top = containerRect.top + containerHeight + "px";
+				arrow.classList.replace("-bottom-0.5", "-top-0.5");
 			}
 		}
 	}

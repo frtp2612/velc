@@ -8,9 +8,7 @@
 			ref="window"
 		>
 			<slot name="header"></slot>
-			<slot
-				><component :is="rawComponent" v-if="contentComponent"></component
-			></slot>
+			<slot><component :is="rawComponent" v-if="contentComponent" /></slot>
 			<slot name="footer"></slot>
 		</div>
 	</div>

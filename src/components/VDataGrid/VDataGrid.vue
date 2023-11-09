@@ -26,6 +26,8 @@
 							v-for="(column, index) in columns"
 							:data="column"
 							:index="index"
+							:formatter="columnFormatter || textFormatter"
+							:translator="translator || i18n"
 							class="px-3 leading-[32px]"
 						/>
 					</div>
@@ -48,18 +50,44 @@
 
 <script lang="ts" setup>
 import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
+import {
+	ExplicitTranslationValue,
+	KeyTranslationValue,
+	RawTranslationValue,
+	TranslationType,
+	VDataColumn,
+	VDataGridEmits,
+	VDataRow,
+} from "@/enums";
+import { textFormatter } from "@/formatters/index";
 import { computed, onMounted, provide, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import VDataGridColumn from "./VDataGridColumn.vue";
 import VDataGridRow from "./VDataGridRow.vue";
 import VDataGridState from "./VDataGridState";
-import { VDataColumn, VDataGridEmits, VDataRow } from "./VDataGridTypes";
 
-const props = defineProps<{
-	columns: Array<VDataColumn>;
-	rows: Array<VDataRow>;
-	defaultSortKey?: string;
-	defaultSortDirection?: string;
-}>();
+const i18n = useI18n();
+
+const props = withDefaults(
+	defineProps<{
+		columns: Array<VDataColumn>;
+		rows: Array<VDataRow>;
+		defaultSortKey?: string;
+		defaultSortDirection?: string;
+		columnFormatter?: (
+			value: {
+				type: TranslationType;
+				value:
+					| ExplicitTranslationValue
+					| KeyTranslationValue
+					| RawTranslationValue;
+			},
+			translator: any
+		) => string;
+		translator?: any;
+	}>(),
+	{}
+);
 
 const emit = defineEmits<VDataGridEmits>();
 
@@ -86,7 +114,6 @@ provide("state", state);
 defineExpose({
 	rows: data,
 	scrollTo: (value: number) => {
-		console.log("Scrolling to", value);
 		content.value?.scrollToIndex(value);
 	},
 });
@@ -97,10 +124,12 @@ onMounted(() => {
 		columnsContainer.value !== null &&
 		content.value !== null
 	) {
-		state.init(
-			tableContainer.value,
-			columnsContainer.value,
-			content.value.container!
+		requestAnimationFrame(() =>
+			state.init(
+				tableContainer.value!,
+				columnsContainer.value!,
+				content.value!.container!
+			)
 		);
 	}
 });

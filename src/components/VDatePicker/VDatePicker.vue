@@ -7,57 +7,59 @@
 			>
 				<font-awesome-icon
 					icon="fa-calendar-days"
-					class="w-5 aspect-square absolute top-0 left-0 p-1 bg-color-bg-50 border-r border-inherit rounded-l text-color-text-400 group-hover:text-color-text"
+					class="z-10 w-5 aspect-square absolute top-0 left-0 p-1 bg-color-bg-50 border-r border-inherit rounded-l text-color-text-400 group-hover:text-color-text"
 				/>
 				<VTextField
 					id="date-picker"
 					v-model="formattedDate"
-					class="pl-9 outline-inherit"
+					:custom-class="inputBaseClass + ' pl-9 outline-inherit'"
 				/>
 			</div>
 		</template>
 		<template #content>
-			<div class="flex gap-2">
-				<font-awesome-icon
-					icon="fa-angle-left"
-					class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
-					@click="onChangeMonthClick(-1)"
-				/><VLabel class="grow self-center pointer-events-none select-none">{{
-					header
-				}}</VLabel
-				><font-awesome-icon
-					icon="fa-angle-right"
-					class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
-					@click="onChangeMonthClick(1)"
-				/>
-			</div>
-			<div
-				class="grid gap-1 bg-color-bg-50 rounded-md py-1"
-				:style="{ gridTemplateColumns: calendarGrid }"
-			>
-				<div v-for="day in days">
-					<span class="aspect-square w-10 p-1 text-color-text">{{
-						day.slice(0, 2)
-					}}</span>
+			<div class="flex flex-col gap-2">
+				<div class="flex gap-2">
+					<font-awesome-icon
+						icon="fa-angle-left"
+						class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
+						@click="onChangeMonthClick(-1)"
+					/><VLabel class="grow self-center pointer-events-none select-none">{{
+						header
+					}}</VLabel
+					><font-awesome-icon
+						icon="fa-angle-right"
+						class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
+						@click="onChangeMonthClick(1)"
+					/>
 				</div>
-			</div>
-			<div>
 				<div
-					ref="calendarDays"
-					class="grid gap-1"
+					class="grid gap-1 bg-color-bg-50 rounded-md py-1"
 					:style="{ gridTemplateColumns: calendarGrid }"
 				>
+					<div v-for="day in days">
+						<span class="aspect-square w-10 p-1 text-color-text">{{
+							day.slice(0, 2)
+						}}</span>
+					</div>
+				</div>
+				<div>
 					<div
-						v-for="dayData in monthData"
-						class="flex flex-col aspect-square w-10 p-1 rounded-md border justify-center relative"
-						:class="[cellClass(dayData)]"
-						@click="changeDate(dayData)"
+						ref="calendarDays"
+						class="grid gap-1"
+						:style="{ gridTemplateColumns: calendarGrid }"
 					>
-						<span class="pointer-events-none">{{ dayData.date }}</span>
 						<div
-							class="absolute bottom-0 mb-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-color-accent rounded-full"
-							v-if="dayData.isToday"
-						></div>
+							v-for="dayData in monthData"
+							class="flex flex-col aspect-square w-10 p-1 rounded-md border justify-center relative"
+							:class="[cellClass(dayData)]"
+							@click="changeDate(dayData)"
+						>
+							<span class="pointer-events-none">{{ dayData.date }}</span>
+							<div
+								class="absolute bottom-0 mb-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-color-accent rounded-full"
+								v-if="dayData.isToday"
+							></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -69,6 +71,7 @@
 import VLabel from "@/components/VLabel/index";
 import VPopover from "@/components/VPopover/VPopover.vue";
 import VTextField from "@/components/VTextField/VTextField.vue";
+import { inputBaseClass } from "@/constants";
 import { useVModel } from "@vueuse/core";
 import { RendererElement, computed, ref } from "vue";
 

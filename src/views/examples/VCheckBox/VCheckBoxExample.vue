@@ -1,6 +1,5 @@
 <template>
-    <VCheckBox>
-    </VCheckBox>
+	<VCheckBox id="checkbox"> </VCheckBox>
 </template>
 
 <script lang="ts" setup>

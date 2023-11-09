@@ -1,12 +1,5 @@
 import type { Directive } from "vue";
-
-export enum TooltipDirection {
-	TOP = "top",
-	BOTTOM = "bottom",
-	LEFT = "left",
-	RIGHT = "right",
-	ADAPTIVE = "adaptive",
-}
+import { useAutoPopDirection } from "../composables/UseAutoPopDirection";
 
 type Tooltip = {
 	text: string;
@@ -14,116 +7,85 @@ type Tooltip = {
 	boxClasses?: string[];
 };
 
-type TooltipDirective = {
+type TooltipDirectiveType = {
 	value: Tooltip;
-	arg: string;
-};
-
-type TooltipElements = {
-	tooltipShell: HTMLElement;
-	tooltipElement: HTMLElement;
-	tooltipArrow: HTMLElement;
-	tooltipContent: HTMLElement;
 };
 
 const tooltipDirective = (app: any) => {
 	app.directive("tooltip", <Directive<HTMLElement, Tooltip>>{
-		mounted(el: HTMLElement, { value, arg }: TooltipDirective) {
-			init(el, value, arg);
+		mounted(el: HTMLElement, { value }: TooltipDirectiveType) {
+			init(el, value);
 		},
-		unmounted(el: HTMLElement, { arg }: TooltipDirective) {
-			const tooltipElements = getTooltipElements(el);
+		unmounted(el: HTMLElement) {
+			const tooltipElement = getTooltipElement(el);
 
-			el.removeEventListener("mouseenter", () =>
-				tooltipElements ? showTooltip(tooltipElements, arg) : {}
-			);
-			el.removeEventListener("mouseleave", () =>
-				tooltipElements ? hideTooltip(tooltipElements.tooltipElement) : {}
-			);
+			if (tooltipElement !== null) {
+				el.removeEventListener("mouseenter", () =>
+					showTooltip(el, tooltipElement)
+				);
+				el.removeEventListener("mouseleave", () =>
+					hideTooltip(el, tooltipElement)
+				);
+
+				hideTooltip(el, tooltipElement);
+			}
 		},
-		updated(el: HTMLElement, { value }: TooltipDirective) {
-			const tooltipElements = getTooltipElements(el);
+		updated(el: HTMLElement, { value }: TooltipDirectiveType) {
+			const tooltipContent = getTooltipElement(el);
 
-			if (tooltipElements) {
-				updateTooltip(tooltipElements.tooltipContent, value.text);
+			if (tooltipContent !== null) {
+				updateTooltip(tooltipContent, value.text);
 			}
 		},
 	});
 
-	function getTooltipElements(el: HTMLElement): TooltipElements | undefined {
-		let tooltipShell: HTMLElement | null = el.parentElement;
-		let tooltipElement: HTMLElement | null = null;
-		let tooltipArrow: HTMLElement | null = null;
-		let tooltipContent: HTMLElement | null = null;
-
-		if (tooltipShell !== null) {
-			tooltipElement = tooltipShell.querySelector("[data-tooltip]");
-
-			if (tooltipElement !== null) {
-				tooltipArrow = tooltipElement.querySelector("[data-tooltip-arrow]");
-				tooltipContent = tooltipElement.querySelector("[data-tooltip-content]");
-			}
+	function getTooltipElement(el: HTMLElement): HTMLElement | null {
+		const tooltipElement = el.querySelector("[data-tooltip]");
+		if (tooltipElement) {
+			return tooltipElement.querySelector("[data-tooltip-content]");
 		}
-
-		if (
-			tooltipShell !== null &&
-			tooltipArrow !== null &&
-			tooltipElement !== null &&
-			tooltipContent !== null
-		) {
-			return { tooltipShell, tooltipElement, tooltipArrow, tooltipContent };
-		}
-		return undefined;
+		return null;
 	}
 
-	function init(el: HTMLElement, properties: Tooltip, direction: string) {
+	function init(el: HTMLElement, properties: Tooltip) {
 		// create the tooltip
-		const tooltipElements = createTooltip(el, properties, direction);
+		const tooltipElement = createTooltip(el, properties);
+		el.classList.remove("relative");
 
-		el.addEventListener("mouseenter", () =>
-			showTooltip(tooltipElements, direction)
+		el.addEventListener("mouseenter", () => showTooltip(el, tooltipElement));
+
+		el.addEventListener("mouseleave", () => hideTooltip(el, tooltipElement));
+	}
+
+	function showTooltip(target: HTMLElement, tooltipElement: HTMLElement) {
+		// target.appendChild(tooltipElement);
+		tooltipElement.classList.remove("hidden");
+
+		const tooltipArrow: HTMLElement | null = tooltipElement.querySelector(
+			"[data-tooltip-arrow]"
 		);
-
-		el.addEventListener("mouseleave", () =>
-			hideTooltip(tooltipElements.tooltipElement)
+		useAutoPopDirection(
+			target,
+			tooltipElement,
+			tooltipArrow !== null ? tooltipArrow : undefined
 		);
 	}
 
-	function showTooltip(tooltipElements: TooltipElements, direction: string) {
-		tooltipElements.tooltipElement.classList.remove("hidden");
-
-		calculateTooltipPosition(
-			tooltipElements.tooltipShell,
-			tooltipElements.tooltipElement,
-			tooltipElements.tooltipArrow,
-			direction
-		);
-	}
-
-	function hideTooltip(tooltipElement: HTMLElement) {
+	function hideTooltip(_el: HTMLElement, tooltipElement: HTMLElement) {
 		tooltipElement.classList.add("hidden");
+		// el.removeChild(tooltipElement);
 	}
 
 	function updateTooltip(tooltipContent: HTMLElement, newText: string) {
 		tooltipContent.innerHTML = newText;
 	}
 
-	function createTooltip(
-		element: HTMLElement,
-		properties: Tooltip,
-		direction: string
-	): TooltipElements {
-		// outer shell of tooltip and actual component
-		const tooltipShell = document.createElement("div");
-
+	function createTooltip(el: HTMLElement, properties: Tooltip): HTMLElement {
 		// effective tooltip
 		const tooltipElement = document.createElement("div");
-		tooltipElement.setAttribute("data-tooltip", "");
+		el.setAttribute("data-tooltip", properties.text);
 
-		// wrapper of the arrow and content divs
-		const tooltipContentWrapper = document.createElement("div");
-
-		// arrow to point the tooltip parent
+		// arrow to point the tooltip target
 		const tooltipArrow = document.createElement("div");
 		tooltipArrow.setAttribute("data-tooltip-arrow", "");
 
@@ -131,160 +93,68 @@ const tooltipDirective = (app: any) => {
 		const tooltipContent = document.createElement("div");
 		tooltipContent.setAttribute("data-tooltip-content", "");
 
-		tooltipShell.classList.add("relative");
-		tooltipElement.classList.add(
-			"p-2",
+		const tooltipStyle = [
 			"absolute",
-			"w-max",
+			"p-1",
 			"z-[999]",
-			"hidden"
-		);
-		const defaultContainerStyle = [
-			"border",
-			"border-slate-300",
-			"bg-white",
-			"px-2",
-			"py-1",
-			"rounded-lg",
-			"shadow-slate-500/10",
-			"shadow-md",
+			"after:content-[data-tooltip]",
+			"after:absolute",
+			"after:px-2",
+			"after:py-1",
+			"after:shadow-md",
+			"after:shadow-color-bg-100",
+			"after:bg-color-bg",
+			"after:border",
+			"after:border-color-border-100",
+			"after:rounded-lg",
+			"after:w-max",
+			"after:max-w-max",
+			"after:text-center",
+			"after:font-normal",
+			"after:text-color-text",
 		];
-		const containerClasses = properties.boxClasses
-			? properties.boxClasses.concat(defaultContainerStyle)
-			: defaultContainerStyle;
-		tooltipContentWrapper.classList.add(...containerClasses);
+		tooltipElement.classList.add(...tooltipStyle);
 
-		const defaultArrowStyle = ["w-3", "h-3", "bg-color-bg", "border-inherit"];
+		const defaultArrowStyle = [
+			"w-3",
+			"h-3",
+			"bg-color-bg",
+			"border-color-border-100",
+			"-top-0.5",
+			"bg-color-bg",
+			"-mx-1.5",
+			"z-30",
+			"border-t",
+			"border-l",
+		];
 
 		const arrowClasses = properties.arrowClasses
 			? properties.arrowClasses.concat(defaultArrowStyle)
 			: defaultArrowStyle;
 		tooltipArrow.classList.add(...arrowClasses, "absolute", "rotate-45");
 
-		wrap(element, tooltipShell);
-
+		const defaultContentStyle = [
+			"after:px-2",
+			"after:py-1",
+			"after:shadow-md",
+			"after:shadow-color-bg-100",
+			"after:bg-color-bg",
+			"after:border",
+			"after:border-color-border-100",
+			"after:rounded-lg",
+			"after:w-max",
+			"after:max-w-max",
+			"after:text-center",
+			"after:font-normal",
+			"after:text-color-text",
+		];
+		tooltipContent.classList.add(...defaultContentStyle);
 		tooltipContent.innerHTML = properties.text;
 
-		tooltipContentWrapper.appendChild(tooltipArrow);
-		tooltipContentWrapper.appendChild(tooltipContent);
+		tooltipElement.appendChild(tooltipArrow);
+		tooltipElement.appendChild(tooltipContent);
 
-		tooltipElement.appendChild(tooltipContentWrapper);
-
-		tooltipShell.appendChild(tooltipElement);
-
-		requestAnimationFrame(() => {
-			calculateArrowMargins(tooltipArrow, direction);
-			calculateTooltipPosition(
-				tooltipShell,
-				tooltipElement,
-				tooltipArrow,
-				direction
-			);
-		});
-
-		return { tooltipShell, tooltipElement, tooltipArrow, tooltipContent };
-	}
-
-	const wrap = function (
-		toWrap: HTMLElement,
-		wrapper: HTMLElement | undefined = undefined
-	) {
-		wrapper = wrapper || document.createElement("div");
-		toWrap.parentNode!.insertBefore(wrapper, toWrap);
-		return wrapper.appendChild(toWrap);
-	};
-
-	function calculateArrowMargins(arrowElement: HTMLElement, direction: string) {
-		switch (direction) {
-			case TooltipDirection.TOP:
-				arrowElement.classList.add(
-					"top-full",
-					"left-0",
-					"border-r",
-					"border-b",
-					"border-l-transparent",
-					"-translate-y-full",
-					"-my-[2px]"
-				);
-				break;
-			default:
-				arrowElement.classList.add(
-					"top-0",
-					"left-0",
-					"border-l",
-					"border-t",
-					"my-[2px]"
-				);
-				break;
-		}
-	}
-
-	function calculateTooltipPosition(
-		elementShell: HTMLElement,
-		tooltipElement: HTMLElement,
-		arrowElement: HTMLElement,
-		direction: string
-	) {
-		switch (direction) {
-			case TooltipDirection.TOP:
-				tooltipElement.classList.add("bottom-full");
-				break;
-			default:
-				tooltipElement.classList.add("top-full");
-				break;
-		}
-
-		const elementRect = elementShell.getBoundingClientRect();
-		const elementLeftOffset = elementShell.offsetLeft;
-		const elementWidth = elementRect.width;
-
-		// console.log("ELEMENT WIDTH ", elementWidth);
-
-		const contentRect = tooltipElement.getBoundingClientRect();
-
-		const contentWidth = contentRect.width;
-		// console.log("content width: ", contentWidth);
-		// const contentHeight = contentRect.height;
-
-		let tooltipAdjustedPosition = (elementWidth - contentWidth) * 0.5;
-
-		// check if overflowing on the right side
-		if (
-			elementLeftOffset + tooltipAdjustedPosition + contentWidth >
-			window.innerWidth
-		) {
-			tooltipAdjustedPosition -=
-				elementLeftOffset +
-				tooltipAdjustedPosition +
-				contentWidth -
-				window.innerWidth;
-		}
-
-		// check if overflowing on the left side
-		if (elementLeftOffset + tooltipAdjustedPosition < 0) {
-			// console.log("content overflowing to the left");
-			tooltipAdjustedPosition -= tooltipAdjustedPosition + elementLeftOffset;
-		}
-
-		// console.log(tooltipAdjustedPosition);
-		calculateTooltipArrowPosition(
-			arrowElement,
-			elementWidth * 0.5,
-			-tooltipAdjustedPosition
-		);
-
-		tooltipElement.style.left = tooltipAdjustedPosition + "px";
-	}
-
-	function calculateTooltipArrowPosition(
-		arrowElement: HTMLElement,
-		elementHalfWidth: number,
-		leftOffset: number
-	) {
-		if (arrowElement) {
-			arrowElement.style.left =
-				leftOffset + elementHalfWidth - arrowElement.clientWidth * 0.5 + "px";
-		}
+		return tooltipElement;
 	}
 };
 

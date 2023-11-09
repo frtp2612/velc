@@ -2,12 +2,14 @@
 	<div
 		class="grid grid-cols-[1fr,_4fr] h-full w-full items-start divide-x divide-color-border-100"
 	>
-		<div class="min-h-0 h-full overflow-auto">
+		<div class="min-h-0 h-full overflow-auto px-2">
 			<ul class="flex flex-col gap-1">
 				<router-link
 					v-for="route in routes"
 					:to="route.path"
-					class="h-full w-full px-4 py-2"
+					class="h-full w-10 px-4 py-2 bg-blue-500"
+					v-tooltip="{ text: route.path }"
+					:key="route.path"
 				>
 					{{ route.name }}
 				</router-link>

@@ -2,19 +2,24 @@
 	<ComponentExampleTemplate title="VDataGrid" component-name="VDataGrid">
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" example="">
-				<VButton :on-click="() => (filterOdd = !filterOdd)">Filter odd</VButton>
-				<VNumericField
-					id="jump-to"
-					@update:model-value="(value: number) => table!.scrollTo(value)"
-				/>
-				<VDataGrid
-					:columns="columns"
-					:rows="filteredRows"
-					default-sort-direction="desc"
-					default-sort-key="col1"
-					ref="table"
-				>
-				</VDataGrid>
+				<div class="flex flex-col min-w-0 h-full gap-2">
+					<VButton :on-click="() => (filterOdd = !filterOdd)"
+						>Filter odd</VButton
+					>
+					<VNumericField
+						id="jump-to"
+						@update:model-value="(value: number) => table!.scrollTo(value)"
+					/>
+					<VDataGrid
+						:columns="columns"
+						:rows="filteredRows"
+						:column-formatter="() => ''"
+						default-sort-direction="desc"
+						default-sort-key="col1"
+						ref="table"
+					>
+					</VDataGrid>
+				</div>
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>
@@ -22,16 +27,13 @@
 
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
-import {
-	VDataColumn,
-	VDataRow,
-	VDataType,
-} from "@/components/VDataGrid/VDataGridTypes";
 import VNumericField from "@/components/VNumericField/VNumericField.vue";
+import { VDataColumn, VDataRow, VDataType } from "@/enums";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
 import { computed, ref } from "vue";
 import VButton from "../../../components/VButton/index";
+import { TranslationType } from "../../../enums/index";
 
 const table = ref<InstanceType<typeof VDataGrid> | null>(null);
 const filterOdd = ref(false);
@@ -51,15 +53,18 @@ const getType = (index: number): VDataType | undefined => {
 	} else if (index % columnsAmount === columnsAmount - 6) {
 		return VDataType.EDITABLE_BOOLEAN;
 	} else if (index % columnsAmount === columnsAmount - 8) {
-		return VDataType.DROPDOWN;
+		return VDataType.SELECT;
 	}
 	return undefined;
 };
 
 const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 	id: "col" + i,
-	label: "col-" + i,
-	formatter:
+	label: {
+		type: TranslationType.RAW,
+		value: "col-" + i,
+	},
+	valueFormatter:
 		i === columnsAmount - 8
 			? (value: any) => value.name
 			: (value: any) => value,
@@ -67,7 +72,6 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 		Math.round(Math.random() * 10) >= 0
 			? {
 					min: 100,
-					max: 400,
 					initial: 200 - Math.round(Math.random() * 200),
 			  }
 			: undefined,
@@ -80,7 +84,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 	editor:
 		i === columnsAmount - 8
 			? {
-					type: VDataType.DROPDOWN,
+					type: VDataType.SELECT,
 					values: values,
 			  }
 			: undefined,
@@ -88,12 +92,12 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 
 const rows = Array.from(Array(1000)).map((_, i) => {
 	let row: VDataRow = {
-		id: "row-" + i,
+		id: i,
 	};
 
 	columns.forEach((column: VDataColumn) => {
-		if (column.type !== undefined) {
-			if (column.type === VDataType.DROPDOWN) {
+		if (column.dataType !== undefined) {
+			if (column.dataType === VDataType.SELECT) {
 				row[column.id] = values[Math.floor(Math.random() * values.length)];
 			} else {
 				row[column.id] = Math.round(Math.random()) === 0 ? true : false;

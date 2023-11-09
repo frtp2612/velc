@@ -67,6 +67,11 @@ const routes = [
 		component: () =>
 			import("@/views/examples/VDatePicker/VDatePickerExample.vue"),
 	},
+	{
+		path: "/VTree",
+		name: "VTree",
+		component: () => import("@/views/examples/VTree/VTreeExample.vue"),
+	},
 ];
 
 const router = createRouter({

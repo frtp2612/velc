@@ -20,6 +20,10 @@ import { VTextArea } from "./VTextArea";
 
 import { VDatePicker } from "./VDatePicker";
 
+import { VSelect } from "./VSelect";
+
+import { VTabbedView } from "./VTabbedView";
+
 export default {
 	VButton,
 	VDropdown,
@@ -32,4 +36,6 @@ export default {
 	VCheckBox,
 	VTextArea,
 	VDatePicker,
+	VSelect,
+	VTabbedView,
 };

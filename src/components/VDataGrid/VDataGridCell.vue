@@ -17,9 +17,9 @@
 			tabindex="-1"
 		/>
 		<VDataEditor
-			:type="column.type"
+			:type="column.dataType"
 			:values="column.editor?.values"
-			:formatter="column.formatter"
+			:formatter="column.valueFormatter"
 			:id="cellId"
 			v-model="data[column.id]"
 			v-else-if="editable && editingCell"
@@ -47,15 +47,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-	VDataColumn,
-	VDataGridStateType,
-	VDataRow,
-	VDataType,
-} from "@/components/VDataGrid/VDataGridTypes";
 import VLabel from "@/components/VLabel/VLabel.vue";
+import { VDataColumn, VDataGridStateType, VDataRow, VDataType } from "@/enums";
 import { onClickOutside } from "@vueuse/core";
 import { computed, inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import VCheckBox from "../VCheckBox/index";
 import VDataEditor from "./VDataEditor.vue";
 
@@ -66,6 +62,8 @@ const props = defineProps<{
 }>();
 
 const state: VDataGridStateType | undefined = inject("state");
+
+const { n, d } = useI18n();
 
 const {
 	lockedColumnsMap,
@@ -105,20 +103,35 @@ const editingCell = computed(
 );
 
 const isBoolean =
-	props.column.type !== undefined &&
-	(props.column.type as VDataType) === VDataType.BOOLEAN;
+	props.column.dataType !== undefined &&
+	(props.column.dataType as VDataType) === VDataType.BOOLEAN;
 const isEditableBoolean =
-	props.column.type !== undefined &&
-	(props.column.type as VDataType) === VDataType.EDITABLE_BOOLEAN;
+	props.column.dataType !== undefined &&
+	(props.column.dataType as VDataType) === VDataType.EDITABLE_BOOLEAN;
+
+const isNumber =
+	props.column.dataType !== undefined &&
+	(props.column.dataType as VDataType) === VDataType.NUMBER;
+
+const isDate =
+	props.column.dataType !== undefined &&
+	(props.column.dataType as VDataType) === VDataType.DATE;
 
 const formattedValue = computed(() => {
-	if (props.column.type !== undefined) {
-		if (isBoolean) return props.data[props.column.id] ? "fa-check" : undefined;
+	if (props.column.valueFormatter) {
+		return props.column.valueFormatter(props.data[props.column.id]);
 	}
 
-	return props.column.formatter
-		? props.column.formatter(props.data[props.column.id])
-		: props.data[props.column.id];
+	if (props.column.dataType !== undefined) {
+		if (isBoolean) return props.data[props.column.id] ? "fa-check" : undefined;
+		if (isNumber) return n(props.data[props.column.id]);
+		if (isDate)
+			return props.data[props.column.id] && props.data[props.column.id] !== null
+				? d(props.data[props.column.id])
+				: null;
+	}
+
+	return props.data[props.column.id];
 });
 
 function selectCell() {

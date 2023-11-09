@@ -11,10 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	VDataGridStateType,
-	VDataRow,
-} from "@/components/VDataGrid/VDataGridTypes";
+import { VDataGridStateType, VDataRow } from "@/enums";
 import { computed, inject } from "vue";
 import VDataGridCell from "./VDataGridCell.vue";
 

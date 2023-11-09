@@ -1,16 +1,16 @@
 <template>
 	<div ref="popover" class="inline-block">
-		<slot :events="{ toggle }"
-			><p @mouseenter="toggle" @mouseleave="toggle">Popover</p></slot
+		<slot :events="{ toggle, open, close }"
+			><p @mouseenter="open" @mouseleave="close">Popover</p></slot
 		>
-		<Teleport to="body">
-			<div v-show="open" ref="container">
+		<Teleport to="body" :disabled="!isOpen">
+			<div v-show="isOpen" ref="container" class="absolute p-1">
 				<div
-					class="w-3 h-3 absolute mt-0 top-0 left-0 bg-color-bg rotate-45 border-t border-l border-color-border-100 -mx-1.5 z-30"
+					class="w-3 h-3 absolute -top-0.5 bg-color-bg rotate-45 border-t border-l border-color-border-100 -mx-1.5 z-30"
 					ref="arrow"
 				></div>
 				<div
-					class="absolute z-20 mt-1.5 shadow-md shadow-color-bg-100 top-full flex flex-col gap-2 bg-color-bg border border-color-border-100 rounded-lg p-4 w-max max-w-max text-center"
+					class="z-20 p-4 shadow-md shadow-color-bg-100 bg-color-bg border border-color-border-100 rounded-lg w-max max-w-max text-center"
 					ref="content"
 				>
 					<slot name="content"><span>Default popover content</span></slot>
@@ -25,27 +25,37 @@ import { useAutoPopDirection } from "@/composables/UseAutoPopDirection";
 import { onClickOutside } from "@vueuse/core";
 import { ref } from "vue";
 
-const open = ref(false);
+const isOpen = ref(false);
 
 const popover = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
 const arrow = ref<HTMLElement | null>(null);
 const container = ref<HTMLElement | null>(null);
 
-onClickOutside(container, () => (open.value = false));
+onClickOutside(container, () => (isOpen.value = false));
+
+function open() {
+	isOpen.value = true;
+	if (
+		popover.value !== null &&
+		container.value !== null &&
+		arrow.value !== null
+	) {
+		requestAnimationFrame(() =>
+			useAutoPopDirection(popover.value!, container.value!, arrow.value!)
+		);
+	}
+}
+
+function close() {
+	isOpen.value = false;
+}
 
 function toggle() {
-	open.value = !open.value;
-	if (open.value) {
-		if (
-			popover.value !== null &&
-			content.value !== null &&
-			arrow.value !== null
-		) {
-			requestAnimationFrame(() =>
-				useAutoPopDirection(popover.value!, content.value!, arrow.value!)
-			);
-		}
+	if (isOpen.value) {
+		close();
+	} else {
+		open();
 	}
 }
 // TODO to improve customization, pass arrow styles as props

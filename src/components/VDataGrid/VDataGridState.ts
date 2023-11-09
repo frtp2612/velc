@@ -1,12 +1,12 @@
+import { useSorter } from "@/composables/UseSorter";
 import {
 	CalculatedElementSize,
 	VDataColumn,
 	VDataGridEmits,
 	VDataRow,
-} from "@/components/VDataGrid/VDataGridTypes";
-import { useSorter } from "@/composables/UseSorter";
+} from "@/enums";
 import { clamp, onKeyStroke, useElementSize } from "@vueuse/core";
-import { ComputedRef, computed, nextTick, ref, watch } from "vue";
+import { ComputedRef, computed, ref, watch } from "vue";
 
 type DataGridColumnData = {
 	id: string;
@@ -29,7 +29,7 @@ function VDataGridState(
 	const lockedColumnsMap = ref<Map<string, number>>(new Map<string, number>());
 	const initialized = ref(false);
 
-	const selectedRowId = ref<string>("");
+	const selectedRowId = ref<number>(0);
 	const selectedColumnId = ref<string>("");
 	const selectedCellId = ref<string>("");
 
@@ -65,9 +65,8 @@ function VDataGridState(
 		columnsContainerRef.value = columnsContainer;
 		contentContainerRef.value = contentContainer;
 
-		initializeColumnsData();
-
-		nextTick(() => {
+		requestAnimationFrame(() => {
+			initializeColumnsData();
 			refreshColumnsData();
 			initialized.value = true;
 		});
@@ -162,7 +161,7 @@ function VDataGridState(
 		}
 	}
 
-	function changeSelectedCell(rowId: string, columnId: string, cellId: string) {
+	function changeSelectedCell(rowId: number, columnId: string, cellId: string) {
 		selectedRowId.value = rowId;
 		selectedColumnId.value = columnId;
 		selectedCellId.value = cellId;
@@ -267,7 +266,7 @@ function VDataGridState(
 				(row: VDataRow) => row.id === selectedRowId.value
 			);
 			if (row) {
-				console.log("NEW VALUE", row[column.id]);
+				// console.log("NEW VALUE", row[column.id]);
 
 				emit("cellValueChanged", {
 					row,

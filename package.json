@@ -23,16 +23,36 @@
 		"./dist/icons.ts": {
 			"import": "./dist/icons.ts",
 			"require": "./dist/icons.ts"
+		},
+		"./dist/directives/index.ts": {
+			"import": "./dist/directives/index.ts",
+			"require": "./dist/directives/index.ts"
+		},
+		"./dist/composables/index.ts": {
+			"import": "./dist/composables/index.ts",
+			"require": "./dist/composables/index.ts"
+		},
+		"./dist/enums": {
+			"import": "./dist/enums.ts",
+			"require": "./dist/enums.ts"
+		},
+		"./dist/localization": {
+			"import": "./dist/localization.ts",
+			"require": "./dist/localization.ts"
 		}
 	},
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"dev": "vite",
-		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons",
+		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons && npm run build:directives && npm run build:composables && npm run build:enums && npm run build:localization",
 		"preview": "vite preview",
 		"build:lib": "vue-tsc && vite build --target lib --name velct-components src/index.ts",
 		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css",
-		"build:icons": "@powershell copy ./src/fontawesome/index.ts ./dist/icons.ts"
+		"build:icons": "@powershell copy ./src/fontawesome/index.ts ./dist/icons.ts",
+		"build:directives": "copyfiles --flat ./src/directives/*.ts ./dist/directives",
+		"build:composables": "copyfiles --flat ./src/composables/*.ts ./dist/composables",
+		"build:enums": "@powershell copy ./src/enums/index.ts ./dist/enums.ts",
+		"build:localization": "@powershell copy ./src/localization/index.ts ./dist/localization.ts"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -40,15 +60,16 @@
 		"@fortawesome/vue-fontawesome": "^3.0.3",
 		"@vueuse/core": "^10.5.0",
 		"path": "^0.12.7",
-		"vite-plugin-dts": "^3.6.0",
+		"vite-plugin-dts": "^3.6.3",
 		"vue": "^3.3.4",
-		"vue-router": "^4.2.5",
-		"vue-typed-virtual-list": "^1.0.10"
+		"vue-i18n": "^9.6.5",
+		"vue-router": "^4.2.5"
 	},
 	"devDependencies": {
-		"@types/node": "^20.8.6",
-		"@vitejs/plugin-vue": "^4.2.3",
+		"@types/node": "^20.9.0",
+		"@vitejs/plugin-vue": "^4.4.0",
 		"autoprefixer": "^10.4.16",
+		"copyfiles": "^2.4.1",
 		"postcss": "^8.4.31",
 		"postcss-cli": "^10.1.0",
 		"tailwindcss": "^3.3.3",
