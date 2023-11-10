@@ -22,7 +22,9 @@ import { VDatePicker } from "./VDatePicker";
 
 import { VSelect } from "./VSelect";
 
-import { VTabbedView } from "./VTabbedView";
+import { VTabbedView, VTabPanel } from "./VTabbedView";
+
+import { VTree } from "./VTree";
 
 export default {
 	VButton,
@@ -38,4 +40,6 @@ export default {
 	VDatePicker,
 	VSelect,
 	VTabbedView,
+	VTree,
+	VTabPanel,
 };

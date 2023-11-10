@@ -73,7 +73,7 @@ import VPopover from "@/components/VPopover/VPopover.vue";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { inputBaseClass } from "@/constants";
 import { useVModel } from "@vueuse/core";
-import { RendererElement, computed, ref } from "vue";
+import { computed, ref } from "vue";
 
 type DateDetails = {
 	index: number;
@@ -95,7 +95,6 @@ type DayDetails = {
 const props = withDefaults(
 	defineProps<{
 		modelValue?: Date;
-		appendTo?: string | RendererElement;
 		offsetDayIndices?: number;
 	}>(),
 	{
@@ -109,7 +108,7 @@ const date = useVModel(
 	props,
 	"modelValue",
 	emit,
-	props.modelValue
+	props.modelValue && props.modelValue !== null
 		? {}
 		: {
 				passive: true,
@@ -129,6 +128,8 @@ const normalizedSelectedDate = computed(
 			date.value!.getDate()
 		)
 );
+
+console.log(date.value instanceof Date);
 
 const year = ref(date.value!.getFullYear());
 const month = ref(date.value!.getMonth());

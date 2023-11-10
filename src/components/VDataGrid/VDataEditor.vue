@@ -6,13 +6,7 @@
 		:id="id"
 		auto-focus
 	/>
-	<input
-		type="date"
-		v-model="model"
-		v-else-if="isDate"
-		class="w-full px-2"
-		:id="id"
-	/>
+	<VDatePicker v-model="model" v-else-if="isDate" :id="id" />
 	<VSelect
 		v-model="model"
 		:values="values!"
@@ -40,12 +34,13 @@
 </template>
 
 <script setup lang="ts">
+import VCheckBox from "@/components/VCheckBox/index";
+import VDatePicker from "@/components/VDatePicker/index";
 import VLabel from "@/components/VLabel/index";
+import VSelect from "@/components/VSelect/index";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { VDataType } from "@/enums";
 import { useVModel } from "@vueuse/core";
-import VCheckBox from "../VCheckBox/index";
-import VSelect from "../VSelect/index";
 
 const props = withDefaults(
 	defineProps<{

@@ -98,6 +98,11 @@ export type VDataGridEmits = {
 		event: "cellValueChanged",
 		data: { row: VDataRow; column: VDataColumn; newValue: any }
 	): void;
+	(event: "rowDoubleClick", row: VDataRow): void;
+	(
+		event: "cellDoubleClick",
+		data: { row: VDataRow; column: VDataColumn }
+	): void;
 };
 
 export enum VButtonTypes {
@@ -107,3 +112,8 @@ export enum VButtonTypes {
 	SUCCESS = "success",
 	DANGER = "danger",
 }
+
+export type VTreeNodeType = {
+	id: string;
+	children?: VTreeNodeType[];
+};

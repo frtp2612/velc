@@ -4,7 +4,7 @@
 			><p @mouseenter="open" @mouseleave="close">Popover</p></slot
 		>
 		<Teleport to="body" :disabled="!isOpen">
-			<div v-show="isOpen" ref="container" class="absolute p-1">
+			<div v-show="isOpen" ref="container" class="absolute p-1 z-[9999]">
 				<div
 					class="w-3 h-3 absolute -top-0.5 bg-color-bg rotate-45 border-t border-l border-color-border-100 -mx-1.5 z-30"
 					ref="arrow"

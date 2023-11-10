@@ -13,7 +13,6 @@
 					<VDataGrid
 						:columns="columns"
 						:rows="filteredRows"
-						:column-formatter="() => ''"
 						default-sort-direction="desc"
 						default-sort-key="col1"
 						ref="table"
@@ -45,15 +44,16 @@ const values = Array.from(Array(8)).map((_, i) => ({
 }));
 
 const getType = (index: number): VDataType | undefined => {
-	if (
-		index % columnsAmount === columnsAmount - 2 ||
-		index % columnsAmount === columnsAmount - 1
-	) {
+	if (index === columnsAmount - 2 || index === columnsAmount - 1) {
 		return VDataType.BOOLEAN;
-	} else if (index % columnsAmount === columnsAmount - 6) {
+	} else if (index === columnsAmount - 6) {
 		return VDataType.EDITABLE_BOOLEAN;
-	} else if (index % columnsAmount === columnsAmount - 8) {
+	} else if (index === columnsAmount - 8) {
 		return VDataType.SELECT;
+	} else if (index === columnsAmount - 9) {
+		console.log("date");
+
+		return VDataType.DATE;
 	}
 	return undefined;
 };
@@ -80,17 +80,28 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 	editable:
 		Math.round(Math.random() * 10) >= 4 ||
 		i === columnsAmount - 8 ||
-		i % columnsAmount === columnsAmount - 6,
+		i === columnsAmount - 9 ||
+		i === columnsAmount - 6,
 	editor:
 		i === columnsAmount - 8
 			? {
 					type: VDataType.SELECT,
 					values: values,
 			  }
+			: i === columnsAmount - 9
+			? {
+					type: VDataType.DATE,
+			  }
+			: undefined,
+	dataType:
+		i === columnsAmount - 8
+			? VDataType.SELECT
+			: i === columnsAmount - 9
+			? VDataType.DATE
 			: undefined,
 }));
 
-const rows = Array.from(Array(1000)).map((_, i) => {
+const rows = Array.from(Array(10)).map((_, i) => {
 	let row: VDataRow = {
 		id: i,
 	};
@@ -99,6 +110,8 @@ const rows = Array.from(Array(1000)).map((_, i) => {
 		if (column.dataType !== undefined) {
 			if (column.dataType === VDataType.SELECT) {
 				row[column.id] = values[Math.floor(Math.random() * values.length)];
+			} else if (column.dataType === VDataType.DATE) {
+				row[column.id] = new Date();
 			} else {
 				row[column.id] = Math.round(Math.random()) === 0 ? true : false;
 			}
@@ -106,6 +119,7 @@ const rows = Array.from(Array(1000)).map((_, i) => {
 			row[column.id] = Math.floor(Math.random() * Date.now()).toString(36);
 		}
 	});
+	console.log(row);
 
 	return row;
 });
@@ -114,7 +128,6 @@ const filteredRows = computed(() => {
 	const filter = rows.filter((_row: VDataRow, index: number) =>
 		filterOdd.value ? index % 2 === 0 : true
 	);
-	console.log(filter.length);
 	return filter;
 });
 </script>

@@ -11,7 +11,7 @@
 		>
 			<font-awesome-icon
 				icon="fa-lock"
-				class="w-3 h-3 text-color-primary-600"
+				class="w-4 h-4 text-color-primary-600"
 				v-if="data.locked"
 			/>
 			<VLabel class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{
@@ -20,7 +20,7 @@
 			<div v-show="data.id === sortKey">
 				<font-awesome-icon
 					:icon="sortIcon"
-					class="w-3 h-3 text-color-primary-600"
+					class="w-4 h-4 text-color-primary-600"
 				/>
 			</div>
 		</div>
@@ -32,7 +32,7 @@
 		>
 			<font-awesome-icon
 				icon="fa-left-right"
-				class="absolute w-3 h-3 top-1/2 right-0 -translate-y-2 text-color-text-400 bg-color-bg-200 group-hover:bg-color-primary group-hover:text-color-text-50 p-1 rounded-l-full cursor-col-resize transition-all ease-in-out duration-150"
+				class="absolute w-4 h-4 top-1/2 right-0 -translate-y-2.5 text-color-text-400 bg-color-bg-200 group-hover:bg-color-primary group-hover:text-color-text-50 p-1 rounded-l-md cursor-col-resize transition-all ease-in-out duration-150"
 			/>
 
 			<div

@@ -1,10 +1,15 @@
 <template>
 	<div
-		class="flex flex-col border bg-color-bg border-color-border-200 min-h-0 min-w-0 h-full w-full overflow-auto"
+		class="flex flex-col p-2 gap-2 bg-color-bg min-h-0 min-w-0 h-full w-full rounded-lg overflow-hidden border border-color-border-100"
 	>
-		<div class="relative min-h-0 flex flex-col h-full" ref="tableContainer">
-			<!--GRID LEADING CONTENT-->
-
+		<!--GRID LEADING CONTENT-->
+		<div v-if="$slots.header">
+			<slot name="header" />
+		</div>
+		<div
+			class="relative min-h-0 flex flex-col h-full border border-color-border-200"
+			ref="tableContainer"
+		>
 			<!-- GRID CONTENT -->
 			<VirtualScroller
 				:item-height="34"
@@ -40,6 +45,7 @@
 						:style="{
 							gridTemplateColumns: columnsLayout || columnsGridLayout,
 						}"
+						@dblclick="emit('rowDoubleClick', item)"
 					/>
 				</template>
 			</VirtualScroller>

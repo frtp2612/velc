@@ -23,6 +23,6 @@ export { VLabel } from "./components/VLabel";
 export { VModalWindow } from "./components/VModalWindow";
 export { VPopover } from "./components/VPopover";
 export { VSelect } from "./components/VSelect";
-export { VTabbedView } from "./components/VTabbedView";
+export { VTabPanel, VTabbedView } from "./components/VTabbedView";
 export { VTextArea } from "./components/VTextArea";
 export { VTextField } from "./components/VTextField";

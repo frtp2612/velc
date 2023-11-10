@@ -6,7 +6,7 @@ import {
 	VDataRow,
 } from "@/enums";
 import { clamp, onKeyStroke, useElementSize } from "@vueuse/core";
-import { ComputedRef, computed, ref, watch } from "vue";
+import { ComputedRef, Ref, computed, ref, watch } from "vue";
 
 type DataGridColumnData = {
 	id: string;
@@ -16,7 +16,7 @@ type DataGridColumnData = {
 };
 
 function VDataGridState(
-	rows: ComputedRef<VDataRow[]>,
+	rows: ComputedRef<VDataRow[]> | Ref<VDataRow[]>,
 	columns: VDataColumn[],
 	defaultSortKey: string | undefined,
 	defaultSortDirection: string | undefined,
@@ -38,7 +38,11 @@ function VDataGridState(
 	// const { width, height } = useElementBounding(tableContainerRef);
 	const { width, height } = useElementSize(contentContainerRef);
 
-	const filteredRows = computed(() => rows.value);
+	const filteredRows = computed(() => {
+		console.log(rows.value);
+
+		return rows.value;
+	});
 
 	const { sortedData, sort, sortKey, sortOrder } = useSorter<VDataRow>(
 		filteredRows,
@@ -266,7 +270,7 @@ function VDataGridState(
 				(row: VDataRow) => row.id === selectedRowId.value
 			);
 			if (row) {
-				// console.log("NEW VALUE", row[column.id]);
+				console.log("NEW VALUE", row[column.id]);
 
 				emit("cellValueChanged", {
 					row,
@@ -300,7 +304,7 @@ function VDataGridState(
 		// computed properties
 		columnsLayout,
 
-		data: sortedData,
+		data: filteredRows,
 		sortKey,
 		sortOrder,
 

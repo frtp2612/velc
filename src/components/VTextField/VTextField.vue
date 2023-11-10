@@ -1,19 +1,24 @@
 <template>
 	<div class="relative outline-inherit">
-		<input
-			v-model="model"
-			class="w-full"
-			:class="elementClass"
-			:type="fieldType"
-			:id="id"
-			ref="input"
-		/>
-		<font-awesome-icon
-			:icon="icon"
-			class="cursor-pointer absolute right-0 m-2 h-5 w-5 text-color-text/50 hover:text-color-text"
-			@click="showPassword = !showPassword"
-			v-if="isPassword"
-		/>
+		<slot name="left" v-if="$slots.left" />
+		<slot>
+			<input
+				v-model="model"
+				class="w-full"
+				:class="elementClass"
+				:type="fieldType"
+				:id="id"
+				ref="input"
+			/>
+		</slot>
+		<slot name="right">
+			<font-awesome-icon
+				:icon="icon"
+				class="cursor-pointer absolute right-0 m-2 h-5 w-5 text-color-text/50 hover:text-color-text"
+				@click="showPassword = !showPassword"
+				v-if="isPassword"
+			/>
+		</slot>
 	</div>
 </template>
 

@@ -12,7 +12,7 @@
 		<Teleport to="body" :disabled="!appendTo">
 			<slot :items="filteredItems" name="item">
 				<div
-					class="absolute z-50 left-0 top-full border border-color-border-100 shadow-md shadow-color-bg-100 flex flex-col max-h-64 min-w-[16rem] w-max max-w-max bg-color-bg divide-y"
+					class="absolute z-[9999] left-0 top-full border border-color-border-100 shadow-md shadow-color-bg-100 flex flex-col max-h-64 min-w-[16rem] w-max max-w-max bg-color-bg divide-y"
 					v-show="open"
 					ref="dropdownPopup"
 				>
@@ -28,6 +28,7 @@
 									selectedItem &&
 									(selectedItem === item ||
 										(typeof selectedItem === 'object' &&
+											item !== null &&
 											selectedItem.id === item.id))
 										? 'bg-color-accent text-color-text-50 hover:text-color-text'
 										: '',

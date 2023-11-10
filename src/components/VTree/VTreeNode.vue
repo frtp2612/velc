@@ -14,12 +14,8 @@
 
 			<div
 				class="flex gap-2 cursor-pointer items-center rounded-lg px-4 py-1 h-10 grow"
-				:class="[
-					isActive
-						? 'bg-color-accent text-color-text-50'
-						: 'bg-color-bg-50 hover:bg-color-bg-100',
-				]"
-				@click="nodeSelected(item)"
+				:class="[nodeClass]"
+				@click="isSelectable ? nodeSelected(item) : toggleSubMenu()"
 			>
 				<span class="grow" :class="[isActive ? 'font-semibold' : '']">{{
 					formattedValue
@@ -33,6 +29,7 @@
 						:item="subItem"
 						:formatter="formatter"
 						:active-node="activeNode"
+						:only-leaves-selectable="onlyLeavesSelectable"
 						@onNodeSelected="nodeSelected"
 					/>
 				</li>
@@ -42,13 +39,14 @@
 </template>
 
 <script setup lang="ts">
+import { VTreeNodeType } from "@/enums";
 import { computed, ref } from "vue";
-import { VTreeNodeType } from "./VTreeNodeTypes";
 
 const props = defineProps<{
 	item: VTreeNodeType;
 	activeNode?: VTreeNodeType;
 	formatter: (value: VTreeNodeType) => string;
+	onlyLeavesSelectable: boolean;
 }>();
 
 const emit = defineEmits(["onNodeSelected"]);
@@ -65,6 +63,23 @@ function nodeSelected(node: VTreeNodeType) {
 const hasChildren = computed(
 	() => props.item.children && props.item.children.length > 0
 );
+
+const isSelectable = computed(
+	() => !hasChildren.value || (hasChildren.value && !props.onlyLeavesSelectable)
+);
+
+const nodeClass = computed(() => {
+	let finalClass = " ";
+	if (isActive.value) {
+		finalClass += "bg-color-accent text-color-text-50";
+	} else {
+		finalClass += isSelectable.value
+			? "bg-color-bg-50 hover:bg-color-bg-100"
+			: "text-color-text-700 hover:text-color-text";
+	}
+
+	return finalClass;
+});
 
 const formattedValue = computed(() => props.formatter(props.item));
 

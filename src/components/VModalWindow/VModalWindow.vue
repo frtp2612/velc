@@ -4,10 +4,14 @@
 		v-if="isOpen"
 	>
 		<div
-			class="border border-color-border-100 bg-color-bg p-4 rounded-lg"
+			class="border border-color-border-100 bg-color-bg p-4 rounded-lg flex flex-col"
 			ref="window"
 		>
-			<slot name="header"></slot>
+			<slot name="header">
+				<div class="p-4" v-if="title">
+					{{ title }}
+				</div>
+			</slot>
 			<slot><component :is="rawComponent" v-if="contentComponent" /></slot>
 			<slot name="footer"></slot>
 		</div>
@@ -15,17 +19,18 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from "@vueuse/core";
+// import { onClickOutside } from "@vueuse/core";
 import { markRaw, ref } from "vue";
 
 const props = defineProps<{
 	contentComponent?: Object;
+	title?: string;
 }>();
 
 const window = ref<HTMLElement | null>(null);
 const isOpen = ref(false);
 
-onClickOutside(window, () => (isOpen.value = false));
+// onClickOutside(window, () => (isOpen.value = false));
 
 defineExpose<{
 	open: () => void;

@@ -5,6 +5,7 @@
 			:formatter="formatter"
 			:activeNode="activeNode"
 			@onNodeSelected="onNodeSelected"
+			:onlyLeavesSelectable="onlyLeavesSelectable"
 			v-if="!hideRoot"
 		/>
 		<ul
@@ -18,6 +19,7 @@
 					:formatter="formatter"
 					:activeNode="activeNode"
 					@onNodeSelected="onNodeSelected"
+					:onlyLeavesSelectable="onlyLeavesSelectable"
 				/>
 			</li>
 		</ul>
@@ -25,16 +27,22 @@
 </template>
 
 <script setup lang="ts">
+import { VTreeNodeType } from "@/enums";
 import { useVModel } from "@vueuse/core";
 import VTreeNode from "./VTreeNode.vue";
-import { VTreeNodeType } from "./VTreeNodeTypes";
 
-const props = defineProps<{
-	root: VTreeNodeType;
-	modelValue?: VTreeNodeType;
-	formatter: (value: VTreeNodeType) => string;
-	hideRoot?: boolean;
-}>();
+const props = withDefaults(
+	defineProps<{
+		root: VTreeNodeType;
+		modelValue?: VTreeNodeType;
+		formatter: (value: VTreeNodeType) => string;
+		hideRoot?: boolean;
+		onlyLeavesSelectable?: boolean;
+	}>(),
+	{
+		onlyLeavesSelectable: false,
+	}
+);
 
 const emit = defineEmits(["nodeSelected", "update:modelValue"]);
 const activeNode = useVModel(

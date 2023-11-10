@@ -2,7 +2,7 @@
 	<ComponentExampleTemplate component-name="VTree">
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
-				<VTree :root="values" :formatter="formatter" />
+				<VTree :root="values" :formatter="formatter" only-leaves-selectable />
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>
