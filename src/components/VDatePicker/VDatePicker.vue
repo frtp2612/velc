@@ -3,16 +3,16 @@
 		<template v-slot="{ events }">
 			<div
 				@click="events.toggle()"
-				class="relative group border-color-border-200 hover:border-color-border-300 outline-color-border-200 hover:outline-color-border-300"
+				class="relative group border-color-border-50 hover:border-color-border-100"
 			>
 				<font-awesome-icon
 					icon="fa-calendar-days"
-					class="z-10 w-5 aspect-square absolute top-0 left-0 p-1 bg-color-bg-50 border-r border-inherit rounded-l text-color-text-400 group-hover:text-color-text"
+					class="z-10 w-5 aspect-square absolute top-[1px] left-[1px] p-2 rounded-l text-color-text-400 group-hover:text-color-text"
 				/>
 				<VTextField
 					id="date-picker"
 					v-model="formattedDate"
-					:custom-class="inputBaseClass + ' pl-9 outline-inherit'"
+					:custom-class="inputBaseClass + ' pl-10 w-full'"
 				/>
 			</div>
 		</template>
@@ -22,14 +22,14 @@
 					<font-awesome-icon
 						icon="fa-angle-left"
 						class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
-						@click="onChangeMonthClick(-1)"
+						@click.capture.stop="onChangeMonthClick(-1)"
 					/><VLabel class="grow self-center pointer-events-none select-none">{{
 						header
 					}}</VLabel
 					><font-awesome-icon
 						icon="fa-angle-right"
 						class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
-						@click="onChangeMonthClick(1)"
+						@click.capture.stop="onChangeMonthClick(1)"
 					/>
 				</div>
 				<div
@@ -52,7 +52,7 @@
 							v-for="dayData in monthData"
 							class="flex flex-col aspect-square w-10 p-1 rounded-md border justify-center relative"
 							:class="[cellClass(dayData)]"
-							@click="changeDate(dayData)"
+							@click.capture.stop="changeDate(dayData)"
 						>
 							<span class="pointer-events-none">{{ dayData.date }}</span>
 							<div
@@ -94,7 +94,7 @@ type DayDetails = {
 
 const props = withDefaults(
 	defineProps<{
-		modelValue?: Date;
+		modelValue?: Date | null;
 		offsetDayIndices?: number;
 	}>(),
 	{
@@ -128,8 +128,6 @@ const normalizedSelectedDate = computed(
 			date.value!.getDate()
 		)
 );
-
-console.log(date.value instanceof Date);
 
 const year = ref(date.value!.getFullYear());
 const month = ref(date.value!.getMonth());

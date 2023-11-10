@@ -6,7 +6,7 @@
 		:id="id"
 		auto-focus
 	/>
-	<VDatePicker v-model="model" v-else-if="isDate" :id="id" />
+	<VDatePicker v-model="model" v-else-if="isDate" :id="id" class="w-full" />
 	<VSelect
 		v-model="model"
 		:values="values!"
@@ -19,18 +19,14 @@
 	>
 		<template v-slot="{ selection }">
 			<VLabel
-				class="text-color-text w-full h-full outline outline-2 -outline-offset-1 outline-color-bg-300 hover:outline-color-bg-500 focus:outline-color-secondary-500 px-2 overflow-hidden overflow-ellipsis whitespace-nowrap"
+				class="input-like overflow-hidden overflow-ellipsis whitespace-nowrap w-full"
+				tabindex="-1"
 				>{{ selection }}</VLabel
 			>
 		</template>
 	</VSelect>
-	<VTextField
-		v-model="model"
-		v-else
-		custom-class="w-full h-full outline outline-2 -outline-offset-1 outline-color-bg-300 hover:outline-color-bg-500 focus:outline-color-secondary-500 px-2"
-		:id="id"
-		auto-focus
-	/>
+	<VNumericField :id="id" v-model="model" v-else-if="isNumber" class="w-full" />
+	<VTextField v-model="model" v-else :id="id" auto-focus class="w-full" />
 </template>
 
 <script setup lang="ts">
@@ -41,6 +37,7 @@ import VSelect from "@/components/VSelect/index";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { VDataType } from "@/enums";
 import { useVModel } from "@vueuse/core";
+import VNumericField from "../VNumericField/index";
 
 const props = withDefaults(
 	defineProps<{
@@ -65,4 +62,6 @@ const isDate =
 	props.type !== undefined && (props.type as VDataType) === VDataType.DATE;
 const isSelect =
 	props.type !== undefined && (props.type as VDataType) === VDataType.SELECT;
+const isNumber =
+	props.type !== undefined && (props.type as VDataType) === VDataType.NUMBER;
 </script>

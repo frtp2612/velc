@@ -26,6 +26,8 @@ import { VTabbedView, VTabPanel } from "./VTabbedView";
 
 import { VTree } from "./VTree";
 
+import { VNumericField } from "./VNumericField";
+
 export default {
 	VButton,
 	VDropdown,
@@ -42,4 +44,5 @@ export default {
 	VTabbedView,
 	VTree,
 	VTabPanel,
+	VNumericField,
 };

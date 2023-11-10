@@ -12,7 +12,7 @@
 		>
 			<!-- GRID CONTENT -->
 			<VirtualScroller
-				:item-height="34"
+				:item-height="35"
 				:items="data"
 				:wrapper-class="initialized ? 'w-fit' : ''"
 				ref="content"
@@ -66,7 +66,7 @@ import {
 	VDataRow,
 } from "@/enums";
 import { textFormatter } from "@/formatters/index";
-import { computed, onMounted, provide, ref } from "vue";
+import { computed, onMounted, provide, ref, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import VDataGridColumn from "./VDataGridColumn.vue";
 import VDataGridRow from "./VDataGridRow.vue";
@@ -102,12 +102,16 @@ const columnsGridLayout = computed(
 );
 
 const state = VDataGridState(
-	computed(() => props.rows),
+	props.rows,
 	props.columns,
 	props.defaultSortKey,
 	props.defaultSortDirection,
 	emit
 );
+
+watchEffect(() => {
+	state.updateRows(props.rows);
+});
 
 const { initialized, columnsLayout, data } = state;
 

@@ -21,6 +21,7 @@ export { VDropdown } from "./components/VDropdown";
 export { VDynamicGrid } from "./components/VDynamicGrid";
 export { VLabel } from "./components/VLabel";
 export { VModalWindow } from "./components/VModalWindow";
+export { VNumericField } from "./components/VNumericField";
 export { VPopover } from "./components/VPopover";
 export { VSelect } from "./components/VSelect";
 export { VTabPanel, VTabbedView } from "./components/VTabbedView";

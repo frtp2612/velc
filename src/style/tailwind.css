@@ -89,4 +89,9 @@
 		--color-tag-300: 48 88 204;
 		--color-component-tag: 83 104 125;
 	}
+
+	.input-base,
+	.input-like {
+		@apply leading-6 w-full border border-color-border-50 focus:border-color-accent py-1 px-2 text-color-text-600 focus:text-color-text bg-color-bg hover:bg-color-bg-50 focus:bg-color-bg-100 rounded-lg;
+	}
 }

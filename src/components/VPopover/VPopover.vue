@@ -32,7 +32,15 @@ const content = ref<HTMLElement | null>(null);
 const arrow = ref<HTMLElement | null>(null);
 const container = ref<HTMLElement | null>(null);
 
-onClickOutside(container, () => (isOpen.value = false));
+onClickOutside(
+	container,
+	() => {
+		isOpen.value = false;
+	},
+	{
+		ignore: [popover],
+	}
+);
 
 function open() {
 	isOpen.value = true;

@@ -31,8 +31,6 @@ export const useSorter: SorterType = <T extends { [key: string]: any }>(
 	}
 
 	function applySort() {
-		console.log(data.value);
-
 		const sortedData = [...data.value].sort((a: any, b: any) => {
 			const valueA =
 				a[sortKey.value] === null

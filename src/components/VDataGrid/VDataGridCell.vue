@@ -1,10 +1,8 @@
 <template>
 	<div
 		:style="column.locked ? lockedStyle : ''"
-		class="flex leading-[31px] border-b border-r-color-border-100 border-r outline-0 p-[1px] relative max-w-full"
+		class="flex leading-[32px] border-b border-r-color-border-100 border-r outline-0 p-[1px] relative max-w-full"
 		:class="[cellClass, { 'z-[1]': column.locked }]"
-		@click="selectCell"
-		@dblclick="startEdit"
 		tabindex="-1"
 	>
 		<VCheckBox
@@ -40,6 +38,8 @@
 			class="px-2 w-full overflow-hidden overflow-ellipsis whitespace-nowrap"
 			:class="[editable ? 'hover:outline outline-color-primary outline-1' : '']"
 			v-else
+			@click="selectCell"
+			@dblclick="startEdit"
 		>
 			{{ formattedValue }}
 		</VLabel>
@@ -49,7 +49,6 @@
 <script setup lang="ts">
 import VLabel from "@/components/VLabel/VLabel.vue";
 import { VDataColumn, VDataGridStateType, VDataRow, VDataType } from "@/enums";
-import { onClickOutside } from "@vueuse/core";
 import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import VCheckBox from "../VCheckBox/index";
@@ -74,10 +73,6 @@ const {
 } = state!;
 
 const editor = ref<HTMLElement | null>(null);
-
-onClickOutside(editor, () =>
-	requestAnimationFrame(() => (editMode.value = false))
-);
 
 const cellId = computed(() => `${props.data.id}-${props.column.id}`);
 
@@ -135,6 +130,9 @@ const formattedValue = computed(() => {
 });
 
 function selectCell() {
+	if (editMode.value) {
+		editMode.value = false;
+	}
 	changeSelectedCell(props.data.id, props.column.id, cellId.value);
 }
 

@@ -6,7 +6,7 @@ import {
 	VDataRow,
 } from "@/enums";
 import { clamp, onKeyStroke, useElementSize } from "@vueuse/core";
-import { ComputedRef, Ref, computed, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 type DataGridColumnData = {
 	id: string;
@@ -16,7 +16,8 @@ type DataGridColumnData = {
 };
 
 function VDataGridState(
-	rows: ComputedRef<VDataRow[]> | Ref<VDataRow[]>,
+	// rows: ComputedRef<VDataRow[]> | Ref<VDataRow[]>,
+	rows: VDataRow[],
 	columns: VDataColumn[],
 	defaultSortKey: string | undefined,
 	defaultSortDirection: string | undefined,
@@ -35,17 +36,17 @@ function VDataGridState(
 
 	const editMode = ref(false);
 
+	const reactiveRows = ref(rows);
+
 	// const { width, height } = useElementBounding(tableContainerRef);
 	const { width, height } = useElementSize(contentContainerRef);
 
-	const filteredRows = computed(() => {
-		console.log(rows.value);
-
-		return rows.value;
-	});
+	function updateRows(updatedRows: VDataRow[]) {
+		reactiveRows.value = updatedRows;
+	}
 
 	const { sortedData, sort, sortKey, sortOrder } = useSorter<VDataRow>(
-		filteredRows,
+		reactiveRows,
 		defaultSortKey,
 		defaultSortDirection
 	);
@@ -266,11 +267,11 @@ function VDataGridState(
 		const column: VDataColumn = columns[getColumnIndex()];
 
 		if (column && column.editable) {
-			const row: VDataRow | undefined = rows.value.find(
+			const row: VDataRow | undefined = rows.find(
 				(row: VDataRow) => row.id === selectedRowId.value
 			);
 			if (row) {
-				console.log("NEW VALUE", row[column.id]);
+				// console.log("NEW VALUE", row[column.id]);
 
 				emit("cellValueChanged", {
 					row,
@@ -294,6 +295,7 @@ function VDataGridState(
 		// methods
 		init,
 		updateColumnSize,
+		updateRows,
 
 		changeSelectedCell,
 
@@ -304,7 +306,7 @@ function VDataGridState(
 		// computed properties
 		columnsLayout,
 
-		data: filteredRows,
+		data: sortedData,
 		sortKey,
 		sortOrder,
 
