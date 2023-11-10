@@ -6,7 +6,13 @@
 		:id="id"
 		auto-focus
 	/>
-	<VDatePicker v-model="model" v-else-if="isDate" :id="id" class="w-full" />
+	<VDatePicker
+		v-model="model"
+		v-else-if="isDate"
+		:id="id"
+		class="w-full"
+		auto-focus
+	/>
 	<VSelect
 		v-model="model"
 		:values="values!"
@@ -25,7 +31,13 @@
 			>
 		</template>
 	</VSelect>
-	<VNumericField :id="id" v-model="model" v-else-if="isNumber" class="w-full" />
+	<VNumericField
+		:id="id"
+		v-model="model"
+		v-else-if="isNumber"
+		auto-focus
+		class="w-full"
+	/>
 	<VTextField v-model="model" v-else :id="id" auto-focus class="w-full" />
 </template>
 

@@ -12,7 +12,7 @@
 				<VTextField
 					id="date-picker"
 					v-model="formattedDate"
-					:custom-class="inputBaseClass + ' pl-10 w-full'"
+					:custom-class="inputBaseClass + ' !pl-10 w-full'"
 				/>
 			</div>
 		</template>
@@ -73,7 +73,7 @@ import VPopover from "@/components/VPopover/VPopover.vue";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { inputBaseClass } from "@/constants";
 import { useVModel } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 type DateDetails = {
 	index: number;
@@ -96,6 +96,7 @@ const props = withDefaults(
 	defineProps<{
 		modelValue?: Date | null;
 		offsetDayIndices?: number;
+		autoFocus?: boolean;
 	}>(),
 	{
 		offsetDayIndices: 0,
@@ -304,4 +305,10 @@ function changeDate(dayData: DayDetails) {
 		date.value = new Date(dayData.timestamp);
 	}
 }
+
+onMounted(() => {
+	if (props.autoFocus) {
+		open();
+	}
+});
 </script>
