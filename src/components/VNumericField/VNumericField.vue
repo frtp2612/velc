@@ -1,5 +1,10 @@
 <template>
-	<input type="number" v-model.number.lazy="model" :class="elementClass" />
+	<input
+		type="number"
+		v-model.number.lazy="model"
+		:class="elementClass"
+		ref="input"
+	/>
 </template>
 
 <script setup lang="ts">
