@@ -3,7 +3,7 @@
     <div ref="dropdown" @click="toggle">
       <slot>
         <VButton icon-right="fa-angle-down" :type="VButtonTypes.PRIMARY">
-          <VLabel class="text-color-text">{{ label }}</VLabel>
+          <VLabel class="text-color-text-50 font-medium">{{ label }}</VLabel>
         </VButton>
       </slot>
     </div>
