@@ -64,7 +64,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
   },
   valueFormatter:
     i === columnsAmount - 8
-      ? (value: any) => value.name
+      ? (value: any) => (value ? value.name : "")
       : i === columnsAmount - 2 || i === columnsAmount - 1
       ? (value: any) => (value ? "fa-check" : undefined)
       : (value: any) => value,
@@ -113,7 +113,6 @@ const rows = Array.from(Array(10)).map((_, i) => {
       row[column.id] = Math.floor(Math.random() * Date.now()).toString(36);
     }
   });
-  console.log(row);
 
   return row;
 });

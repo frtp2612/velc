@@ -4,14 +4,14 @@
     v-if="isBoolean"
     class="w-full h-full"
     :id="id"
-    auto-focus
+    :auto-focus="autoFocus"
   />
   <VDatePicker
     v-model="model"
     v-else-if="isDate"
     :id="id"
     class="w-full flex items-center"
-    auto-focus
+    :auto-focus="autoFocus"
   />
   <VSelect
     v-model="model"
@@ -19,7 +19,7 @@
     :formatter="formatter"
     append-to="body"
     class="w-full"
-    auto-focus
+    :auto-focus="autoFocus"
     @update:model-value="(newValue) => (model = newValue)"
     v-else-if="isSelect"
   >
@@ -35,7 +35,7 @@
     :id="id"
     v-model="model"
     v-else-if="isNumber"
-    auto-focus
+    :auto-focus="autoFocus"
     class="w-full"
   />
   <VTextField v-model="model" v-else :id="id" auto-focus class="w-full" />
@@ -58,8 +58,10 @@ const props = withDefaults(
     values?: any[];
     modelValue: any;
     formatter?: Function;
+    autoFocus?: boolean;
   }>(),
   {
+    autoFocus: false,
     formatter: (value: any) => value,
   }
 );

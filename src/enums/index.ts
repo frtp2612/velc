@@ -85,6 +85,9 @@ export type VDataGridStateType = {
   sortKey: Ref<string>;
   sortOrder: Ref<string>;
 
+  filters: Ref<Map<string, any>>;
+  setFilter: (filterKey: string, filterValue: any) => void;
+
   selectedRowId: Ref<number>;
   selectedColumnId: Ref<string>;
   selectedCellId: Ref<string>;

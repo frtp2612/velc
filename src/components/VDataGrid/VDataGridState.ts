@@ -4,9 +4,11 @@ import {
   VDataColumn,
   VDataGridEmits,
   VDataRow,
+  VDataType,
 } from "@/enums";
 import { clamp, onKeyStroke, useElementSize } from "@vueuse/core";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, Ref } from "vue";
+import { useFilter } from "../../composables/UseFilter";
 
 type DataGridColumnData = {
   id: string;
@@ -16,7 +18,6 @@ type DataGridColumnData = {
 };
 
 function VDataGridState(
-  // rows: ComputedRef<VDataRow[]> | Ref<VDataRow[]>,
   rows: VDataRow[],
   columns: VDataColumn[],
   defaultSortKey: string | undefined,
@@ -38,15 +39,15 @@ function VDataGridState(
 
   const reactiveRows = ref(rows);
 
-  // const { width, height } = useElementBounding(tableContainerRef);
   const { width, height } = useElementSize(contentContainerRef);
+  const { data, filters, setFilter } = useFilter<VDataRow>(reactiveRows);
+
 
   function updateRows(updatedRows: VDataRow[]) {
     reactiveRows.value = updatedRows;
   }
 
-  const { sortedData, sort, sortKey, sortOrder } = useSorter<VDataRow>(
-    reactiveRows,
+  const { sort, sortKey, sortOrder, applySort } = useSorter<VDataRow>(
     defaultSortKey,
     defaultSortDirection
   );
@@ -159,7 +160,7 @@ function VDataGridState(
 
       const nextColumnData: DataGridColumnData =
         columnsDataList.value[columnDataIndex + 1];
-      if (nextColumnData.offset) {
+      if (nextColumnData && nextColumnData.offset) {
         nextColumnData.offset = columnData.offset! + columnData.size.current!;
         lockedColumnsMap.value.set(nextColumnData.id, nextColumnData.offset);
       }
@@ -222,7 +223,7 @@ function VDataGridState(
         direction.y = -1;
       } else if (
         getColumnIndex() + direction.x >= columns.length &&
-        getRowIndex() < sortedData.value.length - 1
+        getRowIndex() < data.value.length - 1
       ) {
         direction.x = -99999;
         direction.y = 1;
@@ -231,7 +232,7 @@ function VDataGridState(
       const nextRowIndex = clamp(
         getRowIndex() + direction.y,
         0,
-        sortedData.value.length - 1
+        data.value.length - 1
       );
       const nextColumnIndex = clamp(
         getColumnIndex() + direction.x,
@@ -239,7 +240,7 @@ function VDataGridState(
         columns.length - 1
       );
 
-      const rowId = sortedData.value[nextRowIndex].id;
+      const rowId = data.value[nextRowIndex].id;
       const columnId = columns[nextColumnIndex].id;
       const cellId = `${rowId}-${columnId}`;
       changeSelectedCell(rowId, columnId, `${cellId}`);
@@ -252,7 +253,7 @@ function VDataGridState(
   );
 
   function getRowIndex() {
-    return sortedData.value.findIndex(
+    return data.value.findIndex(
       (row: VDataRow) => row.id === selectedRowId.value
     );
   }
@@ -301,12 +302,16 @@ function VDataGridState(
 
     sort,
 
+    filters,
+    setFilter,
+
     onCellEditEnd,
 
     // computed properties
     columnsLayout,
 
-    data: sortedData,
+
+    data: computed(() => applySort(data)),
     sortKey,
     sortOrder,
 
