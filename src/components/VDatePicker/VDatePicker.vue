@@ -5,14 +5,14 @@
         @click="events.toggle()"
         class="relative group border-color-border-50 hover:border-color-border-100 w-full"
       >
-        <font-awesome-icon
-          icon="fa-calendar-days"
-          class="z-10 w-5 aspect-square absolute top-[1px] left-[1px] p-2 rounded-l text-color-text-400 group-hover:text-color-text"
-        />
         <VTextField
           id="date-picker"
           v-model="formattedDate"
           :custom-class="inputBaseClass + ' !pl-10 w-full !flex'"
+        />
+        <font-awesome-icon
+          icon="fa-calendar-days"
+          class="w-5 aspect-square absolute top-[1px] left-[1px] p-2 rounded-l text-color-text-400 group-hover:text-color-text"
         />
       </div>
     </template>

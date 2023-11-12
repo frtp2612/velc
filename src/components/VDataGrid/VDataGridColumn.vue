@@ -1,11 +1,11 @@
 <template>
   <div
     ref="column"
-    class="flex flex-col relative border-r-color-border-100 border-r py-2"
+    class="flex flex-col relative border-r-color-border-100 border-r py-2 gap-2"
     :class="[data.locked ? 'bg-inherit z-[1]' : ' ']"
     :style="data.locked ? lockedStyle : ''"
   >
-    <div class="flex items-center gap-2 cursor-pointer min-h-full" @click="sort(data.id)">
+    <div class="flex items-center gap-2 cursor-pointer" @click="sort(data.id)">
       <font-awesome-icon
         icon="fa-lock"
         class="w-4 h-4 text-color-text-400"
@@ -18,6 +18,15 @@
         <font-awesome-icon :icon="sortIcon" class="w-4 h-4 text-color-accent" />
       </div>
     </div>
+    <VDataEditor
+      :id="data.id"
+      :model-value="filters.get(data.id)"
+      :formatter="data.valueFormatter"
+      :values="data.editor?.values"
+      :type="data.dataType"
+      :auto-focus="false"
+      @update:model-value="(value: any) => setFilter(data.id, value)"
+    />
 
     <div
       ref="gutter"
@@ -47,8 +56,10 @@ import {
   TranslationType,
   VDataColumn,
   VDataGridStateType,
+  VDataType,
 } from "@/enums";
 import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import VDataEditor from "./VDataEditor.vue";
 
 const props = defineProps<{
   data: VDataColumn;
@@ -56,7 +67,10 @@ const props = defineProps<{
   formatter: (
     value: {
       type: TranslationType;
-      value: ExplicitTranslationValue | KeyTranslationValue | RawTranslationValue;
+      value:
+        | ExplicitTranslationValue
+        | KeyTranslationValue
+        | RawTranslationValue;
     },
     translator: any
   ) => string;
@@ -68,9 +82,16 @@ const column = ref<HTMLElement | null>(null);
 
 const state: VDataGridStateType | undefined = inject("state");
 
-const { tableHeight } = state!;
-
-const { lockedColumnsMap, sortKey, sortOrder, sort } = state!;
+const {
+  tableHeight,
+  selectAllMap,
+  lockedColumnsMap,
+  sortKey,
+  sortOrder,
+  sort,
+  filters,
+  setFilter,
+} = state!;
 
 const allowResize = ref(false);
 
@@ -85,7 +106,9 @@ const lockedStyle = computed(
 );
 
 const sortIcon = computed(() =>
-  sortOrder.value === "asc" ? "fa-arrow-up-short-wide" : "fa-arrow-down-wide-short"
+  sortOrder.value === "asc"
+    ? "fa-arrow-up-short-wide"
+    : "fa-arrow-down-wide-short"
 );
 
 const formattedLabel = computed(() =>
