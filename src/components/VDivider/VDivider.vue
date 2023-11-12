@@ -15,7 +15,7 @@ const props = withDefaults(
   {
     vertical: false,
     height: "h-[1px]",
-    color: "bg-color-bg-100",
+    color: "bg-color-bg-50",
   }
 );
 

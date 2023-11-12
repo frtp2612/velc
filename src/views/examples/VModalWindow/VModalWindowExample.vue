@@ -1,21 +1,22 @@
 <template>
-	<ComponentExampleTemplate component-name="VModalWindow">
-		<template #usage>
-			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
-				<VButton :on-click="() => modal!.open()">Open Modal</VButton>
-				<VModalWindow ref="modal"> </VModalWindow>
-				<VButton :on-click="() => secondModal!.open()"
-					>Open second Modal</VButton
-				>
-				<VOverrideModalWindowExample
-					:content-component="VModalContent"
-					:on-yes="() => {}"
-					:on-no="() => {}"
-					ref="secondModal"
-				/>
-			</ComponentExampleBlockTemplate>
-		</template>
-	</ComponentExampleTemplate>
+  <ComponentExampleTemplate component-name="VModalWindow">
+    <template #usage>
+      <ComponentExampleBlockTemplate title="Example 1" :example="example1">
+        <VButton :on-click="() => modal!.open()">Open Modal</VButton>
+        <VModalWindow title="Modal" ref="modal" width="50%" height="40%">
+          <VButton>I am a button inside a modal!</VButton>
+        </VModalWindow>
+        <VButton :on-click="() => secondModal!.open()">Open second Modal</VButton>
+        <VOverrideModalWindowExample
+          title="Custom content modal!"
+          :content-component="VModalContent"
+          :on-yes="() => {}"
+          :on-no="() => {}"
+          ref="secondModal"
+        />
+      </ComponentExampleBlockTemplate>
+    </template>
+  </ComponentExampleTemplate>
 </template>
 
 <script lang="ts" setup>

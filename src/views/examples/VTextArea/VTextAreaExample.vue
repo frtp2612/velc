@@ -1,11 +1,11 @@
 <template>
-	<ComponentExampleTemplate component-name="VTextField">
-		<template #usage>
-			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
-				<VTextArea id="text-area-1" v-model="text" :max-chars="200" />
-			</ComponentExampleBlockTemplate>
-		</template>
-	</ComponentExampleTemplate>
+  <ComponentExampleTemplate component-name="VTextArea">
+    <template #usage>
+      <ComponentExampleBlockTemplate title="Example 1" :example="example1">
+        <VTextArea id="text-area-1" v-model="text" :max-chars="200" />
+      </ComponentExampleBlockTemplate>
+    </template>
+  </ComponentExampleTemplate>
 </template>
 
 <script lang="ts" setup>

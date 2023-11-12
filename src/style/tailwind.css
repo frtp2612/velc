@@ -31,29 +31,29 @@
 		--color-nav: 255 255 255;
 		--color-nav-100: 228 230 235;
 
-		--color-primary: 151 153 181;
-		--color-primary-50: 247 247 248;
-		--color-primary-100: 240 240 242;
-		--color-primary-200: 217 217 222;
-		--color-primary-300: 194 194 202;
-		--color-primary-400: 148 148 162;
-		--color-primary-500: 102 102 122;
-		--color-primary-600: 92 92 110;
-		--color-primary-700: 61 61 73;
-		--color-primary-800: 46 46 55;
-		--color-primary-900: 31 31 37;
+		--color-primary: 100 107 162;
+		--color-primary-50: 245 245 249;
+		--color-primary-100: 225 226 237;
+		--color-primary-200: 205 207 225;
+		--color-primary-300: 185 188 213;
+		--color-primary-400: 145 150 189;
+		--color-primary-500: 126 131 177;
+		--color-primary-600: 90 96 149;
+		--color-primary-700: 78 84 129;
+		--color-primary-800: 66 71 110;
+		--color-primary-900: 54 58 90;
 
-		--color-secondary: 217 213 220;
-		--color-secondary-50: 253 253 253;
-		--color-secondary-100: 251 251 252;
-		--color-secondary-200: 246 245 246;
-		--color-secondary-300: 240 238 241;
-		--color-secondary-400: 228 226 231;
-		--color-secondary-500: 217 213 220;
-		--color-secondary-600: 195 192 198;
-		--color-secondary-700: 130 128 132;
-		--color-secondary-800: 98 96 99;
-		--color-secondary-900: 65 64 66;
+		--color-secondary: 188 192 225;
+		--color-secondary-50: 244 245 250;
+		--color-secondary-100: 222 224 240;
+		--color-secondary-200: 200 203 230;
+		--color-secondary-300: 178 183 220;
+		--color-secondary-400: 156 162 211;
+		--color-secondary-500: 112 120 191;
+		--color-secondary-600: 90 100 181;
+		--color-secondary-700: 74 84 165;
+		--color-secondary-800: 64 73 143;
+		--color-secondary-900: 54 61 121;
 
 		--color-accent: 225 74 99;
 		--color-accent-50: 254 246 247;
@@ -90,8 +90,21 @@
 		--color-component-tag: 83 104 125;
 	}
 
-	.input-base,
-	.input-like {
-		@apply focus:ring-0 focus:ring-offset-0 leading-6 w-full border border-color-border-50 focus:border-color-accent py-1 px-2 text-color-text-600 focus:text-color-text bg-color-bg hover:bg-color-bg-50 focus:bg-color-bg-100 rounded-lg;
-	}
+}
+
+.input-base,
+.input-like {
+	@apply focus:ring-0 focus:ring-offset-0 outline-none leading-6 w-full border border-color-border-50 hover:border-color-border-200 focus:border-color-primary py-1 px-2 text-color-text-500 focus:text-color-text bg-color-bg rounded-lg;
+}
+
+.icon {
+	@apply w-5 aspect-square;
+}
+
+.interactive-text {
+	@apply text-color-text-300 hover:text-color-text;
+}
+
+.interactive-bg {
+	@apply bg-color-bg hover:bg-color-bg-50;
 }
