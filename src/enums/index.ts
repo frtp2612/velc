@@ -15,12 +15,45 @@ export type VDataColumn = {
   };
   locked?: boolean;
   dataType?: VDataType;
+  hasSelectAll?: boolean;
+  selectAllEnabling?: (...args: any[]) => boolean;
   editable?: boolean;
   editor?: {
     type: VDataType;
     values?: any[];
   };
   filterable?: boolean;
+};
+
+export type ExperimentalVDataColumn<T extends string | boolean> = {
+  id: string;
+  size?: BaseElementSize;
+  valueFormatter?: (value: any) => string;
+  label: {
+    type: TranslationType;
+    value: RawTranslationValue | ExplicitTranslationValue | KeyTranslationValue;
+  };
+  locked?: boolean;
+  dataType?: VDataType;
+  hasSelectAll?: boolean;
+  selectAllEnabling?: (...args: any[]) => boolean;
+  editable?: boolean;
+  editor?: {
+    type: VDataType;
+    values?: any[];
+  };
+  filterable?: boolean;
+  options: VDataColumnOptions<T>;
+};
+
+export type VDataColumnOptions<T extends string | boolean> = T extends boolean
+  ? VDataColumnEditableBooleanOptions
+  : VDataColumnStringOptions;
+export type VDataColumnStringOptions = {};
+
+export type VDataColumnEditableBooleanOptions = {
+  hasSelectAll?: boolean;
+  selectAllEnabling?: (...args: any[]) => boolean;
 };
 
 export enum TranslationType {
@@ -76,6 +109,7 @@ export type VDataGridStateType = {
   onCellEditEnd: () => void;
 
   columnsLayout: ComputedRef<string>;
+  selectAllMap: Ref<Map<string, Ref<boolean>>>;
 
   data: VDataRow[];
   initialized: Ref<boolean>;
@@ -94,6 +128,8 @@ export type VDataGridStateType = {
 
   editMode: Ref<boolean>;
   isDirty: ComputedRef<boolean>;
+
+  toggleAllValues: (newValue: boolean, columnId: string) => void;
 };
 
 export type VDataGridEmits = {
@@ -105,6 +141,10 @@ export type VDataGridEmits = {
   (
     event: "cellDoubleClick",
     data: { row: VDataRow; column: VDataColumn }
+  ): void;
+  (
+    event: "selectAllValueChanged",
+    data: { newValue: boolean; columnId: string }
   ): void;
 };
 

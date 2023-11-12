@@ -15,6 +15,7 @@
             :rows="filteredRows"
             default-sort-direction="desc"
             default-sort-key="col1"
+            @select-all-value-changed="onSelectAllValueChanged"
             ref="table"
           >
           </VDataGrid>
@@ -123,4 +124,8 @@ const filteredRows = computed(() => {
   );
   return filter;
 });
+
+function onSelectAllValueChanged(...args: any[]) {
+  console.log(args);
+}
 </script>

@@ -3,7 +3,7 @@
     <div ref="dropdown" class="h-full flex items-center" @click="toggle">
       <slot :selection="formattedSelectedItem">
         <component :is="rawComponent" v-if="rawComponent" />
-        <VButton icon-right="fa-angle-down" v-else>
+        <VButton icon-right="fa-angle-down h-full" v-else>
           <VLabel class="text-color-text">{{ formattedSelectedItem }}</VLabel>
         </VButton>
       </slot>

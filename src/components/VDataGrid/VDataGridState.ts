@@ -42,6 +42,7 @@ function VDataGridState(
   const { width, height } = useElementSize(contentContainerRef);
   const { data, filters, setFilter } = useFilter<VDataRow>(reactiveRows);
 
+  const selectAllMap = ref<Map<string, Ref<boolean>>>(new Map());
 
   function updateRows(updatedRows: VDataRow[]) {
     reactiveRows.value = updatedRows;
@@ -70,6 +71,8 @@ function VDataGridState(
     tableContainerRef.value = tableContainer;
     columnsContainerRef.value = columnsContainer;
     contentContainerRef.value = contentContainer;
+
+    initializeSelectAllMap();
 
     requestAnimationFrame(() => {
       initializeColumnsData();
@@ -118,6 +121,21 @@ function VDataGridState(
         columnsDataList.value.push(columnData);
       }
     );
+  }
+
+  function initializeSelectAllMap() {
+    columns
+      .filter(
+        (column: VDataColumn) => column.dataType === VDataType.EDITABLE_BOOLEAN
+      )
+      .forEach((column: VDataColumn) =>
+        selectAllMap.value.set(
+          column.id,
+          computed(() =>
+            reactiveRows.value.every((row: VDataRow) => row[column.id] === true)
+          )
+        )
+      );
   }
 
   function refreshColumnsData() {
@@ -283,6 +301,14 @@ function VDataGridState(
     }
   }
 
+  function toggleAllValues(newValue: boolean, columnId: string) {
+    reactiveRows.value.forEach((row: VDataRow) => (row[columnId] = newValue));
+    emit("selectAllValueChanged", {
+      newValue,
+      columnId,
+    });
+  }
+
   watch(
     () => editMode.value,
     (current: boolean, previous: boolean) => {
@@ -310,6 +336,8 @@ function VDataGridState(
     // computed properties
     columnsLayout,
 
+    selectAllMap,
+    toggleAllValues,
 
     data: computed(() => applySort(data)),
     sortKey,

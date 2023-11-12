@@ -28,6 +28,17 @@
       @update:model-value="(value: any) => setFilter(data.id, value)"
     />
 
+    <template
+      v-if="data.dataType && data.dataType === VDataType.EDITABLE_BOOLEAN"
+    >
+      <VDivider color="bg-color-border-100" />
+      <VCheckBox
+        :id="data.id"
+        :model-value="selectAllMap.get(data.id)?.value"
+        @update:model-value="selectAll"
+      />
+    </template>
+
     <div
       ref="gutter"
       class="absolute -right-[1px] top-0 w-2 group h-full"
@@ -59,6 +70,8 @@ import {
   VDataType,
 } from "@/enums";
 import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import VCheckBox from "@/components/VCheckBox/index";
+import VDivider from "@/components/VDivider/index";
 import VDataEditor from "./VDataEditor.vue";
 
 const props = defineProps<{
@@ -89,6 +102,7 @@ const {
   sortKey,
   sortOrder,
   sort,
+  toggleAllValues,
   filters,
   setFilter,
 } = state!;
@@ -135,5 +149,9 @@ function toggleResize(event: MouseEvent) {
   } else {
     allowResize.value = false;
   }
+}
+
+function selectAll(value: boolean) {
+  toggleAllValues(value, props.data.id);
 }
 </script>
