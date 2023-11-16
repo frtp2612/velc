@@ -32,7 +32,7 @@ export default defineConfig({
 			input: {
 				main: resolve(__dirname, "src/index.ts"),
 			},
-			external: ["vue"],
+			external: ["vue", "vue-router", "vue-i18n"],
 			output: {
 				exports: "named",
 				// Provide global variables to use in the UMD build

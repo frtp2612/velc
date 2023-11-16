@@ -1,11 +1,11 @@
 <template>
-  <ComponentExampleTemplate component-name="VTextArea">
-    <template #usage>
-      <ComponentExampleBlockTemplate title="Example 1" :example="example1">
-        <VTextArea id="text-area-1" v-model="text" :max-chars="200" />
-      </ComponentExampleBlockTemplate>
-    </template>
-  </ComponentExampleTemplate>
+	<ComponentExampleTemplate component-name="VTextArea">
+		<template #usage>
+			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
+				<VTextArea id="text-area-1" v-model="text" :max-chars="200" />
+			</ComponentExampleBlockTemplate>
+		</template>
+	</ComponentExampleTemplate>
 </template>
 
 <script lang="ts" setup>
@@ -14,6 +14,6 @@ import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlo
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
 import { ref } from "vue";
 
-const text = ref("Initial text");
+const text = ref(undefined);
 const example1 = "";
 </script>

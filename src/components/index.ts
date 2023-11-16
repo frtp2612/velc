@@ -28,6 +28,10 @@ import { VTree } from "./VTree";
 
 import { VNumericField } from "./VNumericField";
 
+import { VNavigation } from "./VNavigation";
+
+import { VDivider } from "./VDivider";
+
 export default {
 	VButton,
 	VDropdown,
@@ -45,4 +49,6 @@ export default {
 	VTree,
 	VTabPanel,
 	VNumericField,
+	VNavigation,
+	VDivider,
 };

@@ -11,7 +11,6 @@
 			<VDropdown
 				:values="dropDownValues"
 				:formatter="(value: any) => value ? value.label : ''"
-				@update:model-value="onDropdownItemSelected"
 				append-to="body"
 			>
 				<div class="px-2 py-1">
@@ -42,6 +41,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { TranslationType, VInteractiveItem } from "../../enums/index";
 import VDropdown from "../VDropdown/index";
 
 const emit = defineEmits(["onSelect", "onResize", "clearData"]);
@@ -78,20 +78,15 @@ const mouseData = ref<{
 	height: 0,
 });
 
-const dropDownValues = [
+const dropDownValues: VInteractiveItem[] = [
 	{
-		id: "remove",
-		label: "remove",
-		callBack: () => emit("clearData"),
+		label: {
+			type: TranslationType.RAW,
+			value: "remove",
+		},
+		callback: () => emit("clearData"),
 	},
 ];
-
-function onDropdownItemSelected(item: any) {
-	const match = dropDownValues.find((value: any) => item.id === value.id);
-	if (match) {
-		match.callBack();
-	}
-}
 
 function onMouseClickStart(event: MouseEvent) {
 	mouseData.value.start.x = event.pageX;

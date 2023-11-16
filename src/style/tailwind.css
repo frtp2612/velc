@@ -89,7 +89,6 @@
 		--color-tag-300: 48 88 204;
 		--color-component-tag: 83 104 125;
 	}
-
 }
 
 .input-base,
@@ -107,4 +106,24 @@
 
 .interactive-bg {
 	@apply bg-color-bg hover:bg-color-bg-50;
+}
+
+.true {
+	@apply !bg-color-primary !text-color-text-50;
+}
+
+.true:focus {
+	@apply !bg-color-primary !text-color-text-50;
+}
+
+.resettable-false {
+	@apply !bg-color-primary !text-color-text-50;
+}
+
+.resettable-false:focus {
+	@apply !bg-color-primary !text-color-text-50;
+}
+
+.lighten-text {
+	@apply text-color-text-300;
 }

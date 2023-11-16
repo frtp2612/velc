@@ -20,7 +20,7 @@ export function textFormatter(
 		case TranslationType.KEY_LOOKUP:
 			return translator.t(
 				(value.value as KeyTranslationValue).key,
-				(value.value as KeyTranslationValue).params
+				(value.value as KeyTranslationValue).params || []
 			);
 		default:
 			break;

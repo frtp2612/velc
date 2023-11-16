@@ -44,7 +44,7 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"dev": "vite",
-		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons && npm run build:directives && npm run build:composables && npm run build:enums && npm run build:localization",
+		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons && npm run build:directives && npm run build:composables && npm run build:enums",
 		"preview": "vite preview",
 		"build:lib": "vue-tsc && vite build --target lib --name velct-components src/index.ts",
 		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css",

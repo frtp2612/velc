@@ -148,7 +148,7 @@ const tooltipDirective = (app: any) => {
 				"--tooltip-top",
 				`${element.height + SAFE_MARGIN}px`
 			);
-			el.style.setProperty("--tooltip-left", `0px`);
+			el.style.setProperty("--tooltip-left", `${position.left}px`);
 		}
 
 		if (direction === "top" || direction === "bottom") {

@@ -97,8 +97,8 @@ const props = withDefaults(
 
 const emit = defineEmits<VDataGridEmits>();
 
-const columnsGridLayout = computed(
-	() => `repeat(${props.columns.length}, 1fr)`
+const columnsGridLayout = computed(() =>
+	props.columns ? `repeat(${props.columns.length}, 1fr)` : ""
 );
 
 const state = VDataGridState(
@@ -113,7 +113,8 @@ watchEffect(() => {
 	state.updateRows(props.rows);
 });
 
-const { initialized, columnsLayout, data } = state;
+const { initialized, columnsLayout, data, resetSelection, selectedRowId } =
+	state;
 
 const tableContainer = ref<HTMLElement | null>(null);
 const columnsContainer = ref<HTMLElement | null>(null);
@@ -126,21 +127,23 @@ defineExpose({
 	scrollTo: (value: number) => {
 		content.value?.scrollToIndex(value);
 	},
+	resetSelection,
+	selectedRowId,
 });
 
 onMounted(() => {
-	if (
-		tableContainer.value !== null &&
-		columnsContainer.value !== null &&
-		content.value !== null
-	) {
-		requestAnimationFrame(() =>
+	requestAnimationFrame(() => {
+		if (
+			tableContainer.value !== null &&
+			columnsContainer.value !== null &&
+			content.value !== null
+		) {
 			state.init(
 				tableContainer.value!,
 				columnsContainer.value!,
 				content.value!.container!
-			)
-		);
-	}
+			);
+		}
+	});
 });
 </script>

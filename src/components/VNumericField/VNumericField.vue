@@ -1,8 +1,10 @@
 <template>
 	<input
 		type="number"
-		v-model.number.lazy="model"
+		v-model.number="model"
+		class="text-right"
 		:class="elementClass"
+		:id="id"
 		ref="input"
 	/>
 </template>
@@ -29,7 +31,6 @@ const model = useVModel(
 		? {}
 		: {
 				passive: true,
-				defaultValue: 0,
 		  }
 );
 
