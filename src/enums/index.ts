@@ -123,7 +123,7 @@ export enum VButtonTypes {
 }
 
 export type VTreeNodeType = {
-	id: string;
+	[key: string]: any;
 	children?: VTreeNodeType[];
 };
 

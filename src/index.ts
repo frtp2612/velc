@@ -29,3 +29,4 @@ export { VSelect } from "./components/VSelect";
 export { VTabPanel, VTabbedView } from "./components/VTabbedView";
 export { VTextArea } from "./components/VTextArea";
 export { VTextField } from "./components/VTextField";
+export { VTree } from "./components/VTree";

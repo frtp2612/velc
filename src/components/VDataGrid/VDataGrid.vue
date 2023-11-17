@@ -12,7 +12,7 @@
 		>
 			<!-- GRID CONTENT -->
 			<VirtualScroller
-				:item-height="35"
+				:item-height="32"
 				:items="data"
 				:wrapper-class="initialized ? 'w-fit' : ''"
 				ref="content"
@@ -38,13 +38,17 @@
 					</div>
 				</template>
 				<!-- GRID ROWS -->
-				<template v-slot="{ item, index }">
+				<template v-slot="{ item, index, height }">
 					<VDataGridRow
 						:data="item"
 						:index="index"
-						:style="{
-							gridTemplateColumns: columnsLayout || columnsGridLayout,
-						}"
+						:cellHeight="`${height - 1}px`"
+						:style="[
+							{
+								height: `${height}px`,
+								gridTemplateColumns: columnsLayout || columnsGridLayout,
+							},
+						]"
 						@dblclick="emit('rowDoubleClick', item)"
 					/>
 				</template>

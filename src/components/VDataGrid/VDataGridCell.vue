@@ -1,7 +1,7 @@
 <template>
 	<div
 		:style="column.locked ? lockedStyle : ''"
-		class="flex leading-[32px] border-b border-r-color-border-100 border-r outline-0 p-[1px] relative max-w-full h-full"
+		class="flex border-r-color-border-100 border-r relative max-w-full h-full"
 		:class="[cellClass, { 'z-[1]': column.locked }]"
 		tabindex="-1"
 	>
@@ -38,11 +38,8 @@
 			/>
 		</div>
 		<VLabel
-			class="px-2 w-full h-full overflow-hidden overflow-ellipsis whitespace-nowrap text-inherit"
-			:class="[
-				editable ? 'hover:outline outline-color-primary outline-1' : '',
-				{ 'text-right': isNumber },
-			]"
+			class="px-2 w-full overflow-hidden overflow-ellipsis whitespace-nowrap text-inherit"
+			:class="[editable ? '' : '', { 'text-right': isNumber }]"
 			v-else
 			@click="selectCell"
 			@dblclick="startEdit"

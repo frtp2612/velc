@@ -20,7 +20,7 @@
 				]"
 				:key="currentIndex + index"
 			>
-				<slot :item="item" :index="currentIndex + index">
+				<slot :item="item" :index="currentIndex + index" :height="itemHeight">
 					<span>{{ item }}</span>
 				</slot>
 			</div>
