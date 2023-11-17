@@ -18,7 +18,10 @@ import {
   faHouse,
   faLeftRight,
   faLock,
+  faPause,
+  faPlay,
   faRightFromBracket,
+  faStop,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -36,6 +39,9 @@ library.add(
   faCalendarDays,
   faFilter,
   faXmark,
+  faPlay,
+  faStop,
+  faPause,
   faGear, // TODO REMOVE
   faRightFromBracket, // TODO REMOVE
   faHouse // TODO REMOVE

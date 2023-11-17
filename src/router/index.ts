@@ -84,6 +84,14 @@ const routes = [
     component: () =>
       import("@/views/examples/VNavigation/VNavigationExample.vue"),
   },
+{
+    path: "/VMediaPlayer",
+    name: "VMediaPlayer",
+    component: () =>
+    import(
+        "@/views/examples/VMediaPlayer/VMediaPlayerExample.vue"
+    )
+},
 ];
 
 const router = createRouter({
