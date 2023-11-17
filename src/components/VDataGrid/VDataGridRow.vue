@@ -1,10 +1,13 @@
 <template>
-	<div class="grid relative h-full" :class="rowClass">
+	<div class="grid relative box-content" :class="rowClass">
 		<template v-for="column in columns" :key="`${data.id}-${column.id}`">
 			<VDataGridCell
 				:column="column"
 				:data="data"
 				:editable="column.editable || false"
+				:style="{
+					lineHeight: cellHeight,
+				}"
 			/>
 		</template>
 	</div>
@@ -18,6 +21,7 @@ import VDataGridCell from "./VDataGridCell.vue";
 const props = defineProps<{
 	data: VDataRow;
 	index: number;
+	cellHeight: string;
 }>();
 
 const state: VDataGridStateType | undefined = inject("state");

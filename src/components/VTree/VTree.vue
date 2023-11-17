@@ -5,6 +5,7 @@
 			:formatter="formatter"
 			:activeNode="activeNode"
 			@onNodeSelected="onNodeSelected"
+			identifierKey=""
 			:onlyLeavesSelectable="onlyLeavesSelectable"
 			v-if="!hideRoot"
 		/>
@@ -20,6 +21,7 @@
 					:activeNode="activeNode"
 					@onNodeSelected="onNodeSelected"
 					:onlyLeavesSelectable="onlyLeavesSelectable"
+					identifierKey=""
 				/>
 			</li>
 		</ul>
@@ -34,7 +36,7 @@ import VTreeNode from "./VTreeNode.vue";
 const props = withDefaults(
 	defineProps<{
 		root: VTreeNodeType;
-		modelValue?: VTreeNodeType;
+		modelValue?: VTreeNodeType | null;
 		formatter: (value: VTreeNodeType) => string;
 		hideRoot?: boolean;
 		onlyLeavesSelectable?: boolean;

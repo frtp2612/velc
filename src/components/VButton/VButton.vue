@@ -10,7 +10,7 @@
 				class="h-5 w-5 text-color-inherit"
 				v-if="iconLeft"
 		/></slot>
-		<slot />
+		<VLabel v-if="$slots.default"><slot /></VLabel>
 		<slot name="right"
 			><font-awesome-icon
 				:icon="iconRight"
@@ -20,6 +20,7 @@
 	</button>
 </template>
 <script lang="ts" setup>
+import VLabel from "@/components/VLabel/index";
 import { VButtonTypes } from "@/enums/index";
 import { computed } from "vue";
 
@@ -39,12 +40,6 @@ const props = withDefaults(
 const common =
 	"px-4 py-1 cursor-pointer rounded-lg flex gap-2 items-center font-medium ";
 
-const primary =
-	common + "bg-color-primary hover:bg-color-primary-500 text-color-text-50 ";
-
-const secondary =
-	common + "bg-color-secondary hover:bg-color-secondary-400 text-color-text ";
-
 const success = common + "bg-color-success ";
 
 const danger = common + "bg-color-danger ";
@@ -53,10 +48,10 @@ const buttonClass = computed(() => {
 	let compoundClass = "";
 	switch (props.type) {
 		case VButtonTypes.PRIMARY:
-			compoundClass = primary;
+			compoundClass = "btn-primary ";
 			break;
 		case VButtonTypes.SECONDARY:
-			compoundClass = secondary;
+			compoundClass = "btn-secondary ";
 			break;
 		case VButtonTypes.SUCCESS:
 			compoundClass = success;
@@ -65,7 +60,7 @@ const buttonClass = computed(() => {
 			compoundClass = danger;
 			break;
 		default:
-			compoundClass = "hover:text-theme-primary flex gap-2 items-center";
+			compoundClass = "btn-base ";
 			break;
 	}
 

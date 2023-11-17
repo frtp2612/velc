@@ -70,7 +70,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 					initial: 200 - Math.round(Math.random() * 200),
 			  }
 			: undefined,
-	locked: i === 0 || i === 1,
+	// locked: i === 0 || i === 1,
 	dataType: getType(i),
 	editable:
 		Math.round(Math.random() * 10) >= 4 ||

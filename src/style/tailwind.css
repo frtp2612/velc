@@ -127,3 +127,19 @@
 .lighten-text {
 	@apply text-color-text-300;
 }
+
+.btn-common {
+	@apply px-4 py-1 cursor-pointer rounded-lg flex gap-2 items-center font-semibold;
+}
+
+.btn-primary {
+	@apply btn-common bg-color-primary hover:bg-color-primary-500 text-color-text-50;
+}
+
+.btn-secondary {
+	@apply btn-common bg-color-secondary hover:bg-color-secondary-400 text-color-text;
+}
+
+.btn-base {
+	@apply px-2 cursor-pointer rounded-lg flex gap-2 items-center font-semibold hover:bg-color-bg-50 hover:text-color-primary text-color-text;
+}

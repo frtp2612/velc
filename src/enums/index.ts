@@ -133,7 +133,7 @@ export type VMediaPlayerResource = {
 };
 
 export type VTreeNodeType = {
-  id: string;
+  [key: string]: any;
   children?: VTreeNodeType[];
 };
 
