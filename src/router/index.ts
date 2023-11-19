@@ -92,6 +92,70 @@ const routes = [
         "@/views/examples/VMediaPlayer/VMediaPlayerExample.vue"
     )
 },
+{
+    path: "/VContextMenu",
+    name: "VContextMenu",
+    component: () =>
+    import(
+        "@/views/examples/VContextMenu/VContextMenuExample.vue"
+    )
+},
+{
+    path: "/VDrawer",
+    name: "VDrawer",
+    component: () =>
+    import(
+        "@/views/examples/VDrawer/VDrawerExample.vue"
+    )
+},
+{
+    path: "/VDataList",
+    name: "VDataList",
+    component: () =>
+    import(
+        "@/views/examples/VDataList/VDataListExample.vue"
+    )
+},
+{
+    path: "/VNotification",
+    name: "VNotification",
+    component: () =>
+    import(
+        "@/views/examples/VNotification/VNotificationExample.vue"
+    )
+},
+{
+    path: "/VLoading",
+    name: "VLoading",
+    component: () =>
+    import(
+        "@/views/examples/VLoading/VLoadingExample.vue"
+    )
+},
+{
+    path: "/VProgressBar",
+    name: "VProgressBar",
+    component: () =>
+    import(
+        "@/views/examples/VProgressBar/VProgressBarExample.vue"
+    )
+},
+{
+    path: "/VFileUploader",
+    name: "VFileUploader",
+    component: () =>
+    import(
+        "@/views/examples/VFileUploader/VFileUploaderExample.vue"
+    )
+},
+{
+    path: "/VTimeLine",
+    name: "VTimeLine",
+    component: () =>
+    import(
+        "@/views/examples/VTimeLine/VTimeLineExample.vue"
+    )
+},
 ];
 
 const router = createRouter({

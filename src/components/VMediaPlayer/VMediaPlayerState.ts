@@ -34,6 +34,7 @@ export function VMediaPlayerState(media: Ref<HTMLVideoElement | null>) {
       if (media.value.currentTime === media.value.duration) {
         playing.value = false;
         media.value.pause();
+        media.value.fastSeek(0);
       }
     }
   }

@@ -1,4 +1,10 @@
-import { ComputedRef, Ref } from "vue";
+import {
+  ComputedRef,
+  Ref,
+  DefineComponent,
+  ComponentOptionsMixin,
+  ExtractPropTypes,
+} from "vue";
 
 export type VDataRow = {
   id: number;
@@ -158,3 +164,58 @@ export type VNavItem = {
   icon?: string;
   to?: string;
 };
+
+export type Widget = {
+  widget: DefineComponent<
+    {},
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    any,
+    Readonly<ExtractPropTypes<{}>>,
+    {},
+    {}
+  >;
+  name: string;
+  size: {
+    x: number;
+    y: number;
+  };
+};
+
+export type VDynamicBentoGridRegionData = {
+  componentPath: string;
+  [key: string]: any;
+};
+
+export enum ExportTypes {
+  XLS,
+  XML,
+  PDF,
+  HTML,
+}
+
+export enum HorizontalDirections {
+  LEFT,
+  RIGHT,
+}
+
+export enum MessageType {
+  NORMAL,
+  ALERT,
+  ERROR,
+  SUCCESS,
+  INFO,
+}
+
+export enum UploadStatus {
+  NONE,
+  LOADING,
+  SUCCESS,
+  ERROR,
+}

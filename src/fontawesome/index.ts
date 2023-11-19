@@ -10,18 +10,23 @@ import {
   faAngleRight,
   faArrowDownWideShort,
   faArrowUpShortWide,
+  faBarsStaggered,
   faCalendarDays,
   faCheck,
+  faDownLeftAndUpRightToCenter,
   faEllipsisVertical,
+  faExclamation,
   faFilter,
   faGear,
   faHouse,
   faLeftRight,
+  faLightbulb,
   faLock,
   faPause,
   faPlay,
   faRightFromBracket,
   faStop,
+  faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -44,7 +49,12 @@ library.add(
   faPause,
   faGear, // TODO REMOVE
   faRightFromBracket, // TODO REMOVE
-  faHouse // TODO REMOVE
+  faHouse, // TODO REMOVE
+  faDownLeftAndUpRightToCenter,
+  faBarsStaggered,
+  faLightbulb,
+  faExclamation,
+  faTrashCan
 );
 
 export { FontAwesomeIcon, library };

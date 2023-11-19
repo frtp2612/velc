@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <VButton :on-click="increaseCounter">{{ counter }}</VButton>
-  </div>
+  <VButton :on-click="increaseCounter">{{ counter }}</VButton>
 </template>
 
 <script setup lang="ts">

@@ -3,37 +3,10 @@
     <template #usage>
       <ComponentExampleBlockTemplate title="Example 1" :example="example1">
         <VNavigation :root="navItems">
-          <template #bottomNav>
-            <VLabel class="text-color-text-300 font-bold text-sm"
-              >Account</VLabel
-            >
-            <div class="flex flex-col gap-4">
-              <div
-                class="flex gap-2 items-center px-2 py-1 cursor-pointer font-medium selectable-node"
-              >
-                <font-awesome-icon icon="fa-gear" class="w-5 aspect-square" />
-                <VLabel class="text-lg">Settings</VLabel>
-              </div>
-              <div
-                class="flex gap-2 items-center px-2 py-1 cursor-pointer font-medium selectable-node"
-              >
-                <font-awesome-icon
-                  icon="fa-right-from-bracket"
-                  class="w-5 aspect-square"
-                />
-                <VLabel class="text-lg">Logout</VLabel>
-              </div>
-            </div>
-            <div
-              class="flex gap-4 items-center border border-color-border hover:border-color-primary hover:text-color-primary rounded-lg p-2 group cursor-pointer"
-            >
-              <div
-                class="w-12 aspect-square bg-color-bg-50 border border-color-border-50 group-hover:border-color-primary rounded-full"
-              ></div>
-              <VLabel class="font-semibold">Fictional Name</VLabel>
-            </div>
-            <VDivider />
-            <VLabel class="text-color-text-300 font-bold text-sm self-center"
+          <template #bottomNav="{ isExpanded }">
+            <VLabel
+              class="text-color-text-300 font-bold text-sm self-center"
+              v-show="isExpanded"
               >v-{{ version }}</VLabel
             >
           </template>
@@ -49,7 +22,6 @@ import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate
 import VNavigation from "@/components/VNavigation/index";
 import { TranslationType, VNavItem } from "@/enums/index";
 import VLabel from "@/components/VLabel/index";
-import VDivider from "@/components/VDivider/index";
 
 const example1 = "";
 

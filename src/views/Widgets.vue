@@ -1,23 +1,39 @@
 <template>
-  <div>
-    <VWidget
+  <div class="grid grid-cols-2 gap-2">
+    <VWidgetPreview
       v-for="widget in widgets"
-      :component-path="widget"
-      @click="emit('onWidgetClicked', widget)"
-    />
+      :componentPath="widget.componentPath"
+      :name="widget.name"
+      :size="widget.size"
+    >
+    </VWidgetPreview>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as components from "./widgets/index";
-import VWidget from "@/components/VWidget/VWidget.vue";
 import { ref } from "vue";
+import { Widget } from "@/enums";
+import VWidgetPreview from "./widgets/VWidgetPreview.vue";
 
-const componentsList: { [key: string]: any } = components?.default;
-const widgets = ref<string[]>([]);
+const componentsList: Widget[] = components?.widgets;
+const widgets = ref<
+  {
+    name: string;
+    componentPath: string;
+    size: {
+      x: number;
+      y: number;
+    };
+  }[]
+>([]);
 
-Object.keys(componentsList).forEach((name) => {
-  widgets.value.push("/src" + componentsList[name]["__file"].split("/src")[1]);
+componentsList.forEach((widget: Widget) => {
+  widgets.value.push({
+    componentPath: "/src" + widget.widget["__file"].split("/src")[1],
+    name: widget.name,
+    size: widget.size,
+  });
 });
 
 const emit = defineEmits(["onWidgetClicked"]);

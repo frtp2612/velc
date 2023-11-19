@@ -67,9 +67,11 @@
 		--color-accent-800: 101 33 45;
 		--color-accent-900: 68 22 30;
 
-		--color-success: 24 177 103;
+		--color-success: 98 207 77;
 
-		--color-error: 230 30 66;
+		--color-error: 223 54 75;
+
+		--color-alert: 242 210 57;
 
 		--color-text: 18 22 22;
 		--color-text-50: 243 243 243;
@@ -142,4 +144,8 @@
 
 .btn-base {
 	@apply px-2 cursor-pointer rounded-lg flex gap-2 items-center font-semibold hover:bg-color-bg-50 hover:text-color-primary text-color-text;
+}
+
+.no-after-cutoff {
+	@apply clear-both;
 }

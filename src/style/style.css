@@ -12,6 +12,10 @@ html {
 	font-size: 14px;
 }
 
+* {
+	transform: scale(1);
+}
+
 @media only screen and (max-width: 1920px) {
 	html {
 		font-size: 13px;

@@ -1,0 +1,4 @@
+import VNotification from "./VNotification.vue";
+
+export { VNotification };
+export default VNotification;

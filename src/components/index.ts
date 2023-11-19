@@ -34,6 +34,22 @@ import { VDivider } from "./VDivider";
 
 import { VMediaPlayer } from "./VMediaPlayer";
 
+import { VContextMenu } from "./VContextMenu";
+
+import { VDrawer } from "./VDrawer";
+
+import { VDataList } from "./VDataList";
+
+import { VNotification } from "./VNotification";
+
+import { VLoading } from "./VLoading";
+
+import { VProgressBar } from "./VProgressBar";
+
+import { VFileUploader } from "./VFileUploader";
+
+import { VTimeLine } from "./VTimeLine";
+
 export default {
   VButton,
   VDropdown,
@@ -54,4 +70,5 @@ export default {
   VNavigation,
   VDivider,
   VMediaPlayer,
+  VContextMenu,
 };

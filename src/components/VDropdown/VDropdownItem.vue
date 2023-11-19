@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-4 py-2 px-2 hover:bg-color-bg-100 overflow-ellipsis whitespace-nowrap h-full cursor-pointer"
+    class="flex gap-4 py-2 px-2 hover:bg-color-bg-50 hover:text-color-primary overflow-ellipsis whitespace-nowrap h-full cursor-pointer"
     @click="onItemClick"
   >
     <font-awesome-icon :icon="item.icon" v-if="item.icon" class="w-5 h-5" />

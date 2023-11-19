@@ -77,6 +77,9 @@ const colors = {
   ["color-error"]: {
     DEFAULT: generateColorClass("color-error"),
   },
+  ["color-alert"]: {
+    DEFAULT: generateColorClass("color-alert"),
+  },
   ["color-text"]: {
     DEFAULT: generateColorClass("color-text"),
     50: generateColorClass("color-text-50"),
