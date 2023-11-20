@@ -147,5 +147,5 @@
 }
 
 .no-after-cutoff {
-	@apply clear-both;
+	@apply translate-x-0;
 }

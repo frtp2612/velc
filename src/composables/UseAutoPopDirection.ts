@@ -1,7 +1,4 @@
-export enum PopAlignment {
-	LEFT = "LEFT",
-	RIGHT = "RIGHT",
-}
+import { PopAlignment } from "../enums/index";
 
 export type AutoPopOptions = {
 	align?: PopAlignment;

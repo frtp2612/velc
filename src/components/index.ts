@@ -6,6 +6,8 @@ import { VButtonGroup } from "./VButtonGroup";
 
 import { VDataGrid } from "./VDataGrid";
 
+import { VDynamicBentoGrid } from "./VDynamicBentoGrid";
+
 import { VModalWindow } from "./VModalWindow";
 
 import { VPopover } from "./VPopover";
@@ -51,24 +53,32 @@ import { VFileUploader } from "./VFileUploader";
 import { VTimeLine } from "./VTimeLine";
 
 export default {
-  VButton,
-  VDropdown,
-  VButtonGroup,
-  VDataGrid,
-  VModalWindow,
-  VPopover,
-  VSplitView,
-  VTextField,
-  VCheckBox,
-  VTextArea,
-  VDatePicker,
-  VSelect,
-  VTabbedView,
-  VTree,
-  VTabPanel,
-  VNumericField,
-  VNavigation,
-  VDivider,
-  VMediaPlayer,
-  VContextMenu,
+	VButton,
+	VDropdown,
+	VButtonGroup,
+	VDataGrid,
+	VDataList,
+	VDrawer,
+	VDynamicBentoGrid,
+	VModalWindow,
+	VPopover,
+	VSplitView,
+	VTextField,
+	VCheckBox,
+	VTextArea,
+	VDatePicker,
+	VSelect,
+	VTabbedView,
+	VTree,
+	VTabPanel,
+	VNotification,
+	VNumericField,
+	VLoading,
+	VNavigation,
+	VDivider,
+	VMediaPlayer,
+	VContextMenu,
+	VProgressBar,
+	VFileUploader,
+	VTimeLine,
 };
