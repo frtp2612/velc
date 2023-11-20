@@ -53,30 +53,15 @@
 <script setup lang="ts">
 import VLabel from "@/components/VLabel/index";
 import { useElementResizer } from "@/composables/UseElementResizer";
-import {
-  ExplicitTranslationValue,
-  KeyTranslationValue,
-  RawTranslationValue,
-  TranslationType,
-  VDataColumn,
-  VDataGridStateType,
-} from "@/enums";
+import { VDataColumn, VDataGridStateType } from "@/enums";
 import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import VDataEditor from "./VDataEditor.vue";
+import { Translatable } from "../../enums/index";
 
 const props = defineProps<{
   data: VDataColumn;
   index: number;
-  formatter: (
-    value: {
-      type: TranslationType;
-      value:
-        | ExplicitTranslationValue
-        | KeyTranslationValue
-        | RawTranslationValue;
-    },
-    translator: any
-  ) => string;
+  formatter: (value: Translatable, translator: any) => string;
   translator: any;
 }>();
 

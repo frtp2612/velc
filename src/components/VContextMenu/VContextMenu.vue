@@ -30,7 +30,7 @@ import VContextMenuItem from "./VContextMenuItem.vue";
 
 const props = defineProps<{
   items: VInteractiveItem[];
-  formatter?: Function;
+  formatter?: (value: any) => string;
   modelValue?: boolean;
   attachTo: ComponentPublicInstance | null;
 }>();

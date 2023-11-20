@@ -4,11 +4,11 @@ import * as components from "./components";
 const componentsList: { [key: string]: any } = components?.default;
 
 const VelctComponents = {
-	install: (app: App): any => {
-		Object.keys(componentsList).forEach((name) => {
-			app.component(name, componentsList[name]);
-		});
-	},
+  install: (app: App): any => {
+    Object.keys(componentsList).forEach((name) => {
+      app.component(name, componentsList[name]);
+    });
+  },
 };
 
 export default VelctComponents;
@@ -42,3 +42,4 @@ export { VTextField } from "./components/VTextField";
 export { VTimeLine } from "./components/VTimeLine";
 export { VTree } from "./components/VTree";
 export { VWidget } from "./components/VWidget";
+export { VSwitcher } from "./components/VSwitcher";

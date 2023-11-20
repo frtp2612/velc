@@ -61,21 +61,14 @@
 
 <script lang="ts" setup>
 import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
-import {
-  ExplicitTranslationValue,
-  KeyTranslationValue,
-  RawTranslationValue,
-  TranslationType,
-  VDataColumn,
-  VDataGridEmits,
-  VDataRow,
-} from "@/enums";
+import { VDataColumn, VDataGridEmits, VDataRow } from "@/enums";
 import { textFormatter } from "@/formatters/index";
 import { computed, onMounted, provide, ref, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import VDataGridColumn from "./VDataGridColumn.vue";
 import VDataGridRow from "./VDataGridRow.vue";
 import VDataGridState from "./VDataGridState";
+import { Translatable } from "../../enums/index";
 
 const i18n = useI18n();
 
@@ -85,16 +78,7 @@ const props = withDefaults(
     rows: Array<VDataRow>;
     defaultSortKey?: string;
     defaultSortDirection?: string;
-    columnFormatter?: (
-      value: {
-        type: TranslationType;
-        value:
-          | ExplicitTranslationValue
-          | KeyTranslationValue
-          | RawTranslationValue;
-      },
-      translator: any
-    ) => string;
+    columnFormatter?: (value: Translatable, translator: any) => string;
     translator?: any;
   }>(),
   {}

@@ -156,6 +156,14 @@ const routes = [
         "@/views/examples/VTimeLine/VTimeLineExample.vue"
     )
 },
+{
+    path: "/VSwitcher",
+    name: "VSwitcher",
+    component: () =>
+    import(
+        "@/views/examples/VSwitcher/VSwitcherExample.vue"
+    )
+},
 ];
 
 const router = createRouter({
