@@ -56,6 +56,8 @@ import { VSwitcher } from "./VSwitcher";
 
 import { VThemeCustomizer } from "./VThemeCustomizer";
 
+import { VColorPicker } from "./VColorPicker";
+
 export default {
 	VButton,
 	VDropdown,

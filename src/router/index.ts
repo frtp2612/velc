@@ -172,6 +172,14 @@ const routes = [
         "@/views/examples/VThemeCustomizer/VThemeCustomizerExample.vue"
     )
 },
+{
+    path: "/VColorPicker",
+    name: "VColorPicker",
+    component: () =>
+    import(
+        "@/views/examples/VColorPicker/VColorPickerExample.vue"
+    )
+},
 ];
 
 const router = createRouter({
