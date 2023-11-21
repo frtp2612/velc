@@ -96,17 +96,17 @@ const tooltipDirective = (app: any) => {
 				bottom: -(element.height - tooltipHeight) * 0.5,
 			};
 
-			console.log("POSITION: ", position);
+			// console.log("POSITION: ", position);
 
 			const overflow = {
-				left: position.left - element.left + element.width * 0.5,
+				left: element.left + position.left,
 				right:
 					position.right -
 					(window.innerWidth - element.right) -
 					element.width * 0.5,
 			};
 
-			console.log("OVERFLOW: ", overflow);
+			// console.log("OVERFLOW: ", overflow);
 
 			if (direction) {
 				if (direction === "bottom") {
@@ -140,10 +140,19 @@ const tooltipDirective = (app: any) => {
 					"--tooltip-top",
 					`${element.bottom + SAFE_MARGIN}px`
 				);
-				tooltip.style.setProperty(
-					"--tooltip-left",
-					`${element.left + position.left}px`
-				);
+				if (overflow.left < SAFE_MARGIN) {
+					// console.log("overflowing left");
+					// values have to be subtracted since they are both negative
+					tooltip.style.setProperty(
+						"--tooltip-left",
+						`${element.left + position.left - overflow.left + SAFE_MARGIN}px`
+					);
+				} else {
+					tooltip.style.setProperty(
+						"--tooltip-left",
+						`${element.left + position.left}px`
+					);
+				}
 			}
 
 			if (direction === "top" || direction === "bottom") {

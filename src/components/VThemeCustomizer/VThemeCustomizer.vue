@@ -12,6 +12,7 @@
 				<div
 					class="justify-self-end w-8 h-8 aspect-auto border border-color-border-50 rounded-md cursor-pointer"
 					:style="{ backgroundColor: `rgb(${value.main})` }"
+					v-tooltip="{ text: value.main }"
 				></div>
 				<input type="color" @input="(event) => changeProperty(key, event)" />
 			</div>
