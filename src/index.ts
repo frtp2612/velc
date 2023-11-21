@@ -3,15 +3,15 @@ import * as components from "./components";
 
 const componentsList: { [key: string]: any } = components?.default;
 
-const VelctComponents = {
-  install: (app: App): any => {
-    Object.keys(componentsList).forEach((name) => {
-      app.component(name, componentsList[name]);
-    });
-  },
+const Velc = {
+	install: (app: App): any => {
+		Object.keys(componentsList).forEach((name) => {
+			app.component(name, componentsList[name]);
+		});
+	},
 };
 
-export default VelctComponents;
+export default Velc;
 
 export { VAlert } from "./components/VAlert";
 export { VButton } from "./components/VButton";
@@ -36,10 +36,11 @@ export { VPopover } from "./components/VPopover";
 export { VProgressBar } from "./components/VProgressBar";
 export { VSelect } from "./components/VSelect";
 export { VSplitView } from "./components/VSplitView";
+export { VSwitcher } from "./components/VSwitcher";
 export { VTabPanel, VTabbedView } from "./components/VTabbedView";
 export { VTextArea } from "./components/VTextArea";
 export { VTextField } from "./components/VTextField";
+export { VThemeCustomizer } from "./components/VThemeCustomizer";
 export { VTimeLine } from "./components/VTimeLine";
 export { VTree } from "./components/VTree";
 export { VWidget } from "./components/VWidget";
-export { VSwitcher } from "./components/VSwitcher";

@@ -1,48 +1,50 @@
 <template>
-  <div :class="[dividerClass, color]"></div>
+	<div :class="[dividerClass, color]"></div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
 
 const props = withDefaults(
-  defineProps<{
-    vertical?: boolean;
-    width?: string | number;
-    height?: string | number;
-    color?: string;
-  }>(),
-  {
-    vertical: false,
-    height: "h-[1px]",
-    color: "bg-color-bg-50",
-  }
+	defineProps<{
+		vertical?: boolean;
+		width?: string | number;
+		height?: string | number;
+		color?: string;
+	}>(),
+	{
+		vertical: false,
+		width: "w-[1px]",
+		height: "h-[1px]",
+		color: "bg-color-bg-50",
+	}
 );
 
 const dividerClass = computed(() => {
-  let value = "w-full ";
+	let value = "w-full ";
 
-  if (props.vertical) {
-    value = "h-full ";
-    if (props.width) {
-      if (typeof props.width === "string") {
-        value += props.width;
-      } else if (typeof props.width === "number") {
-        value += "w-[" + props.width + "px]";
-      }
-    }
-  }
+	if (props.vertical) {
+		value = "h-full ";
+		if (props.width) {
+			if (typeof props.width === "string") {
+				value += props.width;
+			} else if (typeof props.width === "number") {
+				value += "w-[" + props.width + "px]";
+			}
+		}
+		return value;
+	}
 
-  if (props.height) {
-    if (typeof props.height === "string") {
-      value += props.height;
-    } else if (typeof props.height === "number") {
-      value += "h-[" + props.height + "px]";
-    }
+	if (props.height) {
+		if (typeof props.height === "string") {
+			value += props.height;
+		} else if (typeof props.height === "number") {
+			value += "h-[" + props.height + "px]";
+		}
 
-    return value;
-  }
+		return value;
+	}
 
-  return value + " h-[1px]";
+	return value + " h-[1px]";
 });
 </script>

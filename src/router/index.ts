@@ -164,6 +164,14 @@ const routes = [
         "@/views/examples/VSwitcher/VSwitcherExample.vue"
     )
 },
+{
+    path: "/VThemeCustomizer",
+    name: "VThemeCustomizer",
+    component: () =>
+    import(
+        "@/views/examples/VThemeCustomizer/VThemeCustomizerExample.vue"
+    )
+},
 ];
 
 const router = createRouter({

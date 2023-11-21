@@ -22,9 +22,9 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolve(__dirname, "src/index.ts"),
-			name: "VelctComponents",
+			name: "Velc",
 			formats: ["es"],
-			fileName: `velct-components`,
+			fileName: `velc`,
 		},
 		rollupOptions: {
 			// make sure to externalize deps that shouldn't be bundled

@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="fixed top-0 left-0 w-screen h-screen bg-black/5 grid grid-rows-1 grid-cols-1 justify-center items-start p-8"
+		class="fixed top-0 left-0 w-screen h-screen bg-black/5 grid grid-rows-1 grid-cols-1 justify-center items-start p-8 z-[999999]"
 		v-if="isOpen"
 	>
 		<div

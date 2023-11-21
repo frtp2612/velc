@@ -1,10 +1,10 @@
 {
-	"name": "velct-components",
+	"name": "velc",
 	"type": "module",
 	"private": false,
-	"version": "0.0.9",
-	"main": "dist/velct-components.umd.cjs",
-	"module": "dist/velct-components.js",
+	"version": "0.0.1",
+	"main": "dist/velc.umd.cjs",
+	"module": "dist/velc.js",
 	"author": "Paolo Forti",
 	"description": "",
 	"files": [
@@ -13,8 +13,8 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/velct-components.js",
-			"require": "./dist/velct-components.umd.cjs"
+			"import": "./dist/velc.js",
+			"require": "./dist/velc.umd.cjs"
 		},
 		"./dist/styles.css": {
 			"import": "./dist/styles.css",
@@ -35,10 +35,6 @@
 		"./dist/enums": {
 			"import": "./dist/enums.ts",
 			"require": "./dist/enums.ts"
-		},
-		"./dist/localization": {
-			"import": "./dist/localization.ts",
-			"require": "./dist/localization.ts"
 		}
 	},
 	"types": "./dist/index.d.ts",
@@ -46,7 +42,7 @@
 		"dev": "vite",
 		"build": "vue-tsc && vite build && npm run build:styles && npm run build:icons && npm run build:directives && npm run build:composables && npm run build:enums",
 		"preview": "vite preview",
-		"build:lib": "vue-tsc && vite build --target lib --name velct-components src/index.ts",
+		"build:lib": "vue-tsc && vite build",
 		"build:styles": "postcss src/style/tailwind.css -o dist/styles.css",
 		"build:icons": "@powershell copy ./src/fontawesome/index.ts ./dist/icons.ts",
 		"build:directives": "copyfiles --flat ./src/directives/*.ts ./dist/directives",

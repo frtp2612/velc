@@ -96,6 +96,8 @@ const tooltipDirective = (app: any) => {
 				bottom: -(element.height - tooltipHeight) * 0.5,
 			};
 
+			console.log("POSITION: ", position);
+
 			const overflow = {
 				left: position.left - element.left + element.width * 0.5,
 				right:
@@ -103,6 +105,8 @@ const tooltipDirective = (app: any) => {
 					(window.innerWidth - element.right) -
 					element.width * 0.5,
 			};
+
+			console.log("OVERFLOW: ", overflow);
 
 			if (direction) {
 				if (direction === "bottom") {

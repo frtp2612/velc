@@ -22,7 +22,6 @@
 		append-to="body"
 		class="w-full"
 		:auto-focus="autoFocus"
-		@update:model-value="(newValue: any) => model = newValue"
 		v-else-if="isSelect"
 	>
 	</VSelect>
