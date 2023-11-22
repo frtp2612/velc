@@ -95,7 +95,7 @@
 
 .input-base,
 .input-like {
-	@apply focus:ring-0 focus:ring-offset-0 outline-none leading-6 w-full border border-color-border-50 hover:border-color-border-200 focus:border-color-primary py-1 px-2 text-color-text-500 focus:text-color-text bg-color-bg rounded-lg;
+	@apply focus:ring-0 focus:ring-offset-0 outline-none leading-6 w-full border border-color-border-50 hover:border-color-border-200 focus:border-color-primary py-1 px-2 text-color-text-400 focus:text-color-text bg-color-bg rounded-lg;
 }
 
 .icon {
@@ -148,4 +148,8 @@
 
 .no-after-cutoff {
 	@apply translate-x-0;
+}
+
+.overlay-element {
+	@apply bg-color-bg shadow-md shadow-color-bg-200 border border-color-border-100 rounded-lg text-color-text
 }

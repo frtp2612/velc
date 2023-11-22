@@ -13,7 +13,7 @@
       <slot></slot>
     </div>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2" v-if="codeSnippet">
       <div class="px-2 py-1"><VLabel class="font-semibold">Code</VLabel></div>
       <div
         class="grid grid-cols-[40px,_1fr] bg-color-bg-100 rounded-lg divide-x divide-color-border-100 overflow-hidden"
@@ -42,10 +42,10 @@ import VLabel from "@/components/VLabel/index";
 import { computed } from "vue";
 const props = defineProps<{
   title: string;
-  example: string;
+  example?: string;
 }>();
 
 const codeSnippet = computed(() => {
-  return props.example.split("\n");
+  return props.example ? props.example.split("\n") : undefined;
 });
 </script>
