@@ -19,6 +19,7 @@
 					<VDataGrid :columns="columns" :rows="filteredRows" ref="table">
 					</VDataGrid>
 				</div>
+				{{ rowsFromTable?.length }}
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>
@@ -154,4 +155,6 @@ const filteredRows = computed(() => {
 	);
 	return filter;
 });
+
+const rowsFromTable = computed(() => table.value?.rows);
 </script>

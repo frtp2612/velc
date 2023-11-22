@@ -1,182 +1,310 @@
-import { ref } from "vue";
-import { HSLToRGB } from "../../utilities/index";
-export function VColorPickerState() {
-  let canvasContext: CanvasRenderingContext2D;
-  let hueCanvasContext: CanvasRenderingContext2D;
+import { HSLToRGB, RGBToHSL, RGBToHSV } from "@/utilities/index";
+import { Ref, ref } from "vue";
+import { toRGBObject } from "../../utilities/index";
 
-  let canvasRect: DOMRect | undefined;
+export function VColorPickerState(initialValue: string | undefined) {
+	let canvasContext: CanvasRenderingContext2D;
+	let hueCanvasContext: CanvasRenderingContext2D;
 
-  const canvasRef = ref<HTMLCanvasElement>();
-  const hueCanvasRef = ref<HTMLCanvasElement>();
-  const pickerRef = ref<HTMLElement>();
+	let canvasRect: DOMRect | undefined;
+	let hueCanvasRect: DOMRect | undefined;
 
-  const canvasWidth = ref(0);
-  const canvasHeight = ref(0);
-  const hueCanvasWidth = ref(0);
-  const hueCanvasHeight = ref(0);
+	const canvasRef = ref<HTMLCanvasElement>();
+	const hueCanvasRef = ref<HTMLCanvasElement>();
+	const pickerRef = ref<HTMLElement>();
+	const huePickerRef = ref<HTMLElement>();
 
-  const lightness = ref(0);
-  const saturation = ref(0);
-  const hue = ref(0);
+	const canvasWidth = ref(0);
+	const canvasHeight = ref(0);
+	const hueCanvasWidth = ref(0);
+	const hueCanvasHeight = ref(0);
 
-  const color = ref();
+	const lightness = ref(0.5);
+	const saturation = ref(1);
+	const hue = ref(0);
 
-  function init(
-    canvas: HTMLCanvasElement,
-    hueCanvas: HTMLCanvasElement,
-    picker: HTMLElement
-  ) {
-    canvasRef.value = canvas;
-    hueCanvasRef.value = hueCanvas;
-    pickerRef.value = picker;
+	const color = ref<string | undefined>(initialValue);
+	const hueColor = ref<string | undefined>();
+	const colorBreakdown = ref<{
+		r: Ref<number | null>;
+		g: Ref<number | null>;
+		b: Ref<number | null>;
+	}>({
+		r: ref(null),
+		g: ref(null),
+		b: ref(null),
+	});
 
-    canvasContext = canvas.getContext("2d")!;
-    hueCanvasContext = hueCanvas.getContext("2d")!;
+	function breakDownColor() {
+		const { r, g, b } = toRGBObject(color.value);
+		colorBreakdown.value.r = r;
+		colorBreakdown.value.g = g;
+		colorBreakdown.value.b = b;
+	}
 
-    canvasWidth.value = canvasContext.canvas.width;
-    canvasHeight.value = canvasContext.canvas.height;
+	function init(
+		canvas: HTMLCanvasElement,
+		hueCanvas: HTMLCanvasElement,
+		picker: HTMLElement,
+		huePicker: HTMLElement
+	) {
+		canvasRef.value = canvas;
+		hueCanvasRef.value = hueCanvas;
+		pickerRef.value = picker;
+		huePickerRef.value = huePicker;
 
-    hueCanvasWidth.value = hueCanvasContext.canvas.width;
-    hueCanvasHeight.value = hueCanvasContext.canvas.height;
+		canvasContext = canvas.getContext("2d")!;
+		hueCanvasContext = hueCanvas.getContext("2d")!;
 
-    initializeCanvasGradient();
-    initializeHueGradient();
-    addListeners();
-  }
+		canvasWidth.value = canvasContext.canvas.width;
+		canvasHeight.value = canvasContext.canvas.height;
 
-  function initializeCanvasGradient() {
-    canvasContext.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+		hueCanvasWidth.value = hueCanvasContext.canvas.width;
+		hueCanvasHeight.value = hueCanvasContext.canvas.height;
 
-    if (!color.value) color.value = "rgb(255,0,0)";
-    canvasContext.fillStyle = color.value;
-    canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
+		initializeCanvasGradient();
+		initializeHueGradient();
+		addListeners();
 
-    // Create a horizontal gradient
-    let whiteGradient = canvasContext?.createLinearGradient(
-      0,
-      0,
-      canvasWidth.value,
-      0
-    );
-    whiteGradient.addColorStop(0, "#fff");
-    whiteGradient.addColorStop(1, "transparent");
-    canvasContext.fillStyle = whiteGradient;
-    canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
+		updateSpectrumCursor(0, 0);
+		updateHueCursor(0);
 
-    // Create a Vertical Gradient(transparent to black)
-    let blackGradient = canvasContext?.createLinearGradient(
-      0,
-      0,
-      0,
-      canvasHeight.value
-    );
-    blackGradient.addColorStop(0, "transparent");
-    blackGradient.addColorStop(1, "#000");
+		breakDownColor();
+		colorToPos();
+	}
 
-    canvasContext.fillStyle = blackGradient;
-    canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
-  }
+	function initializeCanvasGradient(hue?: string) {
+		canvasContext.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
 
-  function initializeHueGradient() {
-    var hueGradient = hueCanvasContext.createLinearGradient(
-      0,
-      0,
-      0,
-      hueCanvasHeight.value
-    );
-    hueGradient.addColorStop(0.0, "hsl(0, 100%, 50%)");
-    hueGradient.addColorStop(0.17, "hsl(298.8, 100%, 50%)");
-    hueGradient.addColorStop(0.33, "hsl(241.2, 100%, 50%)");
-    hueGradient.addColorStop(0.5, "hsl(180, 100%, 50%)");
-    hueGradient.addColorStop(0.67, "hsl(118.8, 100%, 50%)");
-    hueGradient.addColorStop(0.83, "hsl(61.2, 100%, 50%)");
-    hueGradient.addColorStop(1.0, "hsl(360, 100%, 50%)");
-    hueCanvasContext.fillStyle = hueGradient;
-    hueCanvasContext.fillRect(
-      0,
-      0,
-      hueCanvasWidth.value,
-      hueCanvasHeight.value
-    );
-  }
+		if (!hue) hue = "rgb(255,0,0)";
+		canvasContext.fillStyle = hue;
+		canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
 
-  function addListeners() {
-    canvasRef.value?.addEventListener("mousedown", onMouseDown);
-    pickerRef.value?.addEventListener("mousedown", onMouseDown);
-  }
+		// Create a horizontal gradient
+		let whiteGradient = canvasContext?.createLinearGradient(
+			0,
+			0,
+			canvasWidth.value,
+			0
+		);
+		whiteGradient.addColorStop(0, "#fff");
+		whiteGradient.addColorStop(1, "transparent");
+		canvasContext.fillStyle = whiteGradient;
+		canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
 
-  function onMouseDown() {
-    canvasRect = canvasRef.value?.getBoundingClientRect();
+		// Create a Vertical Gradient(transparent to black)
+		let blackGradient = canvasContext?.createLinearGradient(
+			0,
+			0,
+			0,
+			canvasHeight.value
+		);
+		blackGradient.addColorStop(0, "transparent");
+		blackGradient.addColorStop(1, "#000");
 
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  }
+		canvasContext.fillStyle = blackGradient;
+		canvasContext.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
 
-  function onMouseMove(event: MouseEvent) {
-    applyCorrection(event.clientX, event.clientY);
-  }
+		canvasRect = canvasRef.value?.getBoundingClientRect();
+	}
 
-  function onMouseUp(event: MouseEvent) {
-    applyCorrection(event.clientX, event.clientY);
-    document.removeEventListener("mouseup", onMouseUp);
-    document.removeEventListener("mousemove", onMouseMove);
-  }
+	function initializeHueGradient() {
+		var hueGradient = hueCanvasContext.createLinearGradient(
+			0,
+			0,
+			0,
+			hueCanvasHeight.value
+		);
+		hueGradient.addColorStop(0.0, "hsl(0, 100%, 50%)");
+		hueGradient.addColorStop(0.17, "hsl(298.8, 100%, 50%)");
+		hueGradient.addColorStop(0.33, "hsl(241.2, 100%, 50%)");
+		hueGradient.addColorStop(0.5, "hsl(180, 100%, 50%)");
+		hueGradient.addColorStop(0.67, "hsl(118.8, 100%, 50%)");
+		hueGradient.addColorStop(0.83, "hsl(61.2, 100%, 50%)");
+		hueGradient.addColorStop(1.0, "hsl(360, 100%, 50%)");
+		hueCanvasContext.fillStyle = hueGradient;
+		hueCanvasContext.fillRect(
+			0,
+			0,
+			hueCanvasWidth.value,
+			hueCanvasHeight.value
+		);
 
-  function applyCorrection(x: number, y: number): { x: number; y: number } {
-    x -= canvasRect?.left || 0;
-    y -= canvasRect?.top || 0;
+		hueCanvasRect = hueCanvasRef.value?.getBoundingClientRect();
+	}
 
-    if (x > canvasWidth.value) {
-      x = canvasWidth.value;
-    }
-    if (x <= 0) {
-      x = 0.1;
-    }
-    if (y > canvasHeight.value) {
-      y = canvasHeight.value;
-    }
-    if (y <= 0) {
-      y = 0.1;
-    }
+	function addListeners() {
+		canvasRef.value?.addEventListener("mousedown", onCanvasMouseDown);
+		pickerRef.value?.addEventListener("mousedown", onCanvasMouseDown);
+		hueCanvasRef.value?.addEventListener("mousedown", onHueCanvasMouseDown);
+		huePickerRef.value?.addEventListener("mousedown", onHueCanvasMouseDown);
+	}
 
-    var xRatio = (x / canvasWidth.value) * 100;
-    var yRatio = (y / canvasHeight.value) * 100;
-    var hsvValue = 1 - yRatio / 100;
-    var hsvSaturation = xRatio / 100;
-    lightness.value = (hsvValue / 2) * (2 - hsvSaturation);
-    saturation.value =
-      (hsvValue * hsvSaturation) /
-      Math.max(0.1, 1 - Math.abs(2 * lightness.value - 1));
-    // console.log("BEFORE CORRECTION: ", [
-    //   x,
-    //   y,
-    //   xRatio,
-    //   yRatio,
-    //   hsvValue,
-    //   hsvSaturation,
-    //   lightness.value,
-    //   saturation.value,
-    // ]);
-    const { formatted } = HSLToRGB(
-      hue.value,
-      saturation.value,
-      lightness.value
-    );
-    // console.log("CORRECTED COLOR: ", formatted);
+	function onCanvasMouseDown() {
+		canvasRect = canvasRef.value?.getBoundingClientRect();
 
-    color.value = formatted;
-    updateSpectrumCursor(x, y);
+		document.addEventListener("mousemove", onMouseMove);
+		document.addEventListener("mouseup", onMouseUp);
+	}
 
-    return { x, y };
-  }
+	function onHueCanvasMouseDown() {
+		hueCanvasRect = hueCanvasRef.value?.getBoundingClientRect();
 
-  function updateSpectrumCursor(x: number, y: number) {
-    pickerRef.value?.style.setProperty("--x", x + "px");
-    pickerRef.value?.style.setProperty("--y", y + "px");
-  }
+		document.addEventListener("mousemove", onHueCanvasMouseMove);
+		document.addEventListener("mouseup", onHueCanvasMouseUp);
+	}
 
-  return {
-    init,
-    color,
-  };
+	function onMouseMove(event: MouseEvent) {
+		applySpectrumCorrection(event.clientX, event.clientY);
+	}
+
+	function onHueCanvasMouseMove(event: MouseEvent) {
+		applyHueCorrection(event.clientX, event.pageY);
+	}
+
+	function onMouseUp(event: MouseEvent) {
+		applySpectrumCorrection(event.clientX, event.clientY);
+		document.removeEventListener("mouseup", onMouseUp);
+		document.removeEventListener("mousemove", onMouseMove);
+	}
+
+	function onHueCanvasMouseUp(event: MouseEvent) {
+		applyHueCorrection(event.clientX, event.pageY);
+		document.removeEventListener("mouseup", onHueCanvasMouseUp);
+		document.removeEventListener("mousemove", onHueCanvasMouseMove);
+	}
+
+	function applySpectrumCorrection(x: number, y: number) {
+		x -= canvasRect?.left || 0;
+		y -= canvasRect?.top || 0;
+
+		if (x > canvasRect!.width) {
+			x = canvasRect!.width;
+		}
+		if (x <= 0) {
+			x = 0;
+		}
+		if (y > canvasRect!.height) {
+			y = canvasRect!.height;
+		}
+		if (y <= 0) {
+			y = 0;
+		}
+
+		var xRatio = (x / canvasRect!.width) * 100;
+		var yRatio = (y / canvasRect!.height) * 100;
+		var hsvValue = 1 - yRatio / 100;
+		var hsvSaturation = xRatio / 100;
+		lightness.value = (hsvValue / 2) * (2 - hsvSaturation);
+		saturation.value =
+			(hsvValue * hsvSaturation) /
+			Math.max(0.1, 1 - Math.abs(2 * lightness.value - 1));
+
+		const color = HSLToRGB(hue.value, saturation.value, lightness.value);
+		updateSpectrumCursor(x, y);
+		updateColor(color);
+	}
+
+	function applyHueCorrection(x: number, y: number) {
+		let percentage = 0;
+		let offset = 0;
+
+		y = y - hueCanvasRect!.top;
+
+		if (hueCanvasRect!.height > hueCanvasRect!.width) {
+			if (y > hueCanvasRect!.height) {
+				y = hueCanvasRect!.height;
+			}
+			if (y < 0) {
+				y = 0;
+			}
+			percentage = y / hueCanvasRect!.height;
+			offset = y;
+		} else {
+			if (x > hueCanvasRect!.width) {
+				x = hueCanvasRect!.width;
+			}
+			if (x < 0) {
+				x = 0.1;
+			}
+
+			percentage = x / hueCanvasRect!.width;
+			offset = x;
+		}
+
+		hue.value = 360 - 360 * percentage;
+		const hueRGB = HSLToRGB(hue.value, 1, 0.5);
+		const color = HSLToRGB(hue.value, saturation.value, lightness.value);
+		updateColor(color);
+		updateHue(hueRGB.formatted);
+
+		initializeCanvasGradient(hueRGB.formatted);
+		updateHueCursor(offset);
+	}
+
+	function updateColor(newColor: {
+		r: number;
+		g: number;
+		b: number;
+		formatted: string;
+	}) {
+		color.value = newColor.formatted;
+		colorBreakdown.value.r = newColor.r;
+		colorBreakdown.value.g = newColor.g;
+		colorBreakdown.value.b = newColor.b;
+	}
+
+	function updateHue(formatted: string) {
+		hueColor.value = formatted;
+	}
+
+	function updateSpectrumCursor(x: number, y: number) {
+		pickerRef.value?.style.setProperty("--x", x + "px");
+		pickerRef.value?.style.setProperty("--y", y + "px");
+	}
+
+	function updateHueCursor(offset: number) {
+		huePickerRef.value?.style.setProperty("--offset", offset + "px");
+	}
+
+	function updateColorFromRGB() {
+		color.value = `rgb(${colorBreakdown.value.r}, ${colorBreakdown.value.g}, ${colorBreakdown.value.b})`;
+		colorToPos();
+	}
+
+	function colorToPos() {
+		var newColor = RGBToHSL(
+			colorBreakdown.value.r || 0,
+			colorBreakdown.value.g || 0,
+			colorBreakdown.value.b || 0
+		);
+		var hsv = RGBToHSV(
+			colorBreakdown.value.r || 0,
+			colorBreakdown.value.g || 0,
+			colorBreakdown.value.b || 0
+		);
+
+		hue.value = newColor.h;
+		saturation.value = newColor.s / 100;
+		lightness.value = newColor.l / 100;
+
+		var x = canvasRect!.width * hsv.s;
+		var y = canvasRect!.height * (1 - hsv.v);
+		var hueY =
+			hueCanvasRect!.height - (hue.value / 360) * hueCanvasRect!.height;
+		const hueRGB = HSLToRGB(hue.value, 1, 0.5);
+		updateSpectrumCursor(x, y);
+		updateHueCursor(hueY);
+		updateHue(hueRGB.formatted);
+		initializeCanvasGradient(hueRGB.formatted);
+	}
+
+	return {
+		init,
+		color,
+		colorBreakdown,
+		hueColor,
+
+		updateColorFromRGB,
+	};
 }

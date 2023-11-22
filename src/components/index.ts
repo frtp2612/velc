@@ -89,4 +89,5 @@ export default {
 	VTimeLine,
 	VSwitcher,
 	VThemeCustomizer,
+	VColorPicker,
 };

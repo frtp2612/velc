@@ -5,6 +5,8 @@
 		class="text-right"
 		:class="elementClass"
 		:id="id"
+		:min="min"
+		:max="max"
 		ref="input"
 	/>
 </template>
@@ -19,6 +21,8 @@ const props = defineProps<{
 	modelValue?: any;
 	customClass?: string;
 	autoFocus?: boolean;
+	min?: number;
+	max?: number;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
