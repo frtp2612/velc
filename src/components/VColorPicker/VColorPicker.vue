@@ -114,6 +114,8 @@ const state = VColorPickerState(model.value);
 const { color, hueColor, colorBreakdown, updateColorFromRGB } = state;
 
 watchEffect(() => {
+  console.log("value changed");
+
   model.value = color.value;
 });
 

@@ -4,16 +4,12 @@
       <div
         class="w-full aspect-square cursor-pointer rounded-lg border border-color-border-50"
         :style="{ backgroundColor: `${color}` }"
-        v-tooltip="{ text: computed(() => color) }"
       ></div>
     </div>
     <div class="flex justify-between items-center gap-4 w-full px-4 py-2">
       <VLabel class="text-lg font-semibold">{{ name }}</VLabel>
       <div class="flex gap-2 items-center">
-        <VColorPicker
-          v-model="color"
-          @update:model-value="onValueChanged(name, color)"
-        />
+        <VColorPicker v-model="color" @update:model-value="onColorChanged" />
       </div>
     </div>
   </div>
@@ -31,6 +27,12 @@ const props = defineProps<{
 }>();
 
 const color = ref(props.value);
+
+function onColorChanged(newValue: string) {
+  console.log([newValue, props.value]);
+
+  if (newValue !== props.value) props.onValueChanged(props.name, newValue);
+}
 </script>
 
 <style scoped></style>

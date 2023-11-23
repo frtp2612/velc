@@ -20,12 +20,22 @@
 				/> -->
     </div>
   </div>
+  <div class="fixed bottom-0 left-0 flex gap-4 bg-white p-4">
+    <div
+      v-for="color in colors"
+      :style="{ backgroundColor: `rgb(${color})` }"
+      class="w-8 h-8"
+    ></div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { toRGBObject } from "../../utilities/index";
+import { toRGBObject, RGBToHSL, HSLToRGB } from "../../utilities/index";
 import VThemeCustomizerColor from "./VThemeCustomizerColor.vue";
+import { clamp } from "@vueuse/core";
+
+const colors = ref<any[]>([]);
 
 const colorsMap = ref<
   Map<string, { main: string; derived: Map<string, string> }>
@@ -62,5 +72,42 @@ function changeProperty(key: string, newValue: string) {
     "--color-" + key,
     `${updatedColor.r} ${updatedColor.g} ${updatedColor.b}`
   );
+
+  const { h, s, l } = RGBToHSL(updatedColor.r, updatedColor.g, updatedColor.b);
+
+  const newS = s * 0.01;
+  const steps = 10;
+  const lighterSteps = Math.round((100 - l) * 0.1);
+  const darkerSteps = steps - lighterSteps;
+
+  colors.value.length = 0;
+  Array.from(Array(lighterSteps).keys()).forEach((_, i: number) => {
+    const hFactor = h * ((lighterSteps - i) * 1) * 0.01;
+    const newH = clamp(h - hFactor, 0, 360);
+    const newL = clamp(l + l * ((lighterSteps - i) * 10) * 0.01, 0, 100) * 0.01;
+    // console.log([newH, newS, newL]);
+    const rgb = HSLToRGB(newH, newS, newL);
+    colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
+  });
+
+  Array.from(Array(darkerSteps).keys()).forEach((_, i: number) => {
+    const hFactor = h * (i * 1) * 0.01;
+    const newH = clamp(h + hFactor, 0, 360);
+    const newL = clamp(l - l * (i * 10) * 0.01, 0, 100) * 0.01;
+    // console.log([newH, newS, newL]);
+    const rgb = HSLToRGB(newH, newS, newL);
+    colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
+  });
+
+  shades.forEach((shade: number, index: number) => {
+    document.body.style.setProperty(
+      "--color-" + key + "-" + shade,
+      `${colors.value[index]}`
+    );
+  });
+
+  // console.log(colors.value);
 }
+
+const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 </script>
