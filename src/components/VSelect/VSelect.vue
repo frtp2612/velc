@@ -27,14 +27,14 @@
 			</slot>
 		</div>
 
-		<Teleport to="body" :disabled="!open">
-			<slot :items="filteredItems" name="item">
+		<Teleport to="body" :disabled="!open || preventAppend">
+			<slot :items="filteredItems" name="items">
 				<div
-					class="absolute z-[10000] left-0 top-full border border-color-border-100 shadow-md shadow-color-bg-100 flex flex-col max-h-64 min-w-[16rem] w-max max-w-max bg-color-bg divide-y"
+					class="absolute z-[10000] left-0 top-full border border-color-border-100 shadow-md shadow-color-bg-100 flex flex-col max-h-64 min-w-[12rem] w-max max-w-max bg-color-bg"
 					v-show="open"
 					ref="dropdownPopup"
 				>
-					<VirtualScroller :items="filteredItems" :item-height="30">
+					<VirtualScroller :items="filteredItems" :item-height="30" :id="id">
 						<template v-slot="{ item }">
 							<div
 								class="px-2 overflow-ellipsis whitespace-nowrap h-full cursor-pointer flex items-center"
@@ -81,6 +81,7 @@ const props = defineProps<{
 	formatter?: Function;
 	autoFocus?: boolean;
 	component?: RendererElement;
+	preventAppend?: boolean;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
@@ -123,11 +124,9 @@ function toggle() {
 	if (open.value) {
 		startTimer();
 		document.addEventListener("keyup", inputListener);
-		requestAnimationFrame(() => {
-			if (dropdownPopup.value && dropdown.value) {
-				useAutoPopDirection(dropdown.value, dropdownPopup.value);
-			}
-		});
+		if (!props.preventAppend && dropdownPopup.value && dropdown.value) {
+			useAutoPopDirection(dropdown.value, dropdownPopup.value);
+		}
 	} else {
 		reset();
 	}
@@ -193,4 +192,32 @@ onMounted(() => {
 onUnmounted(() => {
 	document.removeEventListener("keyup", inputListener);
 });
+
+// watch(
+// 	() => props.modelValue,
+// 	() => {
+// 		console.log("model value changed in", props.id);
+// 	}
+// );
+
+// watch(
+// 	() => props.formatter,
+// 	() => {
+// 		console.log("formatter value changed in", props.id);
+// 	}
+// );
+
+// watch(
+// 	() => props.id,
+// 	() => {
+// 		console.log("id value changed in", props.id);
+// 	}
+// );
+
+// watch(props, (current: any, old: any) => {
+// 	console.log("current", current);
+// 	console.log("old", old);
+
+// 	console.log("value changed in ", props.id);
+// });
 </script>

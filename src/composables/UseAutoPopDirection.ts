@@ -9,6 +9,7 @@ const SAFE_MARGIN = 8;
 export const useAutoPopDirection = (
 	container: HTMLElement,
 	target: HTMLElement,
+	content?: HTMLElement,
 	arrow?: HTMLElement,
 	options?: AutoPopOptions
 ) => {
@@ -16,12 +17,13 @@ export const useAutoPopDirection = (
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
+		// console.log("CONTAINER RECT", containerRect);
 
 		const targetRect = target.getBoundingClientRect();
 		const targetWidth = targetRect.width;
 		const targetHeight = targetRect.height;
-
-		let overflowX = 0;
+		// console.log("TARGET RECT", targetRect);
+		// let overflowX = 0;
 		// let overflowY = 0;
 
 		let adjustedPositionX =
@@ -46,13 +48,13 @@ export const useAutoPopDirection = (
 			adjustedPositionY + targetHeight > window.innerHeight - SAFE_MARGIN;
 
 		if (overflowsRight) {
-			overflowX = containerRect.right + adjustedPositionX;
-			adjustedPositionX =
-				window.innerWidth -
-				targetWidth +
-				(containerRect.right - window.innerWidth);
+			// overflowX = containerRect.right + adjustedPositionX;
+			// console.log(overflowX);
+
+			adjustedPositionX = window.innerWidth - targetWidth - SAFE_MARGIN;
+			// console.log(adjustedPositionX);
 		} else if (overflowsLeft) {
-			overflowX = adjustedPositionX - containerRect.left;
+			// overflowX = adjustedPositionX - containerRect.left;
 			adjustedPositionX = containerRect.left;
 		}
 
@@ -63,25 +65,46 @@ export const useAutoPopDirection = (
 			adjustedPositionY = containerRect.top - targetHeight;
 		}
 
+		// console.log("ADJUSTED POSITION", adjustedPositionX);
+
 		target.style.left = adjustedPositionX + "px";
 		target.style.top = adjustedPositionY + "px";
 
-		if (arrow) {
-			arrow.style.left = overflowX + targetWidth * 0.5 + "px";
+		if (arrow && content) {
+			const contentRect = content.getBoundingClientRect();
+
+			const arrowRect = arrow.getBoundingClientRect();
+			let arrowX = "";
+
+			if (overflowsLeft || overflowsRight) {
+				arrowX =
+					containerRect.left - adjustedPositionX + arrowRect.width + "px";
+			} else {
+				arrowX = (targetWidth - arrowRect.width) * 0.5 + "px";
+			}
+
+			arrow.style.setProperty("--arrow-x", arrowX + "");
 
 			if (overflowsBottom) {
-				arrow.classList.replace("border-t", "border-b");
-				arrow.classList.replace("border-l", "border-r");
-				arrow.classList.replace("-top-0.5", "-bottom-0.5");
+				arrow.style.setProperty("--arrow-y", contentRect.height + "px");
+
+				if (arrow.classList.contains("arrow-top")) {
+					arrow.classList.replace("arrow-top", "arrow-bottom");
+				} else {
+					arrow.classList.add("arrow-bottom");
+				}
 			} else {
-				arrow.classList.replace("border-b", "border-t");
-				arrow.classList.replace("border-r", "border-l");
-				arrow.classList.replace("-bottom-0.5", "-top-0.5");
+				arrow.style.setProperty("--arrow-y", "1px");
+				if (arrow.classList.contains("arrow-bottom")) {
+					arrow.classList.replace("arrow-bottom", "arrow-top");
+				} else {
+					arrow.classList.add("arrow-top");
+				}
 			}
 		}
 	}
 
-	calculatePosition();
+	requestAnimationFrame(() => calculatePosition());
 
 	return {};
 };

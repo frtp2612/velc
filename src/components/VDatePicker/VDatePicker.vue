@@ -33,10 +33,39 @@
 							icon="fa-angle-left"
 							class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
 							@click.capture.stop="onChangeMonthClick(-1)"
-						/><VLabel
-							class="grow self-center pointer-events-none select-none"
-							>{{ header }}</VLabel
-						><font-awesome-icon
+						/>
+						<div class="flex gap-2 justify-self-center">
+							<VSelect
+								id="month-select"
+								:values="monthsIndeces"
+								v-model="month"
+								:formatter="monthFormatter"
+								prevent-append
+							>
+								<VTextField
+									id="month-select"
+									:model-value="months[month]"
+									custom-class="input-base"
+									autocomplete="off"
+								/>
+							</VSelect>
+							<VSelect
+								id="year-select"
+								:values="years"
+								:formatter="yearFormatter"
+								v-model="year"
+								prevent-append
+							>
+								<VTextField
+									id="year-select"
+									:model-value="year"
+									custom-class="input-base"
+									autocomplete="off"
+								/>
+							</VSelect>
+						</div>
+
+						<font-awesome-icon
 							icon="fa-angle-right"
 							class="w-5 h-5 p-2 hover:bg-color-bg-100 cursor-pointer rounded-md"
 							@click.capture.stop="onChangeMonthClick(1)"
@@ -81,6 +110,7 @@
 <script lang="ts" setup>
 import VLabel from "@/components/VLabel/index";
 import VPopover from "@/components/VPopover/VPopover.vue";
+import VSelect from "@/components/VSelect/index";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { inputBaseClass } from "@/constants";
 import { useVModel } from "@vueuse/core";
@@ -109,9 +139,13 @@ const props = withDefaults(
 		offsetDayIndices?: number;
 		autoFocus?: boolean;
 		label?: string;
+		yearRangeOffsetMin?: number;
+		yearRangeOffsetMax?: number;
 	}>(),
 	{
 		offsetDayIndices: 0,
+		yearRangeOffsetMin: -50,
+		yearRangeOffsetMax: 10,
 	}
 );
 
@@ -147,6 +181,18 @@ const normalizedSelectedDate = computed(() =>
 		  )
 		: undefined
 );
+
+const currentYear = new Date().getFullYear();
+
+const years = Array.from(
+	{ length: props.yearRangeOffsetMax + Math.abs(props.yearRangeOffsetMin) },
+	(_, index: number) => props.yearRangeOffsetMax + currentYear - index
+);
+
+const monthFormatter = (monthIndex: number) => months[monthIndex];
+const yearFormatter = (year: number) => `${year}`;
+
+const monthsIndeces = Array.from(Array(12).keys());
 
 const year = ref(
 	dateIsValid() ? date.value!.getFullYear() : new Date().getFullYear()
@@ -231,7 +277,7 @@ let todayTimestamp =
 
 const monthData = computed(() => getMonthInfo(year.value, month.value));
 // Set dynamic calendar header
-const header = computed(() => getMonthStr(month.value) + " " + year.value);
+// const header = computed(() => getMonthStr(month.value) + " " + year.value);
 
 const calendarGrid = `repeat(${CALENDAR_COLUMNS}, 1fr)`;
 

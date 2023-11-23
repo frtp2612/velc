@@ -110,6 +110,14 @@
 	@apply bg-color-bg hover:bg-color-bg-50;
 }
 
+.selectable-node {
+	@apply hover:bg-color-bg-100 hover:text-color-primary rounded-md;
+}
+
+.selected-node {
+	@apply bg-color-primary text-color-text-50 rounded-md;
+}
+
 .true {
 	@apply !bg-color-primary !text-color-text-50;
 }
@@ -151,5 +159,17 @@
 }
 
 .overlay-element {
-	@apply bg-color-bg shadow-md shadow-color-bg-200 border border-color-border-100 rounded-lg text-color-text
+	@apply bg-color-bg shadow-md shadow-color-bg-200 border border-color-border-100 rounded-lg text-color-text;
+}
+
+.arrow {
+	@apply border-color-border-100 w-3 h-3 absolute bg-color-bg rotate-45 z-30 top-0 translate-y-[var(--arrow-y)] left-[var(--arrow-x)];
+}
+
+.arrow-top {
+	@apply border-t border-l;
+}
+
+.arrow-bottom {
+	@apply border-b border-r;
 }

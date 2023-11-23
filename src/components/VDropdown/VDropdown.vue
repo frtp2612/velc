@@ -67,9 +67,15 @@ function toggle() {
 	if (open.value) {
 		requestAnimationFrame(() => {
 			if (dropdownPopup.value && dropdown.value && props.appendTo) {
-				useAutoPopDirection(dropdown.value, dropdownPopup.value, undefined, {
-					align: props.align,
-				});
+				useAutoPopDirection(
+					dropdown.value,
+					dropdownPopup.value,
+					undefined,
+					undefined,
+					{
+						align: props.align,
+					}
+				);
 			}
 		});
 	}
