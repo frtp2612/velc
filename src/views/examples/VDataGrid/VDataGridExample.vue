@@ -15,11 +15,14 @@
 							@update:model-value="(value: number) => table!.scrollTo(value)"
 						/>
 					</div>
-
-					<VDataGrid :columns="columns" :rows="filteredRows" ref="table">
-					</VDataGrid>
+					<VTabbedView>
+						<VTabPanel title="Tab 1"> </VTabPanel>
+						<VTabPanel title="Data grid">
+							<VDataGrid :columns="columns" :rows="filteredRows" ref="table">
+							</VDataGrid>
+						</VTabPanel>
+					</VTabbedView>
 				</div>
-				{{ rowsFromTable?.length }}
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>
@@ -28,6 +31,7 @@
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
 import VNumericField from "@/components/VNumericField/VNumericField.vue";
+import VTabbedView, { VTabPanel } from "@/components/VTabbedView/index";
 import { VButtonTypes, VDataColumn, VDataRow, VDataType } from "@/enums";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
@@ -97,7 +101,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
 }));
 
 const rows = ref(
-	Array.from(Array(10)).map((_, i) => {
+	Array.from(Array(100)).map((_, i) => {
 		let row: VDataRow = {
 			id: i,
 		};
@@ -156,5 +160,5 @@ const filteredRows = computed(() => {
 	return filter;
 });
 
-const rowsFromTable = computed(() => table.value?.rows);
+// const rowsFromTable = computed(() => table.value?.rows);
 </script>

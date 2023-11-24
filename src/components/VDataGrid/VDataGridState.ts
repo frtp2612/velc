@@ -30,7 +30,7 @@ function VDataGridState(
 ) {
 	const tableContainerRef = ref<HTMLElement>();
 	const columnsContainerRef = ref<HTMLElement>();
-	const contentContainerRef = ref<HTMLElement>();
+	// const contentContainerRef = ref<HTMLElement>();
 	const columnsDataList = ref<DataGridColumnData[]>([]);
 	const lockedColumnsMap = ref<Map<string, number>>(new Map<string, number>());
 	const initialized = ref(false);
@@ -45,7 +45,8 @@ function VDataGridState(
 
 	const reactiveRows = ref(rows);
 
-	const { width, height } = useElementSize(contentContainerRef);
+	const { width, height } = useElementSize(tableContainerRef);
+
 	const { data, filters, setFilter, resetFilter } =
 		useFilter<VDataRow>(reactiveRows);
 
@@ -68,14 +69,10 @@ function VDataGridState(
 			.join(" ")
 	);
 
-	function init(
-		tableContainer: HTMLElement,
-		columnsContainer: HTMLElement,
-		contentContainer: HTMLElement
-	) {
+	function init(tableContainer: HTMLElement, columnsContainer: HTMLElement) {
 		tableContainerRef.value = tableContainer;
 		columnsContainerRef.value = columnsContainer;
-		contentContainerRef.value = contentContainer;
+		// contentContainerRef.value = contentContainer;
 
 		requestAnimationFrame(() => {
 			initializeColumnsData();
@@ -348,13 +345,12 @@ function VDataGridState(
 
 		sort,
 
-		filters,
 		setFilter,
 		resetFilter,
 
 		onCellEditEnd,
 
-		// computed properties
+		// properties
 		columnsLayout,
 
 		data: computed(() => applySort(data)),
@@ -366,6 +362,8 @@ function VDataGridState(
 		lockedColumnsMap,
 
 		columns,
+
+		filters,
 
 		selectedRowId,
 		selectedColumnId,

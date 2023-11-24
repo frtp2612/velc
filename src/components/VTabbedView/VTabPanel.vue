@@ -3,7 +3,7 @@
 		class="grid min-h-0 h-full overflow-auto"
 		:class="[noPadding ? '' : 'p-4']"
 		ref="tab"
-		v-if="parentVisible"
+		v-show="parentVisible"
 	>
 		<slot></slot>
 	</div>

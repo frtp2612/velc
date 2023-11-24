@@ -1,4 +1,4 @@
-import { clamp } from "@vueuse/core";
+import { clamp, useElementSize } from "@vueuse/core";
 import {
 	computed,
 	onMounted,
@@ -18,20 +18,21 @@ export default function useVirtualList(
 	const container = ref<HTMLElement | null>(null);
 
 	const { scrollTop, scrollTo } = useElementScroll(containerRef);
+	const { height } = useElementSize(containerRef);
 
 	const itemCount = computed(() => items.value.length);
 
 	const totalHeight = computed(() => itemCount.value * itemHeight);
 
-	const startIndex = computed(() => {
-		return Math.max(0, Math.floor(scrollTop.value / itemHeight) - renderAhead);
-	});
+	const startIndex = computed(() =>
+		Math.max(0, Math.floor(scrollTop.value / itemHeight) - renderAhead)
+	);
 
 	const visibleItemsCount = computed<number>(() => {
 		const count = container.value
 			? Math.ceil(container.value.clientHeight / itemHeight) + 2 * renderAhead
 			: 0;
-		// console.log("UPDATED VISIBLE ITEMS COUNT IN: ", [id, startIndex.value]);
+		// console.log("UPDATED VISIBLE ITEMS COUNT FROM INDEX: ", [startIndex.value]);
 
 		return Math.min(itemCount.value - startIndex.value, count);
 	});
@@ -56,7 +57,7 @@ export default function useVirtualList(
 		() => items.value.length,
 		() => {
 			if (container.value && scrollTop.value > container.value.clientHeight) {
-				// console.log("SCROLLING TO NEW VALUE IN LIST: ", id);
+				// console.log("SCROLLING TO NEW VALUE IN LIST: ");
 				// console.log(totalHeight.value);
 
 				scrollTo({
@@ -64,6 +65,13 @@ export default function useVirtualList(
 					left: container.value?.scrollLeft || 0,
 				});
 			}
+		}
+	);
+
+	watch(
+		() => height.value,
+		() => {
+			scrollTo({ top: scrollTop.value, left: 0 });
 		}
 	);
 

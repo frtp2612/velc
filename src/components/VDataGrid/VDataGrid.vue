@@ -17,6 +17,7 @@
 				:items="data"
 				:wrapper-class="initialized ? 'w-fit' : ''"
 				ref="content"
+				v-if="gridInitialized || parentVisible"
 			>
 				<template #prepend>
 					<!-- GRID HEADER -->
@@ -63,15 +64,13 @@
 import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
 import { VDataColumn, VDataGridEmits, VDataRow } from "@/enums";
 import { textFormatter } from "@/formatters/index";
-import { clamp } from "@vueuse/core";
-import { computed, onMounted, provide, ref, watchEffect } from "vue";
+import { clamp, watchOnce } from "@vueuse/core";
+import { computed, inject, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Translatable } from "../../enums/index";
 import VDataGridColumn from "./VDataGridColumn.vue";
 import VDataGridRow from "./VDataGridRow.vue";
 import VDataGridState from "./VDataGridState";
-
-const i18n = useI18n();
 
 const props = withDefaults(
 	defineProps<{
@@ -87,6 +86,14 @@ const props = withDefaults(
 
 const emit = defineEmits<VDataGridEmits>();
 
+const gridInitialized = ref(false);
+
+const i18n = useI18n();
+
+const tableContainer = ref<HTMLElement | null>(null);
+const columnsContainer = ref<HTMLElement | null>(null);
+const content = ref<InstanceType<typeof VirtualScroller> | null>(null);
+
 const columnsGridLayout = computed(() =>
 	props.columns ? `repeat(${props.columns.length}, 1fr)` : ""
 );
@@ -99,10 +106,6 @@ const state = VDataGridState(
 	emit
 );
 
-watchEffect(() => {
-	state.updateRows(props.rows);
-});
-
 const {
 	initialized,
 	columnsLayout,
@@ -112,11 +115,8 @@ const {
 	changeSelectedCell,
 } = state;
 
-const tableContainer = ref<HTMLElement | null>(null);
-const columnsContainer = ref<HTMLElement | null>(null);
-const content = ref<InstanceType<typeof VirtualScroller> | null>(null);
-
 provide("state", state);
+const parentVisible = inject("parentVisible", ref(true));
 
 defineExpose({
 	rows: data,
@@ -135,19 +135,35 @@ defineExpose({
 	selectedRowId,
 });
 
-onMounted(() => {
-	requestAnimationFrame(() => {
-		if (
-			tableContainer.value !== null &&
-			columnsContainer.value !== null &&
-			content.value !== null
-		) {
-			state.init(
-				tableContainer.value!,
-				columnsContainer.value!,
-				content.value!.container!
-			);
+watch(
+	() => props.rows.length,
+	() => {
+		state.updateRows(props.rows);
+	}
+);
+
+watchOnce(
+	() => parentVisible.value,
+	() => {
+		if (parentVisible.value && !gridInitialized.value) {
+			requestAnimationFrame(() => {
+				if (tableContainer.value !== null && columnsContainer.value !== null) {
+					state.init(tableContainer.value!, columnsContainer.value!);
+					gridInitialized.value = true;
+				}
+			});
 		}
-	});
+	}
+);
+
+onMounted(() => {
+	if (parentVisible.value) {
+		requestAnimationFrame(() => {
+			if (tableContainer.value !== null && columnsContainer.value !== null) {
+				state.init(tableContainer.value!, columnsContainer.value!);
+				gridInitialized.value = true;
+			}
+		});
+	}
 });
 </script>
