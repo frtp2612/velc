@@ -2,8 +2,8 @@
   <div
     class="bg-color-bg-50 rounded-lg grid items-center justify-center h-full w-full p-8"
   >
-    <div class="animate-pulse flex items-center gap-4 text-color-text-300">
-      <div aria-label="Loading..." role="status" class="stroke-color-text-300">
+    <div class="animate-pulse flex items-center gap-4 text-color-text-500">
+      <div aria-label="Loading..." role="status" class="stroke-color-text-500">
         <svg
           width="24"
           height="24"

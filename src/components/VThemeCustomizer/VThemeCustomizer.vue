@@ -1,32 +1,93 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <div class="grid lg:grid-cols-8 md:grid-cols-4 gap-4 p-8">
-      <div
+  <div
+    class="flex-col justify-center grid grid-cols-[1fr,_3fr] gap-8 p-8 min-h-0 h-full"
+  >
+    <div class="flex col-span-2">
+      <VSelect
+        :values="themeNames"
+        id="theme-select"
+        @update:model-value="onThemeChanged"
+      />
+    </div>
+    <div class="flex flex-col gap-4 overflow-auto">
+      <VThemeCustomizerColor
+        :name="(key as string)"
+        :value="value.default"
+        :active="activeColor === value"
+        @click="changeActiveColor(key as string)"
         v-for="(value, key) in colorsMap"
-        class="flex flex-col gap-4 bg-color-bg-50 rounded-xl overflow-hidden"
-        :key="value.default"
-      >
-        <VThemeCustomizerColor
-          :name="(key as string)"
-          :value="value.default"
-          :on-value-changed="changeProperty"
-        />
+        :key="key + value.default"
+      />
+    </div>
+    <div v-if="activeColor" class="flex flex-col gap-8">
+      <div class="flex flex-col gap-4">
+        <div class="flex gap-2 items-center">
+          <div
+            class="h-16 aspect-square rounded-lg border border-color-border-100"
+            :style="{ backgroundColor: `${activeColor.default}` }"
+            v-tooltip="{ text: `${activeColor.default}` }"
+          ></div>
+          <VLabel class="text-lg font-semibold">{{
+            activeColor.default
+          }}</VLabel>
+        </div>
 
-        <!-- <VThemeCustomizerColor
-						v-for="[derivedKey, derivedValue] in value.derived"
-						:key="derivedKey"
-						:name="key + '-' + derivedKey"
-						:value="derivedValue"
-						:on-value-changed="changeProperty"
-					/> -->
+        <VColorPicker v-model="activeColor.default" ref="colorPicker" />
+      </div>
+      <div class="flex gap-4">
+        <VButton :on-click="generateShades">Generate Shades</VButton>
+        <VCheckBox
+          id="invert-generation"
+          label="Invert colors?"
+          v-model="invertGeneration"
+        ></VCheckBox>
+      </div>
+
+      <div class="flex w-min">
+        <div
+          class="flex flex-col gap-2 items-center"
+          v-for="([key, shade], index) in new Map(
+            [...activeColor.shades.entries()].sort((value1, value2) =>
+              value1[0]
+                .padStart(3, '0')
+                .localeCompare(value2[0].padStart(3, '0'))
+            )
+          )"
+          :key="key"
+        >
+          <VColorPicker
+            v-if="activeColor.shades.has(key)"
+            :model-value="activeColor.shades.get(key)"
+            @update:model-value="(value: string) => activeColor!.shades.set(key, value)"
+            #default="{ toggle }"
+          >
+            <div
+              class="h-16 aspect-square"
+              :class="[
+                {
+                  'rounded-l-lg': index === 0,
+                  'rounded-r-lg': index === activeColor.shades.size - 1,
+                },
+              ]"
+              :style="{ backgroundColor: `${shade}` }"
+              v-tooltip="{ text: `${shade}` }"
+              @click="toggle"
+            ></div>
+          </VColorPicker>
+
+          <VLabel>{{ key }}</VLabel>
+        </div>
       </div>
     </div>
-    <div>
+
+    <div class="flex gap-4 col-span-2 justify-end">
+      <VButton :on-click="exportTheme">Export theme</VButton>
       <VButton
         :type="VButtonTypes.PRIMARY"
         :on-click="() => (promptSaveTheme = true)"
-        >Save</VButton
+        >Save Theme</VButton
       >
+
       <VModalWindow v-model="promptSaveTheme" title="Save theme">
         <VTextField
           id="theme-name"
@@ -37,25 +98,21 @@
           >Confirm</VButton
         >
       </VModalWindow>
+      <VModalWindow
+        v-model="exportWindowVisible"
+        title="Export theme"
+        width="50%"
+        height="50%"
+      >
+        <VTextArea id="export" v-model="exportedTheme" class="h-full" />
+      </VModalWindow>
     </div>
-  </div>
-
-  <div
-    class="fixed bottom-0 left-1/2 -translate-x-1/2 rounded-t-lg flex gap-4 bg-color-nav w-auto mx-auto justify-self-center p-4"
-  >
-    <div
-      v-for="(color, index) in colors"
-      :style="{ backgroundColor: `rgb(${color})` }"
-      :key="color + index"
-      v-tooltip:top="{ text: computed(() => `rgb(${color})`) }"
-      class="w-8 h-8"
-    ></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { clamp } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { ref, computed } from "vue";
 import {
   HSLToRGB,
   RGBToHSL,
@@ -68,6 +125,20 @@ import { VButtonTypes } from "@/enums";
 import VModalWindow from "../VModalWindow/index";
 import VTextField from "@/components/VTextField/VTextField.vue";
 import { lerpFromTo } from "../../utilities/index";
+import VLabel from "@/components/VLabel/index";
+import VColorPicker from "@/components/VColorPicker/VColorPicker.vue";
+import VCheckBox from "@/components/VCheckBox/index";
+import VTextArea from "@/components/VTextArea/VTextArea.vue";
+import VSelect from "@/components/VSelect/index";
+
+const themes = ref<{ [key: string]: string[] }>(
+  JSON.parse(localStorage.getItem("themes") || "{}")
+);
+const themeNames = ref<string[]>([]);
+for (const property in themes.value) {
+  themeNames.value.push(property);
+  // console.log(`${property}: ${themes.value[property]}`);
+}
 
 const colorsMap = ref<{
   [key: string]: { default: string; shades: Map<string, string> };
@@ -75,6 +146,16 @@ const colorsMap = ref<{
 const colors = ref<any[]>([]);
 const promptSaveTheme = ref(false);
 const themeName = ref("");
+
+const activeColorKey = ref<string>("");
+const activeColor = computed(() => colorsMap.value[activeColorKey.value]);
+
+const colorPicker = ref<InstanceType<typeof VColorPicker>>();
+
+const invertGeneration = ref(false);
+
+const exportedTheme = ref();
+const exportWindowVisible = ref(false);
 
 document.body
   .computedStyleMap()
@@ -96,39 +177,36 @@ document.body
     }
   });
 
-function changeProperty(
-  key: string,
-  newValue: string,
-  colorHue: number,
-  colorSaturation: number,
-  updateColorsView: boolean = true
-) {
-  const updatedColor = toRGBObject(newValue);
+function changeActiveColor(colorKey: string) {
+  if (activeColorKey.value === colorKey) return;
+  activeColorKey.value = colorKey;
+  if (colorPicker.value) colorPicker.value.update();
+}
+
+function generateShades() {
+  if (!colorPicker.value) return;
+
+  const hue = colorPicker.value.hue;
+  const saturation = colorPicker.value.saturation;
+
+  const updatedColor = toRGBObject(activeColor.value?.default);
+
   document.body.style.setProperty(
-    "--color-" + key,
+    "--color-" + activeColorKey.value,
     `${updatedColor.r} ${updatedColor.g} ${updatedColor.b}`
   );
 
   const { s, l } = RGBToHSL(updatedColor.r, updatedColor.g, updatedColor.b);
   // console.log([s, l, colorSaturation]);
 
-  const darkestColor =
-    l < 10
-      ? updatedColor
-      : HSLToRGB(colorHue, colorSaturation, Math.random() * 0.1);
-  const lightestColor =
-    l > 90
-      ? updatedColor
-      : HSLToRGB(colorHue, colorSaturation, 1 - Math.random() * 0.1);
+  const darkestColor = HSLToRGB(
+    hue,
+    saturation,
+    l < 20 ? l * 0.01 + Math.random() * 0.05 : Math.random() * 0.1
+  );
+  const lightestColor = HSLToRGB(hue, saturation, 1 - Math.random() * 0.1);
 
-  const steps = 11;
-  let lighterSteps = 0;
-  const lightnessRatio = l * 0.01;
-
-  lighterSteps = Math.floor(steps * (1 - lightnessRatio));
-  let darkerSteps = steps - lighterSteps;
-
-  // console.log([darkestColor, lightestColor]);
+  const steps = 10;
 
   const darkestColorL = RGBToHSL(
     darkestColor.r,
@@ -147,142 +225,89 @@ function changeProperty(
     steps
   );
 
-  var closest = lerpFactors.findIndex(
-    (value: number) =>
-      value ===
-      lerpFactors.reduce(function (prev, curr) {
-        return Math.abs(curr - l) < Math.abs(prev - l) ? curr : prev;
-      })
-  );
-
-  // console.log(lerpFactors);
-  // console.log(closest);
-
   colors.value.length = 0;
 
   Array.from(Array(steps).keys()).forEach((_, i: number) => {
-    if (i === closest) {
-      colors.value.push(
-        `${updatedColor.r} ${updatedColor.g} ${updatedColor.b}`
-      );
-    } else {
-      const lerpValue = lerpFactors[i];
+    const index =
+      invertGeneration.value || (l < 20 && activeColorKey.value === "bg")
+        ? steps - i - 1
+        : i;
 
-      const newH = clamp(colorHue, 0, 360);
-      const newL = clamp(lerpValue, 0, 100) * 0.01;
-      console.log([newH, lerpValue * s * 0.01, newL]);
-      const rgb = HSLToRGB(newH, s * 0.01, newL);
-      console.log(rgb.formatted);
+    const lerpValue = lerpFactors[index];
 
-      colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
-    }
+    const newH = clamp(hue, 0, 360);
+    const newL = clamp(lerpValue, 0, 100) * 0.01;
+    // console.log([newH, lerpValue * s * 0.01, newL]);
+    const rgb = HSLToRGB(newH, s * 0.01, newL);
+    // console.log(rgb.formatted);
+
+    colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
   });
 
   shades.forEach((shade: number, index: number) => {
     document.body.style.setProperty(
-      "--color-" + key + "-" + shade,
+      "--color-" + activeColorKey.value + "-" + shade,
       `${colors.value[index]}`
     );
-    colorsMap.value[key].shades.set(
-      "--color-" + key + "-" + shade,
+    colorsMap.value[activeColorKey.value!].shades.set(
+      "" + shade,
       `rgb(${colors.value[index]})`
     );
   });
 
-  const contrast = getContrast(updatedColor, toRGBObject("rgb(0, 0, 0)"));
-
-  // if (key !== "text") {
-  //   Array.from(Array(lighterSteps).keys()).forEach((_, i: number) => {
-  //     const lIncrease =
-  //       BezierBlend((lighterSteps - i) * 0.1) * 4 * lFraction + lFraction;
-  //     const sDecrease = BezierBlend(i * 0.1) * colorSaturation * 0.2;
-  //     const newH = clamp(colorHue, 0, 360);
-  //     const newL = clamp(l + lIncrease, 0, 100) * 0.01;
-  //     console.log([newH, newS - sDecrease, newL]);
-  //     const rgb = HSLToRGB(newH, newS - sDecrease, newL);
-  //     colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
-  //   });
-
-  //   Array.from(Array(darkerSteps).keys()).forEach((_, i: number) => {
-  //     const lDecrease =
-  //       BezierBlend(i * 0.1) * lFraction + lFraction * (i + 1) * 0.1;
-  //     const sDecrease = BezierBlend(i * 0.1) * colorSaturation * 0.2;
-  //     // console.log(lDecrease);
-  //     const newH = clamp(colorHue, 0, 360);
-  //     const newL = clamp(l - lDecrease, 0, 100) * 0.01;
-  //     console.log([newH, newS + sDecrease, newL]);
-  //     const rgb = HSLToRGB(newH, newS + sDecrease, newL);
-  //     colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
-  //   });
-
-  //   shades.forEach((shade: number, index: number) => {
-  //     document.body.style.setProperty(
-  //       "--color-" + key + "-" + shade,
-  //       `${colors.value[index]}`
-  //     );
-  //     colorsMap.value[key].shades.set(
-  //       "--color-" + key + "-" + shade,
-  //       `rgb(${colors.value[index]})`
-  //     );
-  //   });
-  // }
-  console.log(colors.value);
-
-  // if (key === "bg" || key === "text") {
-  //   const textMainColor = colorsMap.value["text"].default;
-  //   if (textMainColor) {
-  //     const darkestColor = HSLToRGB(
-  //       colorHue,
-  //       colorSaturation,
-  //       Math.random() * 0.1
-  //     );
-  //     const lightestColor = HSLToRGB(
-  //       colorHue,
-  //       colorSaturation,
-  //       1 - Math.random() * 0.1
-  //     );
-
-  //     if (contrast < 4.5) {
-  //       calculateTextShades(
-  //         [lightestColor.r, lightestColor.g, lightestColor.b],
-  //         [darkestColor.r, darkestColor.g, darkestColor.b],
-  //         steps
-  //       );
-  //     } else {
-  //       calculateTextShades(
-  //         [darkestColor.r, darkestColor.g, darkestColor.b],
-  //         [lightestColor.r, lightestColor.g, lightestColor.b],
-  //         steps
-  //       );
-  //     }
-  //     document.body.style.setProperty(
-  //       "--color-text",
-  //       `${updatedColor.r} ${updatedColor.g} ${updatedColor.b}`
-  //     );
-  //     colorsMap.value[
-  //       "text"
-  //     ].default = `rgb(${updatedColor.r} ${updatedColor.g} ${updatedColor.b})`;
-  //     // console.log(contrast);
-  //   }
-  // }
-
+  const contrast = getContrast(
+    updatedColor,
+    toRGBObject(colorsMap.value["text"].default)
+  );
+  console.log(contrast);
+  if (contrast < 8 && activeColorKey.value === "bg") {
+    generateTextShades(hue, l, steps);
+  }
   // console.log(colors.value);
 }
 
-function calculateTextShades(
-  fromColor: number[],
-  toColor: number[],
-  steps: number
-) {
+function generateTextShades(hue: number, l: number, steps: number) {
+  let lightness = 0;
+
+  // bg is light
+  if (l > 60) {
+    // my text should be dark
+    lightness = Math.random() * 0.1;
+  } else {
+    lightness = 1 - Math.random() * 0.1;
+  }
+  const textMainColor = HSLToRGB(hue, 0.1, lightness);
+
+  colorsMap.value["text"].default = textMainColor.formatted;
+  document.body.style.setProperty(
+    "--color-text",
+    `${textMainColor.r} ${textMainColor.g} ${textMainColor.b}`
+  );
+
+  const { s } = RGBToHSL(textMainColor.r, textMainColor.g, textMainColor.b);
+
+  console.log(lightness);
+
+  const lerpFactors: number[] = lerpFromTo(
+    l > 60 ? lightness + Math.random() * 0.1 : Math.random() * 0.1,
+    l > 60 ? 1 - Math.random() * 0.1 : lightness - Math.random() * 0.1,
+    steps
+  );
+
+  colors.value.length = 0;
+
   Array.from(Array(steps).keys()).forEach((_, i: number) => {
-    const interpolatedColor = interpolateColor(fromColor, toColor, i / steps);
+    const index = l < 40 ? steps - i - 1 : i;
 
-    colors.value.push(
-      `${interpolatedColor[0]} ${interpolatedColor[1]} ${interpolatedColor[2]}`
-    );
+    const lerpValue = lerpFactors[index];
+
+    const newH = clamp(hue, 0, 360);
+    const newL = clamp(lerpValue, 0, 100);
+    const rgb = HSLToRGB(newH, s * 0.01, newL);
+    // console.log(rgb.formatted);
+
+    colors.value.push(`${rgb.r} ${rgb.g} ${rgb.b}`);
   });
-
-  console.log(colors.value);
 
   shades.forEach((shade: number, index: number) => {
     document.body.style.setProperty(
@@ -290,32 +315,15 @@ function calculateTextShades(
       `${colors.value[index]}`
     );
     colorsMap.value["text"].shades.set(
-      "--color-text-" + shade,
+      "" + shade,
       `rgb(${colors.value[index]})`
     );
   });
 }
 
-function BezierBlend(t: number): number {
-  return t * t * (3.0 - 2.0 * t);
-}
-
-// function quadraticBlend(x: number): number {
-//   return 2 * x * (1 - x) + 0.5;
-// }
-
-function interpolateColor(color1: number[], color2: number[], factor: number) {
-  var result: number[] = color1.slice();
-  for (var i = 0; i < 3; i++) {
-    result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
-  }
-  return result;
-}
-
 function storeTheme() {
   let colorsArray = [];
   for (const [key, value] of Object.entries(colorsMap.value)) {
-    console.log(`--color-${key}: ${value.default}`);
     colorsArray.push(
       `--color-${key}: ${value.default.match(/\d+/g)?.join(" ")}`
     );
@@ -323,12 +331,50 @@ function storeTheme() {
       colorsArray.push(
         `--color-${key}-${shadeKey}: ${shade.match(/\d+/g)?.join(" ")}`
       );
-      console.log(
-        `--color-${key}-${shadeKey}: ${shade.match(/\d+/g)?.join(" ")}`
-      );
     });
   }
-  localStorage.setItem(themeName.value, JSON.stringify(colorsArray));
+  themes.value[themeName.value] = colorsArray;
+  localStorage.setItem("themes", JSON.stringify(themes.value));
+}
+
+function exportTheme() {
+  let colorsArray = "";
+  for (const [key, value] of Object.entries(colorsMap.value)) {
+    colorsArray += `--color-${key}: ${value.default
+      .match(/\d+/g)
+      ?.join(" ")};\n`;
+    value.shades.forEach((shade: string, shadeKey: string) => {
+      colorsArray += `--color-${key}-${shadeKey}: ${shade
+        .match(/\d+/g)
+        ?.join(" ")};\n`;
+    });
+  }
+  exportedTheme.value = colorsArray;
+  exportWindowVisible.value = true;
+}
+
+function onThemeChanged(theme: string) {
+  if (themes.value[theme] === undefined) return;
+
+  themes.value[theme].forEach((themeColor: string) => {
+    const colorData = themeColor.split(": ");
+    document.body.style.setProperty(colorData[0], colorData[1]);
+
+    const main = colorData[0].replace("--color-", "");
+    console.log(main);
+
+    if (!main.endsWith("0")) {
+      colorsMap.value[main] = {
+        default: `rgb(${colorData[1]})`,
+        shades: new Map(),
+      };
+    } else {
+      colorsMap.value[main.split("-")[0]]?.shades.set(
+        main.replace(main.split("-")[0] + "-", ""),
+        `rgb(${colorData[1]})`
+      );
+    }
+  });
 }
 
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];

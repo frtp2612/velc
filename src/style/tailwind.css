@@ -73,17 +73,17 @@
 
 		--color-alert: 242 210 57;
 
-		--color-text: 18 22 22;
-		--color-text-50: 243 243 243;
-		--color-text-100: 231 232 232;
-		--color-text-200: 196 197 197;
-		--color-text-300: 160 162 162;
-		--color-text-400: 89 92 92;
-		--color-text-500: 18 22 22;
-		--color-text-600: 16 20 20;
-		--color-text-700: 11 13 13;
-		--color-text-800: 8 10 10;
-		--color-text-900: 5 7 7;
+		--color-text: 18 20 22;
+		--color-text-100: 228 231 233;
+		--color-text-200: 210 215 218;
+		--color-text-300: 185 192 198;
+		--color-text-400: 154 165 172;
+		--color-text-50: 234 236 238;
+		--color-text-500: 120 135 145;
+		--color-text-600: 92 104 112;
+		--color-text-700: 66 75 81;
+		--color-text-800: 46 51 56;
+		--color-text-900: 31 35 38;
 
 		--color-tag: 79 68 95;
 		--color-tag-100: 157 56 56;
@@ -95,7 +95,7 @@
 
 .input-base,
 .input-like {
-	@apply focus:ring-0 focus:ring-offset-0 outline-none leading-6 w-full border border-color-border-50 hover:border-color-border-200 focus:border-color-primary py-1 px-2 text-color-text-400 focus:text-color-text bg-color-bg rounded-lg;
+	@apply focus:ring-0 focus:ring-offset-0 outline-none leading-6 w-full border border-color-border-50 hover:border-color-border-200 focus:border-color-primary py-1 px-2 text-color-text/70 focus:text-color-text bg-color-bg rounded-lg;
 }
 
 .icon {
@@ -103,7 +103,7 @@
 }
 
 .interactive-text {
-	@apply text-color-text-300 hover:text-color-text;
+	@apply text-color-text-500 hover:text-color-text;
 }
 
 .interactive-bg {
@@ -135,7 +135,7 @@
 }
 
 .lighten-text {
-	@apply text-color-text-300;
+	@apply text-color-text-500;
 }
 
 .btn-common {

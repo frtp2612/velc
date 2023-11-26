@@ -4,7 +4,7 @@
     class="bg-color-bg-50 rounded-lg w-full h-full select-none overflow-hidden relative group"
   >
     <div
-      class="absolute right-0 top-0 rounded-lg text-transparent group-hover:text-color-text-300 group-hover:hover:text-color-primary cursor-pointer"
+      class="absolute right-0 top-0 rounded-lg text-transparent group-hover:text-color-text-500 group-hover:hover:text-color-primary cursor-pointer"
     >
       <VDropdown
         :values="dropDownValues"
@@ -25,7 +25,7 @@
     ></slot>
 
     <font-awesome-icon
-      class="text-transparent group-hover:text-color-text-300 group-hover:hover:text-color-primary w-5 h-5 absolute right-0 bottom-0 p-4 cursor-pointer rotate-90"
+      class="text-transparent group-hover:text-color-text-500 group-hover:hover:text-color-primary w-5 h-5 absolute right-0 bottom-0 p-4 cursor-pointer rotate-90"
       icon="down-left-and-up-right-to-center"
       ref="resizeHandle"
       @mousedown="onMouseClickStart"

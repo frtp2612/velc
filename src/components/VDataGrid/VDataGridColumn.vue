@@ -1,7 +1,7 @@
 <template>
   <div
     ref="column"
-    class="flex flex-col relative border-r-color-border-50 border-r py-2 gap-2"
+    class="flex flex-col relative border-r-color-border-100 border-r py-2 gap-2"
     :class="[data.locked ? 'bg-inherit z-[1]' : ' ']"
     :style="data.locked ? lockedStyle : ''"
   >
@@ -11,7 +11,7 @@
     >
       <font-awesome-icon
         icon="fa-lock"
-        class="w-4 h-4 text-color-text-300"
+        class="w-4 h-4 text-color-text-500"
         v-if="data.locked"
       />
       <VLabel class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{
@@ -39,7 +39,7 @@
     >
       <font-awesome-icon
         icon="fa-left-right"
-        class="absolute w-4 h-4 top-1/2 right-0 -translate-y-2.5 text-color-text-300 bg-color-bg-200 group-hover:bg-color-primary group-hover:text-color-text-50 p-1 rounded-l-md cursor-col-resize transition-all ease-in-out duration-150"
+        class="absolute w-4 h-4 top-1/2 right-0 -translate-y-2.5 text-color-text-700 bg-color-bg-200 group-hover:bg-color-primary group-hover:text-color-text-50 p-1 rounded-l-md cursor-col-resize transition-all ease-in-out duration-150"
       />
 
       <div

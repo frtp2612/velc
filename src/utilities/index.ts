@@ -263,3 +263,10 @@ export function lerpOnceFromTo(
 function SMOOTHSTEP(x: number): number {
   return x * x * (3 - 2 * x);
 }
+
+export function loadTheme(themeData: string[]) {
+  themeData.forEach((themeColor: string) => {
+    const colorData = themeColor.split(": ");
+    document.body.style.setProperty(colorData[0], colorData[1]);
+  });
+}

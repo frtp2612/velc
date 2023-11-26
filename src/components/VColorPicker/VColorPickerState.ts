@@ -1,6 +1,7 @@
 import { HSLToRGB, RGBToHSL, RGBToHSV } from "@/utilities/index";
 import { Ref, ref } from "vue";
 import { toRGBObject } from "../../utilities/index";
+import { nextTick } from "vue";
 
 export function VColorPickerState(color: Ref<string | undefined>) {
   let canvasContext: CanvasRenderingContext2D;
@@ -181,21 +182,21 @@ export function VColorPickerState(color: Ref<string | undefined>) {
     x -= canvasRect?.left || 0;
     y -= canvasRect?.top || 0;
 
-    if (x > canvasRect!.width) {
-      x = canvasRect!.width;
+    if (x > canvasWidth.value) {
+      x = canvasWidth.value;
     }
     if (x <= 0) {
       x = 0;
     }
-    if (y > canvasRect!.height) {
-      y = canvasRect!.height;
+    if (y > canvasHeight.value) {
+      y = canvasHeight.value;
     }
     if (y <= 0) {
       y = 0;
     }
 
-    var xRatio = (x / canvasRect!.width) * 100;
-    var yRatio = (y / canvasRect!.height) * 100;
+    var xRatio = (x / canvasWidth.value) * 100;
+    var yRatio = (y / canvasHeight.value) * 100;
     var hsvValue = 1 - yRatio / 100;
     var hsvSaturation = xRatio / 100;
     lightness.value = (hsvValue / 2) * (2 - hsvSaturation);
@@ -241,10 +242,11 @@ export function VColorPickerState(color: Ref<string | undefined>) {
 
     const hueRGB = HSLToRGB(hue.value, 1, 0.5);
     const color = HSLToRGB(hue.value, saturation.value, lightness.value);
-    updateColor(color);
-    updateHue(hueRGB.formatted);
+
     actualSaturationValue.value = saturation.value;
     actualHueValue.value = hue.value;
+    updateColor(color);
+    updateHue(hueRGB.formatted);
 
     initializeCanvasGradient(hueRGB.formatted);
     updateHueCursor(offset);
@@ -313,6 +315,12 @@ export function VColorPickerState(color: Ref<string | undefined>) {
     initializeCanvasGradient(hueRGB.formatted);
   }
 
+  async function update() {
+    await nextTick();
+    breakDownColor();
+    colorToPos();
+  }
+
   return {
     init,
     color,
@@ -323,5 +331,6 @@ export function VColorPickerState(color: Ref<string | undefined>) {
     actualSaturationValue,
 
     updateColorFromRGB,
+    update,
   };
 }

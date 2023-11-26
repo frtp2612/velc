@@ -7,7 +7,7 @@
           :class="[
             dropZoneActive
               ? 'border-color-primary text-color-primary'
-              : 'hover:border-color-primary hover:text-color-primary border-color-border-50 text-color-text-300',
+              : 'hover:border-color-primary hover:text-color-primary border-color-border-50 text-color-text-500',
           ]"
         >
           <VLabel v-if="dropZoneActive">Drop files to start the upload.</VLabel>

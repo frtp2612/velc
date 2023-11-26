@@ -78,7 +78,7 @@ const nodeClass = computed(() => {
   } else {
     finalClass += isSelectable.value
       ? "hover:bg-color-bg-50 hover:text-color-primary"
-      : "text-color-text-400 hover:text-color-text";
+      : "text-color-text-600 hover:text-color-text";
   }
 
   return finalClass;
