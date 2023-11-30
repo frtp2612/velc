@@ -11,7 +11,7 @@ import {
 	onStartTyping,
 	useElementSize,
 } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 import { useFilter } from "../../composables/UseFilter";
 
 type DataGridColumnData = {
@@ -22,7 +22,7 @@ type DataGridColumnData = {
 };
 
 function VDataGridState(
-	rows: VDataRow[],
+	rows: Ref<VDataRow[]>,
 	columns: VDataColumn[],
 	defaultSortKey: string | undefined,
 	defaultSortDirection: string | undefined,
@@ -171,7 +171,9 @@ function VDataGridState(
 		}
 	}
 
-	function changeSelectedCell(rowId: number, columnId: string, cellId: string) {
+	function changeSelectedCell(rowId: number, columnId: string) {
+		const cellId = `${rowId}-${columnId}`;
+
 		if (editMode.value) {
 			editMode.value = false;
 			onCellEditEnd();
@@ -260,8 +262,7 @@ function VDataGridState(
 
 			const rowId = data.value[nextRowIndex].id;
 			const columnId = columns[nextColumnIndex].id;
-			const cellId = `${rowId}-${columnId}`;
-			changeSelectedCell(rowId, columnId, `${cellId}`);
+			changeSelectedCell(rowId, columnId);
 		},
 		{ target: tableContainerRef.value }
 	);
@@ -315,7 +316,7 @@ function VDataGridState(
 		const column: VDataColumn = columns[getColumnIndex()];
 
 		if (column && column.editable) {
-			const row: VDataRow | undefined = rows.find(
+			const row: VDataRow | undefined = rows.value.find(
 				(row: VDataRow) => row.id === selectedRowId.value
 			);
 			if (row) {
@@ -331,7 +332,11 @@ function VDataGridState(
 	}
 
 	function resetSelection() {
-		changeSelectedCell(-1, "", "");
+		changeSelectedCell(-1, "");
+	}
+
+	function toggleEdit() {
+		editMode.value = !editMode.value;
 	}
 
 	return {
@@ -349,6 +354,8 @@ function VDataGridState(
 		resetFilter,
 
 		onCellEditEnd,
+
+		toggleEdit,
 
 		// properties
 		columnsLayout,

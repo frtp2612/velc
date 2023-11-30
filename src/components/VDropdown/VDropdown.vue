@@ -8,7 +8,7 @@
 			</slot>
 		</div>
 
-		<Teleport :to="appendTo" :disabled="!appendTo">
+		<Teleport to="body" :disabled="!open || preventAppend">
 			<div
 				class="absolute z-50 left-0 top-full border border-color-border-100 shadow-md shadow-color-bg-100 flex flex-col max-h-64 min-w-[16rem] w-max max-w-max bg-color-bg overflow-auto"
 				v-show="open"
@@ -31,7 +31,7 @@ import VLabel from "@/components/VLabel/index";
 import { useAutoPopDirection } from "@/composables/UseAutoPopDirection";
 import { PopAlignment, VButtonTypes, VInteractiveItem } from "@/enums/index";
 import { onClickOutside } from "@vueuse/core";
-import { RendererElement, ref } from "vue";
+import { ref } from "vue";
 import VDropdownItem from "./VDropdownItem.vue";
 
 const props = withDefaults(
@@ -39,11 +39,11 @@ const props = withDefaults(
 		values: VInteractiveItem[];
 		label?: string;
 		formatter?: Function;
-		appendTo?: string | RendererElement;
+		preventAppend?: boolean;
 		align?: PopAlignment;
 	}>(),
 	{
-		appendTo: "body",
+		preventAppend: false,
 	}
 );
 
@@ -66,7 +66,7 @@ function toggle() {
 
 	if (open.value) {
 		requestAnimationFrame(() => {
-			if (dropdownPopup.value && dropdown.value && props.appendTo) {
+			if (!props.preventAppend && dropdownPopup.value && dropdown.value) {
 				useAutoPopDirection(
 					dropdown.value,
 					dropdownPopup.value,

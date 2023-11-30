@@ -1,5 +1,5 @@
 <template>
-	<div class="grid grid-cols-2 gap-8 p-8 h-96">
+	<div class="grid grid-cols-2 gap-6 p-6 h-96">
 		<VDataList :items="firstList" :item-height="30" v-show="firstListVisible">
 		</VDataList>
 		<VDataList :items="list2" :item-height="30"> </VDataList>

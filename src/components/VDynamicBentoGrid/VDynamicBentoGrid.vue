@@ -1,71 +1,79 @@
 <template>
-  <div class="relative h-full">
-    <div
-      class="absolute grid w-full h-full z-0"
-      :style="[
-        { 'grid-template-rows': gridRows },
-        { 'grid-template-columns': gridColumns },
-      ]"
-      ref="grid"
-      @drop="onDrop"
-      @dragend="onDragEnd"
-    >
-      <div
-        v-for="gridBlock in gridBlocks"
-        class="w-full h-full"
-        @dragover.prevent="() => onDragOver(gridBlock)"
-      ></div>
-    </div>
-    <div
-      class="grid gap-4 h-full z-10"
-      :style="[
-        { 'grid-template-rows': gridRows },
-        { 'grid-template-columns': gridColumns },
-      ]"
-    >
-      <VWidget
-        v-if="dragging && previewElementPath !== ''"
-        :component-path="previewElementPath"
-        :name="previewElementName"
-        :class="[positionValid ? 'bg-color-primary' : 'bg-color-error']"
-        :style="[
-          { 'grid-column': previewElementWidth },
-          { 'grid-row': previewElementHeight },
-        ]"
-      ></VWidget>
-      <VDynamicBentoGridRegion
-        v-for="region in regions.values()"
-        :key="region.id"
-        :style="[
-          {
-            'grid-column': `${region.colIndex + 1} / span ${region.colSpan}`,
-            'grid-row': `${region.rowIndex + 1} / span ${region.rowSpan}`,
-          },
-        ]"
-        :id="region.id"
-        :data="region.data"
-        :active="activeRegionId === region.id"
-      >
-      </VDynamicBentoGridRegion>
-    </div>
-  </div>
+	<div class="relative h-full">
+		<div
+			class="absolute grid w-full h-full z-0"
+			:style="[
+				{ 'grid-template-rows': gridRows },
+				{ 'grid-template-columns': gridColumns },
+			]"
+			ref="grid"
+			@drop="onDrop"
+			@dragend="onDragEnd"
+		>
+			<div
+				v-for="gridBlock in gridBlocks"
+				class="w-full h-full"
+				@dragover.prevent="() => onDragOver(gridBlock)"
+				v-once
+			></div>
+		</div>
+		<div
+			class="grid gap-4 h-full z-10"
+			:style="[
+				{ 'grid-template-rows': gridRows },
+				{ 'grid-template-columns': gridColumns },
+			]"
+		>
+			<div
+				v-if="dragging && previewElementPath !== ''"
+				:style="[
+					{ 'grid-column': previewElementWidth },
+					{ 'grid-row': previewElementHeight },
+				]"
+				class="relative"
+			>
+				<div
+					class="absolute top-0 left-0 w-full h-full"
+					:class="[positionValid ? 'bg-color-primary' : 'bg-color-error']"
+				></div>
+				<VWidget
+					:component-path="previewElementPath"
+					:name="previewElementName"
+					class="opacity-50"
+				/>
+			</div>
+			<VDynamicBentoGridRegion
+				v-for="region in regions.values()"
+				:key="region.id"
+				:style="[
+					{
+						'grid-column': `${region.colIndex + 1} / span ${region.colSpan}`,
+						'grid-row': `${region.rowIndex + 1} / span ${region.rowSpan}`,
+					},
+				]"
+				:id="region.id"
+				:data="region.data"
+				:active="activeRegionId === region.id"
+			/>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
+import VWidget from "@/components/VWidget/VWidget.vue";
 import { ref } from "vue";
 import VDynamicBentoGridRegion from "./VDynamicBentoGridRegion.vue";
-import VWidget from "@/components/VWidget/VWidget.vue";
 import { VDynamicBentoGridState } from "./VDynamicBentoGridState";
 
 const props = withDefaults(
-  defineProps<{
-    rows?: number;
-    columns?: number;
-  }>(),
-  {
-    rows: 10,
-    columns: 10,
-  }
+	defineProps<{
+		rows?: number;
+		columns?: number;
+	}>(),
+	{
+		rows: 10,
+		columns: 10,
+	}
 );
 
 const emit = defineEmits(["selectBlockContent"]);
@@ -74,20 +82,20 @@ const grid = ref<HTMLElement | null>(null);
 
 const state = VDynamicBentoGridState(props.rows, props.columns);
 const {
-  activeRegionId,
-  gridRows,
-  gridColumns,
-  gridBlocks,
-  regions,
-  dragging,
-  positionValid,
-  previewElementHeight,
-  previewElementPath,
-  previewElementWidth,
-  previewElementName,
-  onDragEnd,
-  onDragOver,
-  onDrop,
+	activeRegionId,
+	gridRows,
+	gridColumns,
+	gridBlocks,
+	regions,
+	dragging,
+	positionValid,
+	previewElementHeight,
+	previewElementPath,
+	previewElementWidth,
+	previewElementName,
+	onDragEnd,
+	onDragOver,
+	onDrop,
 } = state;
 
 // function onBlockResize(

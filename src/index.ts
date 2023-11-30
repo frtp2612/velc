@@ -35,7 +35,7 @@ export { VNumericField } from "./components/VNumericField";
 export { VPopover } from "./components/VPopover";
 export { VProgressBar } from "./components/VProgressBar";
 export { VSelect } from "./components/VSelect";
-export { VSplitView } from "./components/VSplitView";
+export { VSplitPanel, VSplitView } from "./components/VSplitView";
 export { VSwitcher } from "./components/VSwitcher";
 export { VTabPanel, VTabbedView } from "./components/VTabbedView";
 export { VTextArea } from "./components/VTextArea";

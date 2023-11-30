@@ -12,7 +12,7 @@ import { VModalWindow } from "./VModalWindow";
 
 import { VPopover } from "./VPopover";
 
-import { VSplitView } from "./VSplitView";
+import { VSplitPanel, VSplitView } from "./VSplitView";
 
 import { VTextField } from "./VTextField";
 
@@ -58,6 +58,8 @@ import { VThemeCustomizer } from "./VThemeCustomizer";
 
 import { VColorPicker } from "./VColorPicker";
 
+import { VStepper } from "./VStepper";
+
 export default {
 	VButton,
 	VDropdown,
@@ -90,4 +92,6 @@ export default {
 	VSwitcher,
 	VThemeCustomizer,
 	VColorPicker,
+	VStepper,
+	VSplitPanel,
 };

@@ -1,10 +1,10 @@
 <template>
 	<div
-		class="fixed top-0 left-0 w-screen h-screen bg-black/5 grid grid-rows-1 grid-cols-1 justify-center items-start p-8 z-[999999]"
+		class="fixed top-0 left-0 w-screen h-screen bg-black/5 grid grid-rows-1 grid-cols-1 justify-center items-start p-6 z-[999999]"
 		v-if="isOpen"
 	>
 		<div
-			class="bg-color-bg border border-color-border-50 rounded-lg p-8 w-1/3 mx-auto flex flex-col gap-4"
+			class="bg-color-bg border border-color-border-50 rounded-lg p-6 w-1/3 mx-auto flex flex-col gap-4"
 		>
 			<div class="flex justify-between gap-4 items-center">
 				<slot name="title"

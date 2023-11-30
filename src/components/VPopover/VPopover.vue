@@ -11,7 +11,7 @@
 			>
 				<div class="arrow" ref="arrow"></div>
 				<div
-					class="z-20 p-8 overlay-element w-min max-w-max text-center"
+					class="z-20 p-6 overlay-element min-w-min max-w-max text-center"
 					ref="content"
 				>
 					<slot name="content"><span>Default popover content</span></slot>

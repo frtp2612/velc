@@ -26,7 +26,7 @@
 					/>
 				</section>
 
-				<section class="p-4 h-full min-h-0 flex flex-col gap-4">
+				<section class="p-6 h-full min-h-0 flex flex-col gap-4">
 					<slot
 						><component
 							:is="rawComponent"

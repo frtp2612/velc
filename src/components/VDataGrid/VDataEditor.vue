@@ -30,6 +30,7 @@
 		v-model="model"
 		v-else-if="isNumber"
 		:auto-focus="autoFocus"
+		:placeholder="placeholder"
 		class="w-full"
 	/>
 	<VTextField
@@ -37,6 +38,7 @@
 		v-else
 		:id="id"
 		:auto-focus="autoFocus"
+		:placeholder="placeholder"
 		class="w-full"
 	/>
 </template>
@@ -58,6 +60,7 @@ const props = withDefaults(
 		modelValue: any;
 		formatter?: Function;
 		autoFocus?: boolean;
+		placeholder?: string;
 	}>(),
 	{
 		autoFocus: false,

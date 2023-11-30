@@ -6,11 +6,13 @@
 			<slot>
 				<input
 					v-model="model"
-					class="w-full"
+					class="w-full disabled:disabled-input"
 					:class="elementClass"
 					:type="fieldType"
 					:id="id"
 					:autocomplete="autocomplete"
+					:disabled="disabled"
+					:placeholder="placeholder"
 					ref="input"
 				/>
 			</slot>
@@ -32,15 +34,22 @@ import { inputBaseClass } from "@/constants/index";
 import { useVModel } from "@vueuse/core";
 import { computed, onMounted, ref } from "vue";
 
-const props = defineProps<{
-	id: string;
-	modelValue: any;
-	customClass?: string;
-	autoFocus?: boolean;
-	isPassword?: boolean;
-	autocomplete?: string;
-	label?: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		id: string;
+		modelValue: any;
+		customClass?: string;
+		autoFocus?: boolean;
+		isPassword?: boolean;
+		autocomplete?: string;
+		label?: string;
+		disabled?: boolean;
+		placeholder?: string;
+	}>(),
+	{
+		disabled: false,
+	}
+);
 
 const emit = defineEmits(["update:modelValue"]);
 

@@ -4,13 +4,13 @@
 		@click="toggleValue"
 	>
 		<div
-			class="input-base !p-0 !h-[1.25rem] !w-[1.25rem] flex items-center justify-center aspect-square"
+			class="input-base !p-0 !h-[1.25rem] !w-[1.25rem] flex items-center justify-center"
 			:class="[checkboxClass]"
 			tabindex="0"
 		>
 			<font-awesome-icon
 				:icon="checkboxIcon"
-				class="aspect-square w-2.5"
+				class="h-2.5 w-2.5"
 				v-if="checkboxIcon"
 			/>
 		</div>

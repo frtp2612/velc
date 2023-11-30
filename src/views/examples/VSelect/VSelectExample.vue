@@ -1,5 +1,5 @@
 <template>
-	<div class="grid grid-cols-2 gap-8 p-8 h-96">
+	<div class="grid grid-cols-2 gap-6 p-6 h-96">
 		<VSelect
 			:values="list1"
 			:id="id1"
