@@ -1,45 +1,26 @@
 <template>
-	<div class="relative h-full">
+	<div class="relative h-full" @dragover="onDragDetected" ref="grid">
 		<div
-			class="absolute grid w-full h-full z-0"
-			:style="[
-				{ 'grid-template-rows': gridRows },
-				{ 'grid-template-columns': gridColumns },
-			]"
-			ref="grid"
-			@drop="onDrop"
-			@dragend="onDragEnd"
-		>
-			<div
-				v-for="gridBlock in gridBlocks"
-				class="w-full h-full"
-				@dragover.prevent="() => onDragOver(gridBlock)"
-				v-once
-			></div>
-		</div>
-		<div
-			class="grid gap-4 h-full z-10"
+			class="grid gap-4 h-full"
 			:style="[
 				{ 'grid-template-rows': gridRows },
 				{ 'grid-template-columns': gridColumns },
 			]"
 		>
 			<div
-				v-if="dragging && previewElementPath !== ''"
+				v-if="dragging && activeGridBlock"
 				:style="[
 					{ 'grid-column': previewElementWidth },
 					{ 'grid-row': previewElementHeight },
 				]"
-				class="relative"
+				:class="[positionValid ? 'bg-color-success/10' : 'bg-color-error/10']"
+				class="relative p-2 rounded-lg pointer-events-none"
 			>
-				<div
-					class="absolute top-0 left-0 w-full h-full"
-					:class="[positionValid ? 'bg-color-primary' : 'bg-color-error']"
-				></div>
 				<VWidget
 					:component-path="previewElementPath"
 					:name="previewElementName"
-					class="opacity-50"
+					class="pointer-events-none"
+					v-show="positionValid"
 				/>
 			</div>
 			<VDynamicBentoGridRegion
@@ -54,6 +35,39 @@
 				:id="region.id"
 				:data="region.data"
 				:active="activeRegionId === region.id"
+			/>
+		</div>
+		<div
+			class="absolute top-0 left-0 grid w-full h-full z-0 gap-4"
+			v-show="dragging"
+			:style="[
+				{ 'grid-template-rows': gridRows },
+				{ 'grid-template-columns': gridColumns },
+			]"
+			@drop.prevent="onDrop"
+			@dragend="onDragEnd"
+			@dragover.prevent="onDragOver"
+		>
+			<div
+				v-for="gridBlock in gridBlocks"
+				class="w-full h-full rounded-lg transition-colors ease-in-out pointer-events-none"
+				:class="[{ 'bg-color-primary/5 opacity-20': dragging }]"
+				:key="gridBlock.id"
+			></div>
+		</div>
+		<div
+			v-if="dragging && activeGridBlock"
+			:style="[
+				{
+					translate: `${previewElementPosition.x}px ${previewElementPosition.y}px`,
+				},
+			]"
+			class="absolute z-10 top-0 left-0 transition-transform duration-150 ease-out pointer-events-none"
+		>
+			<VWidget
+				:component-path="previewElementPath"
+				:name="previewElementName"
+				class="opacity-50 pointer-events-none"
 			/>
 		</div>
 	</div>
@@ -78,14 +92,15 @@ const props = withDefaults(
 
 const emit = defineEmits(["selectBlockContent"]);
 
-const grid = ref<HTMLElement | null>(null);
+const grid = ref<HTMLElement>();
 
-const state = VDynamicBentoGridState(props.rows, props.columns);
+const state = VDynamicBentoGridState(grid, props.rows, props.columns);
 const {
 	activeRegionId,
+	gridBlocks,
 	gridRows,
 	gridColumns,
-	gridBlocks,
+	activeGridBlock,
 	regions,
 	dragging,
 	positionValid,
@@ -93,8 +108,10 @@ const {
 	previewElementPath,
 	previewElementWidth,
 	previewElementName,
+	previewElementPosition,
 	onDragEnd,
 	onDragOver,
+	onDragDetected,
 	onDrop,
 } = state;
 

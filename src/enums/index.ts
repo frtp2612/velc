@@ -235,3 +235,10 @@ export enum PopAlignment {
 	LEFT = "LEFT",
 	RIGHT = "RIGHT",
 }
+
+export type VStep = {
+	title: string;
+	component: Object;
+	enablingCondition?: () => boolean;
+	visibilityCondition?: () => boolean;
+};

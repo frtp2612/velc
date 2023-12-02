@@ -1,166 +1,253 @@
-import { ref, computed } from "vue";
+import { Ref, computed, onMounted, ref } from "vue";
 import { VDynamicBentoGridRegionData } from "../../enums/index";
 type GridBlock = {
-  id: number;
-  rowIndex: number;
-  colIndex: number;
+	id: number;
+	rowIndex: number;
+	colIndex: number;
 };
 
 type GridRegion = {
-  id: string;
-  rowIndex: number;
-  colIndex: number;
-  rowSpan: number;
-  colSpan: number;
-  data: VDynamicBentoGridRegionData;
+	id: string;
+	rowIndex: number;
+	colIndex: number;
+	rowSpan: number;
+	colSpan: number;
+	data: VDynamicBentoGridRegionData;
 };
 
-export function VDynamicBentoGridState(rows: number, columns: number) {
-  const gridBlocks = ref<GridBlock[]>([]);
-  const regions = ref<Map<string, GridRegion>>(new Map());
-  const usedGridBlocks = ref<Set<string>>(new Set());
+export function VDynamicBentoGridState(
+	grid: Ref<HTMLElement | undefined>,
+	rows: number,
+	columns: number
+) {
+	let gridSize: DOMRect;
 
-  const previewElementWidth = ref("");
-  const previewElementHeight = ref("");
-  const previewElementPath = ref("");
-  const previewElementName = ref("");
-  const dragging = ref(false);
+	const gridBlocks = ref<GridBlock[]>([]);
+	const regions = ref<Map<string, GridRegion>>(new Map());
+	const usedGridBlocks = ref<Set<string>>(new Set());
 
-  const activeGridBlock = ref<GridBlock>();
-  const activeRegionId = ref("");
+	const previewElementWidth = ref("");
+	const previewElementPosition = ref({ x: 0, y: 0 });
+	const previewElementHeight = ref("");
+	const previewElementPath = ref("");
+	const previewElementName = ref("");
+	const dragging = ref(false);
 
-  const gridRows = computed(() => `repeat(${rows}, minmax(0, 1fr))`);
-  const gridColumns = computed(() => `repeat(${columns}, minmax(0, 1fr))`);
-  const positionValid = ref(false);
+	const activeGridBlock = ref<{ x: number; y: number }>();
+	const activeRegionId = ref("");
 
-  function initializeGrid() {
-    for (let index = 0; index < rows * columns; index++) {
-      gridBlocks.value.push({
-        id: index,
-        rowIndex: Math.floor(index / columns),
-        colIndex: index % columns,
-      });
-    }
-  }
+	const gridRows = computed(() => `repeat(${rows}, 1fr)`);
+	const gridColumns = computed(() => `repeat(${columns}, 1fr)`);
+	const positionValid = ref(false);
 
-  function addRegionContent(
-    rowSpan: number,
-    colSpan: number,
-    data: VDynamicBentoGridRegionData
-  ) {
-    if (activeGridBlock.value) {
-      const region: GridRegion = {
-        id: `${activeGridBlock.value.rowIndex}-${activeGridBlock.value.colIndex}`,
-        rowSpan,
-        colSpan,
-        rowIndex: activeGridBlock.value.rowIndex,
-        colIndex: activeGridBlock.value.colIndex,
-        data,
-      };
-      console.log(region);
+	const draggedElement = ref();
 
-      regions.value.set(region.id, region);
-    }
-  }
+	function initializeGrid() {
+		for (let index = 0; index < rows * columns; index++) {
+			gridBlocks.value.push({
+				id: index,
+				rowIndex: Math.floor(index / columns),
+				colIndex: index % columns,
+			});
+		}
+	}
 
-  function onDragOver(gridBlock: GridBlock) {
-    const data = JSON.parse(sessionStorage.getItem("draggable")!);
-    if (previewElementPath.value === "") {
-      previewElementPath.value = data.componentPath;
-    }
+	function addRegionContent(
+		rowSpan: number,
+		colSpan: number,
+		data: VDynamicBentoGridRegionData
+	) {
+		if (activeGridBlock.value) {
+			const region: GridRegion = {
+				id: `${activeGridBlock.value.y}-${activeGridBlock.value.x}`,
+				rowSpan,
+				colSpan,
+				rowIndex: activeGridBlock.value.y,
+				colIndex: activeGridBlock.value.x,
+				data,
+			};
+			console.log(region);
 
-    if (previewElementName.value === "") {
-      previewElementName.value = data.name;
-    }
+			regions.value.set(region.id, region);
+		}
+	}
 
-    previewElementWidth.value =
-      gridBlock.colIndex + 1 + " / span " + data.size.x;
-    previewElementHeight.value =
-      gridBlock.rowIndex + 1 + " / span " + data.size.y;
+	function onDragDetected() {
+		if (!draggedElement.value && !dragging.value) {
+			draggedElement.value = JSON.parse(sessionStorage.getItem("draggable")!);
+			dragging.value = true;
 
-    activeGridBlock.value = gridBlock;
+			if (previewElementPath.value === "") {
+				previewElementPath.value = draggedElement.value.componentPath;
+			}
 
-    positionValid.value =
-      gridBlock.colIndex + data.size.x <= columns &&
-      gridBlock.rowIndex + data.size.y <= rows &&
-      isBlockAvailable(data.size.y, data.size.x);
-    dragging.value = true;
-  }
+			if (previewElementName.value === "") {
+				previewElementName.value = draggedElement.value.name;
+			}
+			gridSize = getGridSize();
+		}
+	}
 
-  function onDrop(event: DragEvent) {
-    if (positionValid.value) {
-      const data = JSON.parse(event.dataTransfer?.getData("text/plain")!);
-      console.log(data);
+	// function onDragOver(gridBlock: GridBlock) {
+	// 	if (previewElementPath.value === "") {
+	// 		previewElementPath.value = draggedElement.value.componentPath;
+	// 	}
 
-      addRegionContent(data.size.y, data.size.x, data);
-      updateUsedBlocks(data.size.y, data.size.x);
-    }
-    onDragEnd();
-  }
+	// 	if (previewElementName.value === "") {
+	// 		previewElementName.value = draggedElement.value.name;
+	// 	}
 
-  function updateUsedBlocks(rowSpan: number, colSpan: number) {
-    if (activeGridBlock.value) {
-      for (let rowIndex = 0; rowIndex < rowSpan; rowIndex++) {
-        const effectiveRowIndex =
-          (activeGridBlock.value.rowIndex + rowIndex) * rows;
-        for (let colIndex = 0; colIndex < colSpan; colIndex++) {
-          const effectiveColIndex = activeGridBlock.value.colIndex + colIndex;
-          usedGridBlocks.value.add(effectiveRowIndex + "-" + effectiveColIndex);
-        }
-      }
-    }
-  }
+	// 	previewElementWidth.value =
+	// 		gridBlock.colIndex + 1 + " / span " + draggedElement.value.size.x;
+	// 	previewElementHeight.value =
+	// 		gridBlock.rowIndex + 1 + " / span " + draggedElement.value.size.y;
 
-  function isBlockAvailable(rowSpan: number, colSpan: number) {
-    if (activeGridBlock.value) {
-      for (let rowIndex = 0; rowIndex < rowSpan; rowIndex++) {
-        const effectiveRowIndex =
-          (activeGridBlock.value.rowIndex + rowIndex) * rows;
+	// 	activeGridBlock.value = gridBlock;
 
-        for (let colIndex = 0; colIndex < colSpan; colIndex++) {
-          const effectiveColIndex = activeGridBlock.value.colIndex + colIndex;
+	// 	positionValid.value =
+	// 		gridBlock.colIndex + draggedElement.value.size.x <= columns &&
+	// 		gridBlock.rowIndex + draggedElement.value.size.y <= rows &&
+	// 		isBlockAvailable(
+	// 			draggedElement.value.size.y,
+	// 			draggedElement.value.size.x
+	// 		);
+	// }
 
-          if (
-            usedGridBlocks.value.has(
-              effectiveRowIndex + "-" + effectiveColIndex
-            )
-          ) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
+	function onDragOver(event: DragEvent) {
+		const x = Math.floor(
+			(event.clientX - gridSize.x) / (gridSize.width / columns)
+		);
+		const y = Math.floor(
+			(event.clientY - gridSize.y) / (gridSize.height / rows)
+		);
+		activeGridBlock.value = { x, y };
+		previewElementPosition.value = {
+			x: event.clientX - gridSize.x,
+			y: event.clientY - gridSize.y,
+		};
+		if (
+			x + draggedElement.value.size.x <= columns &&
+			y + draggedElement.value.size.y <= rows &&
+			isBlockAvailable(draggedElement.value.size.y, draggedElement.value.size.x)
+		) {
+			positionValid.value = true;
+			previewElementWidth.value =
+				x + 1 + " / span " + draggedElement.value.size.x;
+			previewElementHeight.value =
+				y + 1 + " / span " + draggedElement.value.size.y;
+		} else {
+			positionValid.value = false;
+			previewElementWidth.value = x + 1 + "";
+			previewElementHeight.value = y + 1 + "";
+		}
+	}
 
-  function onDragEnd() {
-    dragging.value = false;
-    previewElementWidth.value = "";
-    previewElementHeight.value = "";
-    previewElementPath.value = "";
-    previewElementName.value = "";
-  }
+	function onDrop(event: DragEvent) {
+		if (positionValid.value) {
+			const data = JSON.parse(event.dataTransfer?.getData("text/plain")!);
 
-  initializeGrid();
+			addRegionContent(data.size.y, data.size.x, data);
+			updateUsedBlocks(data.size.y, data.size.x);
+		}
+		onDragEnd();
+	}
 
-  return {
-    activeRegionId,
+	function updateUsedBlocks(rowSpan: number, colSpan: number) {
+		if (activeGridBlock.value) {
+			for (let rowIndex = 0; rowIndex < rowSpan; rowIndex++) {
+				const effectiveRowIndex = (activeGridBlock.value.y + rowIndex) * rows;
+				for (let colIndex = 0; colIndex < colSpan; colIndex++) {
+					const effectiveColIndex = activeGridBlock.value.x + colIndex;
+					usedGridBlocks.value.add(effectiveRowIndex + "-" + effectiveColIndex);
+				}
+			}
+		}
+	}
 
-    gridRows,
-    gridColumns,
+	function isBlockAvailable(rowSpan: number, colSpan: number) {
+		if (activeGridBlock.value) {
+			for (let rowIndex = 0; rowIndex < rowSpan; rowIndex++) {
+				const effectiveRowIndex = (activeGridBlock.value.y + rowIndex) * rows;
 
-    previewElementHeight,
-    previewElementWidth,
-    previewElementPath,
-    previewElementName,
-    dragging,
-    positionValid,
+				for (let colIndex = 0; colIndex < colSpan; colIndex++) {
+					const effectiveColIndex = activeGridBlock.value.x + colIndex;
 
-    gridBlocks,
-    regions,
-    addRegionContent,
-    onDragOver,
-    onDrop,
-    onDragEnd,
-  };
+					if (
+						usedGridBlocks.value.has(
+							effectiveRowIndex + "-" + effectiveColIndex
+						)
+					) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	function onDragEnd() {
+		activeGridBlock.value = undefined;
+		dragging.value = false;
+		draggedElement.value = undefined;
+		previewElementWidth.value = "";
+		previewElementHeight.value = "";
+		previewElementPath.value = "";
+		previewElementName.value = "";
+	}
+
+	function onDragLeave() {
+		if (dragging.value) {
+			console.log("drag left");
+
+			onDragEnd();
+		}
+	}
+
+	// function onMouseMove(event: MouseEvent) {
+	// 	console.log([event.clientX, event.clientY]);
+
+	// 	if (dragging.value) {
+	// 		const intersectingElement = document.elementFromPoint(
+	// 			event.clientX,
+	// 			event.clientY
+	// 		);
+	// 		console.log(intersectingElement);
+	// 	}
+	// }
+
+	onMounted(() => {
+		gridSize = getGridSize();
+	});
+
+	function getGridSize(): DOMRect {
+		return grid.value!.getBoundingClientRect();
+	}
+
+	initializeGrid();
+
+	return {
+		activeRegionId,
+		activeGridBlock,
+
+		gridRows,
+		gridColumns,
+
+		previewElementHeight,
+		previewElementWidth,
+		previewElementPosition,
+		previewElementPath,
+		previewElementName,
+		dragging,
+		positionValid,
+
+		gridBlocks,
+		regions,
+		addRegionContent,
+		onDragDetected,
+		onDragOver,
+		onDragLeave,
+		onDrop,
+		onDragEnd,
+		// onMouseMove,
+	};
 }

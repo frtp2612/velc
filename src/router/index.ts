@@ -85,12 +85,6 @@ const routes = [
 			import("@/views/examples/VNavigation/VNavigationExample.vue"),
 	},
 	{
-		path: "/VMediaPlayer",
-		name: "VMediaPlayer",
-		component: () =>
-			import("@/views/examples/VMediaPlayer/VMediaPlayerExample.vue"),
-	},
-	{
 		path: "/VContextMenu",
 		name: "VContextMenu",
 		component: () =>
@@ -156,14 +150,11 @@ const routes = [
 		name: "VSelect",
 		component: () => import("@/views/examples/VSelect/VSelectExample.vue"),
 	},
-{
-    path: "/VStepper",
-    name: "VStepper",
-    component: () =>
-    import(
-        "@/views/examples/VStepper/VStepperExample.vue"
-    )
-},
+	{
+		path: "/VStepper",
+		name: "VStepper",
+		component: () => import("@/views/examples/VStepper/VStepperExample.vue"),
+	},
 ];
 
 const router = createRouter({

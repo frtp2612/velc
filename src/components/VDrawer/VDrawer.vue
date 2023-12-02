@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="h-screen fixed top-0 w-96 p-4 overflow-auto bg-color-nav border-color-border-50 transition-transform"
+		class="h-full fixed top-0 w-96 p-4 overflow-auto bg-color-nav border-color-border-50 transition-transform"
 		:class="drawerClass"
 		ref="drawer"
 	>

@@ -53,7 +53,7 @@ export function VSplitViewState(
 
 			// calculate all initial sizes
 			const initialSizeListTemp = slotData
-				.filter((slot: any) => slot.children !== "v-if")
+				.filter((slot: any) => typeof slot.type === "object")
 				.map((slot, index: number) => {
 					let initial = -1;
 					if (slot.props !== null) {

@@ -34,8 +34,6 @@ import { VNavigation } from "./VNavigation";
 
 import { VDivider } from "./VDivider";
 
-import { VMediaPlayer } from "./VMediaPlayer";
-
 import { VContextMenu } from "./VContextMenu";
 
 import { VDrawer } from "./VDrawer";
@@ -59,6 +57,8 @@ import { VThemeCustomizer } from "./VThemeCustomizer";
 import { VColorPicker } from "./VColorPicker";
 
 import { VStepper } from "./VStepper";
+
+import { VSideBar } from "./VSideBar";
 
 export default {
 	VButton,
@@ -84,7 +84,6 @@ export default {
 	VLoading,
 	VNavigation,
 	VDivider,
-	VMediaPlayer,
 	VContextMenu,
 	VProgressBar,
 	VFileUploader,
@@ -94,4 +93,5 @@ export default {
 	VColorPicker,
 	VStepper,
 	VSplitPanel,
+	VSideBar,
 };
