@@ -5,7 +5,6 @@
 			:formatter="formatter"
 			:activeNode="activeNode"
 			@onNodeSelected="onNodeSelected"
-			identifierKey=""
 			:onlyLeavesSelectable="onlyLeavesSelectable"
 			v-if="!hideRoot"
 		/>
@@ -21,7 +20,6 @@
 					:activeNode="activeNode"
 					@onNodeSelected="onNodeSelected"
 					:onlyLeavesSelectable="onlyLeavesSelectable"
-					identifierKey=""
 				/>
 			</li>
 		</ul>

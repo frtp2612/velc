@@ -6,7 +6,7 @@
 		:style="data.locked ? lockedStyle : ''"
 	>
 		<div
-			class="flex items-center gap-2 cursor-pointer"
+			class="flex items-center gap-2 cursor-pointer justify-center"
 			@click="sort(data.id, data.valueFormatter)"
 		>
 			<font-awesome-icon

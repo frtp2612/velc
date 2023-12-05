@@ -34,6 +34,11 @@ export function deepEqual(obj1: any, obj2: any) {
 	return true;
 }
 
+export const flattenData = <T extends { children?: T[] }>(list: T[]): T[] =>
+	list
+		? list.flatMap((item: T) => [item, ...flattenData<T>(item.children as T[])])
+		: [];
+
 export function formatBytes(bytes: number, decimals = 2) {
 	if (!+bytes) return "0 Bytes";
 

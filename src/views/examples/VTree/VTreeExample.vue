@@ -2,7 +2,7 @@
 	<ComponentExampleTemplate component-name="VTree">
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" :example="example1">
-				<VTree :root="values" :formatter="formatter" only-leaves-selectable />
+				<VTree :root="values" :formatter="formatter" v-model="selection" />
 			</ComponentExampleBlockTemplate>
 		</template>
 	</ComponentExampleTemplate>
@@ -11,6 +11,7 @@
 import VTree from "@/components/VTree/VTree.vue";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
+import { ref } from "vue";
 
 const values = {
 	id: "item-0",
@@ -31,5 +32,6 @@ const values = {
 const formatter = (value: any) => {
 	return value.id;
 };
+const selection = ref(values.children[0]);
 const example1 = "";
 </script>

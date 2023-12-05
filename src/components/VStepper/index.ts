@@ -1,4 +1,5 @@
+import VStepPanel from "./VStepPanel.vue";
 import VStepper from "./VStepper.vue";
 
-export { VStepper };
+export { VStepPanel, VStepper };
 export default VStepper;

@@ -8,11 +8,19 @@ export const useFilter = <T extends { [key: string]: any }>(
 
 	function filter(this: { [key: string]: any }, dataValue: T) {
 		return Object.keys(this).every((key) => {
-			if (typeof dataValue[key] === "string") {
+			if (
+				typeof dataValue[key] === "string" ||
+				typeof dataValue[key] === "number"
+			) {
 				return dataValue[key]
 					.toString()
 					.toLowerCase()
 					.includes(this[key].toLowerCase());
+			} else if (dataValue[key] instanceof Date) {
+				dataValue[key].setHours(0, 0, 0, 0);
+				this[key].setHours(0, 0, 0, 0);
+
+				return dataValue[key].getTime() === this[key].getTime();
 			}
 			return dataValue[key] === this[key];
 		});
@@ -35,8 +43,15 @@ export const useFilter = <T extends { [key: string]: any }>(
 			let success = true;
 			filters.value!.forEach((value, key) => {
 				if (typeof value === "string") {
+					let objectValue = element[key];
+					if (objectValue === undefined || objectValue === null) {
+						objectValue = "";
+					}
 					if (
-						!element[key].toString().toLowerCase().includes(value.toLowerCase())
+						!objectValue
+							.toString()
+							.toLowerCase()
+							.includes(value.toString().toLowerCase())
 					) {
 						success = false;
 					}

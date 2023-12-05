@@ -30,7 +30,6 @@
 						:formatter="formatter"
 						:active-node="activeNode"
 						:only-leaves-selectable="onlyLeavesSelectable"
-						:identifier-key="identifierKey"
 						@onNodeSelected="nodeSelected"
 					/>
 				</li>
@@ -42,6 +41,7 @@
 <script setup lang="ts">
 import VButton from "@/components/VButton/index";
 import { VTreeNodeType } from "@/enums";
+import { flattenData } from "@/utilities/index";
 import { computed, ref } from "vue";
 
 const props = defineProps<{
@@ -49,11 +49,23 @@ const props = defineProps<{
 	activeNode?: VTreeNodeType | null;
 	formatter: (value: VTreeNodeType) => string;
 	onlyLeavesSelectable: boolean;
-	identifierKey: string;
 }>();
 
 const emit = defineEmits(["onNodeSelected"]);
-const subMenuOpen = ref(false);
+
+function treeNodeIsSelected(): boolean {
+	return (
+		(props.activeNode &&
+			props.item.children &&
+			!props.onlyLeavesSelectable &&
+			flattenData(props.item.children)
+				.map((child: VTreeNodeType) => JSON.stringify(child))
+				.includes(JSON.stringify(props.activeNode))) ||
+		false
+	);
+}
+
+const subMenuOpen = ref(treeNodeIsSelected());
 
 function toggleSubMenu() {
 	subMenuOpen.value = !subMenuOpen.value;

@@ -1,5 +1,7 @@
 import { VButton } from "./VButton";
 
+import { VAlert } from "./VAlert";
+
 import { VDropdown } from "./VDropdown";
 
 import { VButtonGroup } from "./VButtonGroup";
@@ -56,11 +58,12 @@ import { VThemeCustomizer } from "./VThemeCustomizer";
 
 import { VColorPicker } from "./VColorPicker";
 
-import { VStepper } from "./VStepper";
+import { VStepPanel, VStepper } from "./VStepper";
 
 import { VSideBar } from "./VSideBar";
 
 export default {
+	VAlert,
 	VButton,
 	VDropdown,
 	VButtonGroup,
@@ -92,6 +95,7 @@ export default {
 	VThemeCustomizer,
 	VColorPicker,
 	VStepper,
+	VStepPanel,
 	VSplitPanel,
 	VSideBar,
 };

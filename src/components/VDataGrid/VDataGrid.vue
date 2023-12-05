@@ -63,7 +63,7 @@ import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
 import { VDataColumn, VDataGridEmits, VDataRow } from "@/enums";
 import { textFormatter } from "@/formatters/index";
 import { clamp, watchOnce } from "@vueuse/core";
-import { computed, inject, onMounted, provide, ref, watch } from "vue";
+import { computed, inject, onMounted, provide, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { Translatable } from "../../enums/index";
 import VDataGridColumn from "./VDataGridColumn.vue";
@@ -134,12 +134,12 @@ defineExpose({
 	selectedRowId,
 });
 
-watch(
-	() => props.rows.length,
-	() => {
-		state.updateRows(props.rows);
-	}
-);
+// watch(
+// 	() => props.rows.length,
+// 	() => {
+// 		state.updateRows(props.rows);
+// 	}
+// );
 
 watchOnce(
 	() => parentVisible.value,

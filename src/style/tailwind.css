@@ -203,3 +203,23 @@
 .arrow-bottom {
 	@apply border-b border-r;
 }
+
+.gradient-normal {
+	@apply bg-color-bg border border-color-bg-100 bg-gradient-to-r from-color-bg-200/10 to-color-bg to-30%;
+}
+
+.gradient-info {
+	@apply bg-color-bg border border-color-primary/20 bg-gradient-to-r from-color-primary/10 to-color-bg to-30%;
+}
+
+.gradient-alert {
+	@apply bg-color-bg border border-color-alert/20 bg-gradient-to-r from-color-alert/10 to-color-bg to-30%;
+}
+
+.gradient-success {
+	@apply bg-color-bg border border-color-success/20 bg-gradient-to-r from-color-success/10 to-color-bg to-30%;
+}
+
+.gradient-error {
+	@apply bg-color-bg border border-color-error/20 bg-gradient-to-r from-color-error/10 to-color-bg to-30%;
+}
