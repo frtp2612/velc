@@ -51,9 +51,9 @@
 		"build:localization": "@powershell copy ./src/localization/index.ts ./dist/localization.ts"
 	},
 	"dependencies": {
-		"@fortawesome/fontawesome-svg-core": "^6.4.2",
-		"@fortawesome/free-solid-svg-icons": "^6.4.2",
-		"@fortawesome/vue-fontawesome": "^3.0.3",
+		"@fortawesome/fontawesome-svg-core": "latest",
+		"@fortawesome/free-solid-svg-icons": "latest",
+		"@fortawesome/vue-fontawesome": "latest",
 		"@vueuse/core": "^10.5.0",
 		"axios": "^1.6.2",
 		"path": "^0.12.7",

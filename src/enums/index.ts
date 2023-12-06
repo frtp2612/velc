@@ -243,7 +243,7 @@ export enum PopAlignment {
 export type VStep = {
 	title: string;
 	component: Object;
-	completionCondition?: Ref<boolean> | ComputedRef<boolean>;
+	completionCondition?: () => boolean;
 	enablingCondition?: () => boolean;
 	visibilityCondition?: () => boolean;
 };
