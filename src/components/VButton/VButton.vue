@@ -31,6 +31,7 @@ const props = withDefaults(
 		iconRight?: string;
 		type?: VButtonTypes;
 		disabled?: boolean;
+		customClass?: string;
 	}>(),
 	{
 		disabled: false,
@@ -47,6 +48,8 @@ const error =
 	common + "bg-color-error hover:bg-color-error-400 text-color-text-50 ";
 
 const buttonClass = computed(() => {
+	if (props.customClass) return props.customClass;
+
 	let compoundClass = "";
 	switch (props.type) {
 		case VButtonTypes.PRIMARY:

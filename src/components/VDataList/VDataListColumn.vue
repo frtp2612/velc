@@ -2,8 +2,6 @@
 	<div
 		ref="column"
 		class="flex flex-col relative border-r-color-border-100 border-r py-2 gap-2"
-		:class="[data.locked ? 'bg-inherit z-[1]' : ' ']"
-		:style="data.locked ? lockedStyle : ''"
 	>
 		<div
 			class="flex items-center gap-2 cursor-pointer justify-center"
@@ -21,16 +19,13 @@
 				<font-awesome-icon :icon="sortIcon" class="w-4 h-4 text-color-accent" />
 			</div>
 		</div>
-		<VDataEditor
+		<VCheckBox
+			type="checkbox"
+			:model-value="selectAllSelected"
+			class="w-full h-full self-center"
+			@update:model-value="onSelectAllSelectionChanged"
 			:id="data.id"
-			:model-value="filters.get(data.id)"
-			:formatter="data.valueFormatter"
-			:values="data.editor?.values"
-			:type="data.dataType"
-			:auto-focus="false"
-			placeholder="Filter.."
-			resettable
-			@update:model-value="(value: any) => setFilter(data.id, value)"
+			v-if="data.id === 'select-all'"
 		/>
 
 		<div
@@ -45,7 +40,7 @@
 
 			<div
 				class="absolute h-full w-[2px] left-1.5 transition-all ease-in-out duration-150 bg-color-bg-200 group-hover:bg-color-primary"
-				:style="[{ height: state ? tableHeight + 'px' : '100%' }]"
+				:style="[{ height: state ? listHeight + 'px' : '100%' }]"
 			></div>
 		</div>
 	</div>
@@ -54,14 +49,13 @@
 <script setup lang="ts">
 import VLabel from "@/components/VLabel/index";
 import { useElementResizer } from "@/composables/UseElementResizer";
-import { VDataColumn, VDataGridStateType } from "@/enums";
+import { VDataColumn, VDataListStateType } from "@/enums";
 import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import { Translatable } from "../../enums/index";
-import VDataEditor from "../VDataEditor/VDataEditor.vue";
+import VCheckBox from "../VCheckBox/index";
 
 const props = defineProps<{
 	data: VDataColumn;
-	index: number;
 	formatter: (value: Translatable, translator: any) => string;
 	translator: any;
 }>();
@@ -69,16 +63,15 @@ const props = defineProps<{
 const gutter = ref<HTMLElement | null>(null);
 const column = ref<HTMLElement | null>(null);
 
-const state: VDataGridStateType | undefined = inject("state");
+const state: VDataListStateType | undefined = inject("state");
 
 const {
-	tableHeight,
-	lockedColumnsMap,
+	listHeight,
 	sortKey,
 	sortOrder,
 	sort,
-	filters,
-	setFilter,
+	selectAllSelected,
+	onSelectAllSelectionChanged,
 } = state!;
 
 const allowResize = ref(false);
@@ -88,10 +81,6 @@ if (state) {
 		state.updateColumnSize(props.data.id, width)
 	);
 }
-
-const lockedStyle = computed(
-	() => `position: sticky; left:${lockedColumnsMap.value.get(props.data.id)}px;`
-);
 
 const sortIcon = computed(() =>
 	sortOrder.value === "asc"

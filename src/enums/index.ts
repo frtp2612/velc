@@ -129,6 +129,61 @@ export type VDataGridEmits = {
 	): void;
 };
 
+export type VDataListStateType = {
+	init: (tableContainer: HTMLElement, columnsContainer: HTMLElement) => void;
+	updateColumnSize: (columnId: string, width: number) => void;
+	sort: (key: string, formatter: Function | undefined) => void;
+
+	changeSelectedCell: (
+		rowId: string | number,
+		columnId: string,
+		cellId: string
+	) => void;
+	onCellEditEnd: () => void;
+
+	columnsLayout: ComputedRef<string>;
+
+	data: VDataRow[];
+	initialized: Ref<boolean>;
+	listHeight: ComputedRef<number>;
+	lockedColumnsMap: Ref<Map<string, number>>;
+	columns: VDataColumn[];
+	sortKey: Ref<string>;
+	sortOrder: Ref<string>;
+
+	filters: Ref<Map<string, any>>;
+	setFilter: (filterKey: string, filterValue: any) => void;
+
+	selectedRowId: Ref<number>;
+	selectedColumnId: Ref<string>;
+	selectedCellId: Ref<string>;
+
+	editMode: Ref<boolean>;
+
+	selectAllSelected: ComputedRef<boolean>;
+	selectedRowsMap: Ref<Map<number, boolean>>;
+
+	onRowSelectionChanged: (rowId: number, newValue: boolean) => void;
+	onSelectAllSelectionChanged: (newValue: boolean) => void;
+};
+
+export type VDataListEmits = {
+	(
+		event: "cellValueChanged",
+		data: { row: VDataRow; column: VDataColumn; newValue: any }
+	): void;
+	(event: "rowClick", row: VDataRow | undefined): void;
+	(event: "rowDoubleClick", row: VDataRow | undefined): void;
+	(event: "CellEditStart", data: { row: VDataRow; column: VDataColumn }): void;
+};
+
+export type VColumnData = {
+	id: string;
+	el: HTMLElement;
+	size: CalculatedElementSize;
+	offset?: number;
+};
+
 export enum VButtonTypes {
 	PRIMARY = "primary",
 	SECONDARY = "secondary",

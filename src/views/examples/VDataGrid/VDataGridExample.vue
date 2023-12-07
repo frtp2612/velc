@@ -3,7 +3,7 @@
 		<template #usage>
 			<ComponentExampleBlockTemplate title="Example 1" example="">
 				<div class="flex flex-col min-w-0 h-full gap-2">
-					<div class="flex gap-4">
+					<div class="flex gap-4 w-full">
 						<VButton :on-click="addRow" :type="VButtonTypes.PRIMARY"
 							>Add</VButton
 						>
@@ -15,13 +15,8 @@
 							@update:model-value="(value: number) => table!.scrollTo(value)"
 						/>
 					</div>
-					<VTabbedView>
-						<VTabPanel title="Tab 1"> </VTabPanel>
-						<VTabPanel title="Data grid">
-							<VDataGrid :columns="columns" :rows="filteredRows" ref="table">
-							</VDataGrid>
-						</VTabPanel>
-					</VTabbedView>
+					<VDataGrid :columns="columns" :rows="filteredRows" ref="table">
+					</VDataGrid>
 				</div>
 			</ComponentExampleBlockTemplate>
 		</template>
@@ -31,7 +26,6 @@
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
 import VNumericField from "@/components/VNumericField/VNumericField.vue";
-import VTabbedView, { VTabPanel } from "@/components/VTabbedView/index";
 import { VButtonTypes, VDataColumn, VDataRow, VDataType } from "@/enums";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";

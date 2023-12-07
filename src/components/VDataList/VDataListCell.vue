@@ -1,27 +1,16 @@
 <template>
 	<div
-		:style="column.locked ? lockedStyle : ''"
 		class="flex border-r-color-border-50 border-r relative max-w-full h-full"
-		:class="[cellClass, { 'z-[1]': column.locked }]"
+		:class="[cellClass]"
 		tabindex="-1"
 	>
-		<VCheckBox
-			type="checkbox"
-			v-model="data[column.id]"
-			v-if="isEditableBoolean"
-			class="w-full h-full self-center"
-			@update:model-value="onCellEditEnd"
-			@click.capture="selectCell"
-			:id="cellId"
-			tabindex="0"
-		/>
 		<VDataEditor
 			:type="column.dataType"
 			:values="column.editor?.values"
 			:formatter="column.valueFormatter"
 			:id="cellId"
 			v-model="data[column.id]"
-			v-else-if="editable && editingCell"
+			v-if="editable && editMode"
 			auto-focus
 			tabindex="0"
 			ref="editor"
@@ -43,7 +32,6 @@
 			v-else
 			@click="selectCell"
 			@contextmenu="selectCell"
-			@dblclick="startEdit"
 		>
 			{{ formattedValue }}
 		</VLabel>
@@ -55,7 +43,6 @@ import VLabel from "@/components/VLabel/VLabel.vue";
 import { VDataColumn, VDataGridStateType, VDataRow, VDataType } from "@/enums";
 import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import VCheckBox from "../VCheckBox/index";
 import VDataEditor from "../VDataEditor/VDataEditor.vue";
 
 const props = defineProps<{
@@ -68,29 +55,16 @@ const state: VDataGridStateType | undefined = inject("state");
 
 const { n, d } = useI18n();
 
-const {
-	lockedColumnsMap,
-	changeSelectedCell,
-	onCellEditEnd,
-	selectedCellId,
-	editMode,
-} = state!;
+const { changeSelectedCell, selectedCellId, editMode } = state!;
 
 const editor = ref<HTMLElement | null>(null);
 
 const cellId = computed(() => `${props.data.id}-${props.column.id}`);
 
-const lockedStyle = computed(
-	() =>
-		`position: sticky; left:${lockedColumnsMap.value.get(props.column.id)}px`
-);
-
 const cellClass = computed(() => {
 	let value = `cell-${cellId.value} `;
 
-	if (props.column.locked && selectedCellId.value !== cellId.value) {
-		value += "bg-inherit ";
-	} else if (selectedCellId.value === cellId.value) {
+	if (selectedCellId.value === cellId.value) {
 		value += "bg-color-secondary-200 ";
 	}
 
@@ -103,16 +77,9 @@ const cellClass = computed(() => {
 	return value;
 });
 
-const editingCell = computed(
-	() => editMode.value && selectedCellId.value === cellId.value
-);
-
 const isBoolean =
 	props.column.dataType !== undefined &&
 	(props.column.dataType as VDataType) === VDataType.BOOLEAN;
-const isEditableBoolean =
-	props.column.dataType !== undefined &&
-	(props.column.dataType as VDataType) === VDataType.EDITABLE_BOOLEAN;
 
 const isNumber =
 	props.column.dataType !== undefined &&
@@ -144,16 +111,7 @@ const formattedValue = computed(() => {
 });
 
 function selectCell() {
-	console.log("cell selected");
-
 	changeSelectedCell(props.data.id, props.column.id, cellId.value);
-}
-
-function startEdit() {
-	// selectCell();
-	if (props.column.editable && !isEditableBoolean && !isBoolean) {
-		editMode.value = true;
-	}
 }
 </script>
 

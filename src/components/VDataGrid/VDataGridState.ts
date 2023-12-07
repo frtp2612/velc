@@ -1,10 +1,5 @@
 import { useSorter } from "@/composables/UseSorter";
-import {
-	CalculatedElementSize,
-	VDataColumn,
-	VDataGridEmits,
-	VDataRow,
-} from "@/enums";
+import { VColumnData, VDataColumn, VDataGridEmits, VDataRow } from "@/enums";
 import {
 	clamp,
 	onKeyStroke,
@@ -13,13 +8,6 @@ import {
 } from "@vueuse/core";
 import { computed, ref, type Ref } from "vue";
 import { useFilter } from "../../composables/UseFilter";
-
-type DataGridColumnData = {
-	id: string;
-	el: HTMLElement;
-	size: CalculatedElementSize;
-	offset?: number;
-};
 
 function VDataGridState(
 	rows: Ref<VDataRow[]>,
@@ -31,7 +19,7 @@ function VDataGridState(
 	const tableContainerRef = ref<HTMLElement>();
 	const columnsContainerRef = ref<HTMLElement>();
 	// const contentContainerRef = ref<HTMLElement>();
-	const columnsDataList = ref<DataGridColumnData[]>([]);
+	const columnsDataList = ref<VColumnData[]>([]);
 	const lockedColumnsMap = ref<Map<string, number>>(new Map<string, number>());
 	const initialized = ref(false);
 
@@ -61,7 +49,7 @@ function VDataGridState(
 
 	const columnsLayout = computed(() =>
 		columnsDataList.value
-			.map((column: DataGridColumnData) =>
+			.map((column: VColumnData) =>
 				column.size.current === -1
 					? `minmax(${column.size.min}px, 1fr)`
 					: `${column.size.current!}px`
@@ -87,7 +75,7 @@ function VDataGridState(
 			(column: Element, index: number) => {
 				const columnProps: VDataColumn = columns[index];
 
-				const columnData: DataGridColumnData = {
+				const columnData: VColumnData = {
 					id: columnProps.id,
 					el: column as HTMLElement,
 					size: {
@@ -125,36 +113,33 @@ function VDataGridState(
 	}
 
 	function refreshColumnsData() {
-		columnsDataList.value.forEach(
-			(columnData: DataGridColumnData, index: number) => {
-				if (columnData.size.current! === -1) {
-					columnData.size.current = columnData.el.getBoundingClientRect().width;
-				}
-
-				columnData.size.current = clamp(
-					columnData.size.current!,
-					columnData.size.min!,
-					columnData.size.max!
-				);
-
-				if (index > 0 && columnData.offset !== undefined) {
-					columnData.offset =
-						columnsDataList.value[index - 1].offset! +
-						columnsDataList.value[index - 1].size.current!;
-					lockedColumnsMap.value.set(columnData.id, columnData.offset);
-				}
+		columnsDataList.value.forEach((columnData: VColumnData, index: number) => {
+			if (columnData.size.current! === -1) {
+				columnData.size.current = columnData.el.getBoundingClientRect().width;
 			}
-		);
+
+			columnData.size.current = clamp(
+				columnData.size.current!,
+				columnData.size.min!,
+				columnData.size.max!
+			);
+
+			if (index > 0 && columnData.offset !== undefined) {
+				columnData.offset =
+					columnsDataList.value[index - 1].offset! +
+					columnsDataList.value[index - 1].size.current!;
+				lockedColumnsMap.value.set(columnData.id, columnData.offset);
+			}
+		});
 	}
 
 	function updateColumnSize(columnId: string, width: number) {
 		const columnDataIndex: number = columnsDataList.value.findIndex(
-			(column: DataGridColumnData) => column.id === columnId
+			(column: VColumnData) => column.id === columnId
 		);
 
 		if (columnDataIndex !== -1) {
-			const columnData: DataGridColumnData =
-				columnsDataList.value[columnDataIndex];
+			const columnData: VColumnData = columnsDataList.value[columnDataIndex];
 
 			columnData.size.current = clamp(
 				width,
@@ -162,7 +147,7 @@ function VDataGridState(
 				columnData.size.max!
 			);
 
-			const nextColumnData: DataGridColumnData =
+			const nextColumnData: VColumnData =
 				columnsDataList.value[columnDataIndex + 1];
 			if (nextColumnData && nextColumnData.offset) {
 				nextColumnData.offset = columnData.offset! + columnData.size.current!;
