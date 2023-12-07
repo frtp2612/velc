@@ -62,6 +62,8 @@ import { VStepPanel, VStepper } from "./VStepper";
 
 import { VSideBar } from "./VSideBar";
 
+import { VEvaluationGraph } from "./VEvaluationGraph";
+
 export default {
 	VAlert,
 	VButton,
@@ -98,4 +100,5 @@ export default {
 	VStepPanel,
 	VSplitPanel,
 	VSideBar,
+	VEvaluationGraph,
 };

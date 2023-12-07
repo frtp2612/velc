@@ -160,6 +160,14 @@ const routes = [
 		name: "VStepper",
 		component: () => import("@/views/examples/VStepper/VStepperExample.vue"),
 	},
+{
+    path: "/VEvaluationGraph",
+    name: "VEvaluationGraph",
+    component: () =>
+    import(
+        "@/views/examples/VEvaluationGraph/VEvaluationGraphExample.vue"
+    )
+},
 ];
 
 const router = createRouter({
