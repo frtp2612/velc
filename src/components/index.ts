@@ -64,6 +64,8 @@ import { VSideBar } from "./VSideBar";
 
 import { VEvaluationGraph } from "./VEvaluationGraph";
 
+import { VBarGraph } from "./VBarGraph";
+
 export default {
 	VAlert,
 	VButton,

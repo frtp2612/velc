@@ -34,6 +34,20 @@ export function deepEqual(obj1: any, obj2: any) {
 	return true;
 }
 
+export function round(value: number, precision: number) {
+	var multiplier = Math.pow(10, precision || 0);
+	return Math.round(value * multiplier) / multiplier;
+}
+
+export function getNumberMagnitude(value: number) {
+	var order = Math.floor(Math.log(value) / Math.LN10 + 0.000000001); // because float math sucks like that
+	return Math.pow(10, order);
+}
+
+export function roundNumberToMagnitude(value: number, magnitude: number) {
+	return Math.ceil(value / magnitude) * magnitude;
+}
+
 export const flattenData = <T extends { children?: T[] }>(list: T[]): T[] =>
 	list
 		? list.flatMap((item: T) => [item, ...flattenData<T>(item.children as T[])])

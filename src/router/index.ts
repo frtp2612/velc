@@ -168,6 +168,14 @@ const routes = [
         "@/views/examples/VEvaluationGraph/VEvaluationGraphExample.vue"
     )
 },
+{
+    path: "/VBarGraph",
+    name: "VBarGraph",
+    component: () =>
+    import(
+        "@/views/examples/VBarGraph/VBarGraphExample.vue"
+    )
+},
 ];
 
 const router = createRouter({
