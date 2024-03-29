@@ -1,36 +1,26 @@
 <template>
-	<div class="grid relative border-b border-color-border-50" :class="rowClass">
-		<template v-for="column in columns" :key="`${data.id}-${column.id}`">
-			<VDataGridCell
-				:column="column"
-				:data="data"
-				:editable="column.editable || false"
-				:style="{
-					lineHeight: cellHeight,
-				}"
-			/>
-		</template>
-	</div>
+  <tr class="relative border-color-border-50">
+    <template v-for="column in columns" :key="`${data.id}-${column.id}`">
+      <VDataGridCell
+        :column="column"
+        :state="state"
+        :data="data"
+        :editable="column.editable || false"
+      />
+    </template>
+  </tr>
 </template>
 
-<script setup lang="ts">
-import { VDataGridStateType, VDataRow } from "@/enums";
-import { computed, inject } from "vue";
+<script setup lang="ts" generic="RowType extends VDataRow">
 import VDataGridCell from "./VDataGridCell.vue";
+import { VDataGridStateType, VDataRow } from "./types";
 
 const props = defineProps<{
-	data: VDataRow;
-	index: number;
-	cellHeight: string;
+  data: RowType;
+  index: number;
+  cellHeight: string;
+  state: VDataGridStateType<RowType>;
 }>();
 
-const state: VDataGridStateType | undefined = inject("state");
-
-const { columns, selectedRowId } = state!;
-
-const rowClass = computed(() =>
-	selectedRowId.value === props.data.id
-		? "bg-color-bg-50 hover:bg-color-bg-100"
-		: "bg-color-bg hover:bg-color-bg-50"
-);
+const { columns } = props.state;
 </script>
