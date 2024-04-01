@@ -4,9 +4,6 @@
       <ComponentExampleBlockTemplate title="Example 1" example="">
         <div class="flex flex-col min-w-0 h-full gap-2">
           <div class="flex gap-4 w-full">
-            <VButton :on-click="addRow" :type="VButtonTypes.PRIMARY"
-              >Add</VButton
-            >
             <VButton :on-click="() => (filterOdd = !filterOdd)"
               >Filter odd</VButton
             >
@@ -19,6 +16,7 @@
             :columns="columns"
             :rows="filteredRows"
             :column-groups="columnGroups"
+            :descriptor="gridDescriptor"
             ref="table"
           >
           </VDataGrid>
@@ -31,7 +29,7 @@
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
 import VNumericField from "@/components/VNumericField/VNumericField.vue";
-import { VButtonTypes, VDataType } from "@/enums";
+import { VDataType } from "@/enums";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
 import { computed, ref } from "vue";
@@ -43,6 +41,7 @@ import {
   VDataGroupColumn,
 } from "@/components/VDataGrid/types";
 import type { ComponentExposed } from "vue-component-type-helpers";
+import { VDataGridDescriptor } from "../../../components/VDataGrid/types";
 
 const table = ref<ComponentExposed<typeof VDataGrid<VDataRow>> | null>(null);
 const filterOdd = ref(false);
@@ -88,89 +87,68 @@ const columnGroups: VDataGroupColumn[] = [
   },
 ];
 
-const getType = (index: number): VDataType | undefined => {
+const getType = (index: number): VDataType => {
   if (index === columnsAmount - 2 || index === columnsAmount - 1) {
     return VDataType.BOOLEAN;
-  } else if (index === columnsAmount - 6) {
+  } else if (index === columnsAmount - 3) {
     return VDataType.EDITABLE_BOOLEAN;
-  } else if (index === columnsAmount - 8) {
+  } else if (index === columnsAmount - 4) {
     return VDataType.SELECT;
-  } else if (index === columnsAmount - 9) {
+  } else if (index === columnsAmount - 5) {
     return VDataType.DATE;
   }
-  return undefined;
+  return VDataType.STRING;
 };
 
-const columns: VDataColumn<VDataRow>[] = Array.from(Array(columnsAmount)).map(
-  (_, i) => ({
-    id: "col" + i,
-    label: {
-      type: TranslationType.RAW,
-      value: "col-" + i,
-    },
-    valueFormatter:
-      i === columnsAmount - 8
-        ? (value: any) => (value ? value.name : "")
-        : i === columnsAmount - 2 || i === columnsAmount - 1
-        ? (value: any) => (value ? "fa-check" : undefined)
-        : (value: any) => value,
-    locked: i === 0 || i === 1,
-    dataType: getType(i),
-  })
-);
+const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
+  id: "col" + i,
+  label: {
+    type: TranslationType.RAW,
+    value: "col-" + i,
+  },
+  descriptor: {
+    isLocked: i === 0 || i === 1,
+  },
+}));
+
+const gridDescriptor: VDataGridDescriptor<VDataRow> = {
+  getDataType(_row, column) {
+    return getType(parseInt(column.id.replace("col", "")));
+  },
+  getValueFormatter(row, column) {
+    if (column.id === "col6") {
+      return () => row[column.id].name;
+    }
+    return () => row[column.id];
+  },
+};
 
 const rows = ref(
-  Array.from(Array(100)).map((_, i) => {
+  Array.from(Array(10)).map((_, i) => {
     let row: VDataRow = {
       id: i,
     };
 
-    columns.forEach((column: VDataColumn<VDataRow>) => {
-      if (column.dataType !== undefined) {
-        if (column.dataType === VDataType.SELECT) {
+    columns.forEach((column: VDataColumn) => {
+      const type: VDataType = gridDescriptor.getDataType(row, column);
+      if (type !== undefined) {
+        if (type === VDataType.STRING) {
+          row[column.id] =
+            i !== 0 ? Math.floor(Math.random() * Date.now()).toString(36) : "";
+        } else if (type === VDataType.SELECT) {
           row[column.id] = values[Math.floor(Math.random() * values.length)];
-        } else if (column.dataType === VDataType.DATE) {
+        } else if (type === VDataType.DATE) {
           row[column.id] =
             Math.round(Math.random()) === 0 ? new Date() : undefined;
         } else {
           row[column.id] = Math.round(Math.random()) === 0 ? true : false;
         }
-      } else {
-        row[column.id] =
-          i !== 0 ? Math.floor(Math.random() * Date.now()).toString(36) : "";
       }
     });
 
     return row;
   })
 );
-
-function addRow() {
-  rows.value.push(rowToAdd[0]);
-}
-
-const rowToAdd = Array.from(Array(1)).map((_, i) => {
-  let row: VDataRow = {
-    id: i + rows.value.length,
-  };
-
-  columns.forEach((column: VDataColumn<VDataRow>) => {
-    if (column.dataType !== undefined) {
-      if (column.dataType === VDataType.SELECT) {
-        row[column.id] = values[Math.floor(Math.random() * values.length)];
-      } else if (column.dataType === VDataType.DATE) {
-        row[column.id] =
-          Math.round(Math.random()) === 0 ? new Date() : undefined;
-      } else {
-        row[column.id] = Math.round(Math.random()) === 0 ? true : false;
-      }
-    } else {
-      row[column.id] = Math.floor(Math.random() * Date.now()).toString(36);
-    }
-  });
-
-  return row;
-});
 
 const filteredRows = computed(() => {
   const filter = rows.value.filter((_row: VDataRow, index: number) =>

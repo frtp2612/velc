@@ -1,31 +1,37 @@
 <template>
   <div class="flex flex-col gap-4 min-h-0 min-w-0 h-full w-full">
     <div class="min-h-0 min-w-0 h-full w-full overflow-auto">
-      <table
-        class="table table-fixed w-full max-h-full h-full min-h-0 bg-color-bg relative overflow-auto border border-collapse border-color-border-200"
+      <div
+        class="w-full max-h-full h-full min-h-0 bg-color-bg relative overflow-auto border border-color-border-200"
         ref="table"
       >
-        <thead class="sticky-header border-b">
+        <div
+          class="sticky-header bg-color-bg border-b border-inherit divide-y divide-color-border-200"
+        >
           <!-- additional header with colspan -->
-          <tr
-            class=""
+          <div
+            class="grid divide-x divide-color-border-200"
             ref="columnGroupsWrapper"
             v-if="columnGroups"
             :style="{
               gridTemplateColumns: layout,
             }"
           >
-            <th
+            <div
               v-for="columnGroup in columnGroups"
-              class="table-cell px-2 py-2 bg-color-bg border border-inherit"
-              :colspan="columnGroup.span"
+              class="px-2 py-2"
+              :style="[
+                {
+                  gridColumn: `span ${columnGroup.span}`,
+                },
+              ]"
             >
               <span>{{ textFormatter(columnGroup.label, i18n) }}</span>
-            </th>
-          </tr>
+            </div>
+          </div>
           <!-- columns header -->
-          <tr
-            class="table-row"
+          <div
+            class="grid divide-x divide-color-border-200"
             ref="columnsWrapper"
             :style="{
               gridTemplateColumns: layout,
@@ -36,20 +42,20 @@
               :data="column"
               :index="index"
               :state="state"
-              class="bg-color-bg table-cell"
+              class="bg-color-bg"
               :style="[
                 columnsDataList[index]
                   ? { width: `${columnsDataList[index].size.current}px` }
                   : {},
               ]"
             />
-          </tr>
-        </thead>
+          </div>
+        </div>
         <VirtualScroller
           :items="data"
           :item-height="30"
           wrapper-tag="tbody"
-          wrapper-class="min-h-0 h-full"
+          wrapper-class="min-h-0 h-full divide-y divide-color-border-100"
           v-if="initialized"
         >
           <template
@@ -82,14 +88,13 @@
             />
           </template>
         </VirtualScroller>
-        <tfoot></tfoot>
-      </table>
+        <div></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup generic="RowType extends VDataRow">
-// import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
 import {
   VDataColumn,
   VDataGridStateType,
@@ -104,14 +109,18 @@ import { useI18n } from "vue-i18n";
 import VirtualScroller from "../VirtualScroller/VirtualScroller.vue";
 import VDataGridRow from "./VDataGridRow.vue";
 import { StyleValue } from "vue";
+import { VDataGridDescriptor } from "./types";
+import { getDefaultDescriptor } from "./defaultDescriptor";
 
 const props = withDefaults(
   defineProps<{
-    columns: VDataColumn<RowType>[];
+    columns: VDataColumn[];
     rows?: RowType[];
     columnGroups?: VDataGroupColumn[];
+    descriptor?: VDataGridDescriptor<RowType>;
   }>(),
   {
+    descriptor: () => getDefaultDescriptor<RowType>(),
     rows: Array,
   }
 );
@@ -128,6 +137,7 @@ const columnsWrapper = ref<HTMLElement | null>(null);
 const state: VDataGridStateType<RowType> = VDataGridState(
   computed(() => props.rows),
   computed(() => props.columns),
+  props.descriptor,
   emit
 );
 
@@ -146,6 +156,6 @@ onMounted(() => {
 
 <style scoped>
 .sticky-header {
-  @apply sticky top-0 left-0;
+  @apply sticky w-fit top-0 z-10;
 }
 </style>

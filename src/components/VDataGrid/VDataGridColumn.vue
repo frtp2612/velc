@@ -1,13 +1,10 @@
 <template>
-  <th
-    ref="column"
-    class="flex flex-col relative px-2 py-2 gap-2 border border-inherit"
-  >
+  <div ref="column" class="flex flex-col relative px-2 py-2 gap-2">
     <div class="flex items-center gap-2 cursor-pointer justify-center">
       <font-awesome-icon
         icon="fa-lock"
         class="w-4 h-4 text-color-text-500"
-        v-if="data.locked"
+        v-if="data.descriptor.isLocked"
       />
       <VLabel class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{
         formattedLabel
@@ -29,7 +26,7 @@
         :style="[{ height: state ? height + 'px' : '100%' }]"
       ></div>
     </div>
-  </th>
+  </div>
 </template>
 
 <script setup lang="ts" generic="RowType extends VDataRow">
@@ -41,7 +38,7 @@ import { textFormatter } from "@/formatters";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
-  data: VDataColumn<RowType>;
+  data: VDataColumn;
   index: number;
   state: VDataGridStateType<RowType>;
 }>();

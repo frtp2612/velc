@@ -1,40 +1,50 @@
 <template>
-  <td
-    class="table-cell flex border relative max-w-full h-full items-center"
-    :class="[cellClass, { 'z-[1]': column.locked }]"
+  <div
+    class="flex relative max-w-full h-full items-center"
+    :class="[cellClass, { 'z-[1]': column.descriptor?.isLocked }]"
     tabindex="-1"
   >
     <VLabel
+      v-if="row"
       class="px-2 w-full overflow-hidden overflow-ellipsis whitespace-nowrap text-inherit"
-      :class="[editable ? '' : '', { 'text-right': isNumber }]"
+      :class="[isEditable ? '' : '']"
       @click="selectCell"
       @contextmenu="selectCell"
       @dblclick="startEdit"
     >
       {{ formattedValue }}
     </VLabel>
-  </td>
+  </div>
 </template>
 
 <script setup lang="ts" generic="RowType extends VDataRow">
 import VLabel from "@/components/VLabel/VLabel.vue";
-import { VDataType } from "@/enums";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { VDataColumn, VDataGridStateType, VDataRow } from "./types";
 
 const props = defineProps<{
-  data: RowType;
-  column: VDataColumn<RowType>;
-  editable: boolean;
+  rowId: number;
+  column: VDataColumn;
   state: VDataGridStateType<RowType>;
 }>();
 
 const { n, d } = useI18n();
 
-const {} = props.state;
+const {
+  getRow,
+  isBoolean,
+  isDate,
+  isDropdown,
+  isEditableBoolean,
+  isNumber,
+  isString,
+  descriptor,
+} = props.state;
 
-const cellId = computed(() => `${props.data.id}-${props.column.id}`);
+const row = computed(() => getRow(props.rowId));
+
+const cellId = computed(() => `${props.rowId}-${props.column.id}`);
 
 const cellClass = computed(() => {
   let value = `cell-${cellId.value} `;
@@ -42,38 +52,29 @@ const cellClass = computed(() => {
   return value;
 });
 
-const isBoolean =
-  props.column.dataType !== undefined &&
-  (props.column.dataType as VDataType) === VDataType.BOOLEAN;
+function getFormattedValue(row: RowType | undefined, column: VDataColumn) {
+  if (row) {
+    if (row?.options?.filler) {
+      return "";
+    }
 
-const isNumber =
-  props.column.dataType !== undefined &&
-  (props.column.dataType as VDataType) === VDataType.NUMBER;
-
-const isDate =
-  props.column.dataType !== undefined &&
-  (props.column.dataType as VDataType) === VDataType.DATE;
-
-const formattedValue = computed(() => {
-  if (props.data.options?.filler) {
-    return "";
-  }
-
-  if (props.column.valueFormatter) {
-    return props.column.valueFormatter(props.data[props.column.id]);
-  }
-
-  if (props.column.dataType !== undefined) {
-    if (isBoolean) return props.data[props.column.id] ? "fa-check" : undefined;
-    if (isNumber) return n(props.data[props.column.id]);
-    if (isDate)
-      return props.data[props.column.id] && props.data[props.column.id] !== null
-        ? d(props.data[props.column.id])
+    if (isBoolean(row, column)) return row[column.id] ? "fa-check" : undefined;
+    if (isNumber(row, column)) return n(row[column.id]);
+    if (isDate(row, column))
+      return row[column.id] && row[column.id] !== null
+        ? d(row[column.id])
         : null;
-  }
 
-  return props.data[props.column.id];
-});
+    return descriptor.getValueFormatter(row, column)();
+  }
+  return "";
+}
+
+const isEditable = computed(() => descriptor.getCellEditor);
+
+const formattedValue = computed(() =>
+  getFormattedValue(row.value, props.column)
+);
 
 function selectCell() {
   console.log("cell selected");

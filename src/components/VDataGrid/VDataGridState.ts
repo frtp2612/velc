@@ -3,9 +3,10 @@ import { computed, ref, type Ref } from "vue";
 import {
   VDataColumn,
   VDataColumnState,
-  VDataGroupColumn,
+  VDataGridDescriptor,
   VDataRow,
 } from "./types";
+import { VDataType } from "@/enums";
 
 function isElementVisible(el: HTMLElement | undefined) {
   return el && !!el.offsetParent;
@@ -13,8 +14,8 @@ function isElementVisible(el: HTMLElement | undefined) {
 
 function VDataGridState<RowType extends VDataRow>(
   rows: Ref<RowType[]>,
-  columns: Ref<VDataColumn<RowType>[]>,
-  // columnGroups: VDataGroupColumn[] | undefined,
+  columns: Ref<VDataColumn[]>,
+  descriptor: VDataGridDescriptor<RowType>,
   emit: {}
 ) {
   const tableContainerRef = ref<HTMLElement>();
@@ -58,24 +59,18 @@ function VDataGridState<RowType extends VDataRow>(
 
     Array.from(columnsContainerRef.value.children).forEach(
       (column: Element, index: number) => {
-        const columnProps: VDataColumn<RowType> = columns.value[index];
-
+        const columnProps: VDataColumn = columns.value[index];
+        const size = columnProps.descriptor.size;
         const columnData: VDataColumnState = {
           id: columnProps.id,
           el: column as HTMLElement,
           size: {
             current:
-              columnProps.size && columnProps.size.initial
-                ? columnProps.size.initial
+              size && size.initial
+                ? size.initial
                 : width.value / columns.value.length,
-            max:
-              columnProps.size && columnProps.size.max
-                ? columnProps.size.max
-                : width.value,
-            min:
-              columnProps.size && columnProps.size.min
-                ? columnProps.size.min
-                : 30,
+            max: size && size.max ? size.max : width.value,
+            min: size && size.min ? size.min : 30,
           },
         };
 
@@ -87,7 +82,7 @@ function VDataGridState<RowType extends VDataRow>(
           );
         }
 
-        if (columnProps.locked) {
+        if (columnProps.descriptor.isLocked) {
           lockedColumnsMap.value.set(columnProps.id, 0);
           columnData.offset = 0;
         }
@@ -120,6 +115,24 @@ function VDataGridState<RowType extends VDataRow>(
     );
   }
 
+  function getRow(rowId: number): RowType | undefined {
+    return reactiveRows.value.find((row) => row.id === rowId);
+  }
+
+  const isString = (row: RowType, column: VDataColumn) =>
+    descriptor && descriptor.getDataType(row, column) === VDataType.STRING;
+  const isNumber = (row: RowType, column: VDataColumn) =>
+    descriptor && descriptor.getDataType(row, column) === VDataType.NUMBER;
+  const isDropdown = (row: RowType, column: VDataColumn) =>
+    descriptor && descriptor.getDataType(row, column) === VDataType.SELECT;
+  const isDate = (row: RowType, column: VDataColumn) =>
+    descriptor && descriptor.getDataType(row, column) === VDataType.DATE;
+  const isBoolean = (row: RowType, column: VDataColumn) =>
+    descriptor && descriptor.getDataType(row, column) === VDataType.BOOLEAN;
+  const isEditableBoolean = (row: RowType, column: VDataColumn) =>
+    descriptor &&
+    descriptor.getDataType(row, column) === VDataType.EDITABLE_BOOLEAN;
+
   watchOnce(
     () => visible.value,
     () => {
@@ -134,15 +147,25 @@ function VDataGridState<RowType extends VDataRow>(
     // methods
     init,
 
+    getRow,
+
     // vars
     initialized,
     layout,
     data: reactiveRows,
 
+    descriptor,
     height,
 
     columns,
     columnsDataList,
+
+    isString,
+    isNumber,
+    isDropdown,
+    isDate,
+    isBoolean,
+    isEditableBoolean,
   };
 }
 
