@@ -22,6 +22,7 @@ export enum VDataType {
   EDITABLE_BOOLEAN,
   DATE,
   SELECT,
+  OBJECT,
 }
 
 export enum VButtonTypes {
@@ -137,3 +138,14 @@ export type VStep = {
   enablingCondition?: () => boolean;
   visibilityCondition?: () => boolean;
 };
+
+export enum HorizontalAlignment {
+  LEFT,
+  CENTER,
+  RIGHT,
+}
+
+export enum Position {
+  LEFT,
+  RIGHT,
+}

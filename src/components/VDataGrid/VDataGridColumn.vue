@@ -1,5 +1,10 @@
 <template>
-  <div ref="column" class="flex flex-col relative px-2 py-2 gap-2">
+  <div
+    ref="column"
+    class="flex flex-col relative px-2 py-2 gap-2 bg-inherit group/column"
+    :class="[data.descriptor.isLocked ? 'z-[1]' : ' ']"
+    :style="data.descriptor.isLocked ? lockedStyle : ''"
+  >
     <div class="flex items-center gap-2 cursor-pointer justify-center">
       <font-awesome-icon
         icon="fa-lock"
@@ -13,16 +18,10 @@
 
     <div
       ref="gutter"
-      class="absolute -right-[1px] top-0 w-2 group h-full z-10"
-      v-show="allowResize"
+      class="absolute right-0 top-0 h-full z-10 invisible group-hover/column:visible"
     >
-      <font-awesome-icon
-        icon="fa-left-right"
-        class="absolute w-4 h-4 top-1/2 right-0 -translate-y-2.5 text-color-text-700 bg-color-bg-200 group-hover:bg-color-primary group-hover:text-color-text-50 p-1 rounded-l-md cursor-col-resize transition-all ease-in-out duration-150"
-      />
-
       <div
-        class="absolute h-full w-[2px] left-1.5 transition-all ease-in-out duration-150 bg-color-bg-200 group-hover:bg-color-primary"
+        class="absolute h-full w-0 left-0 before:hover:cursor-ew-resize before:absolute before:right-0 before:bg-color-bg-200 before:hover:bg-color-primary before:transition-[colors,_transform] before:duration-150 before:hover:z-10 before:w-1 before:h-full before:hover:scale-x-[2]"
         :style="[{ height: state ? height + 'px' : '100%' }]"
       ></div>
     </div>
@@ -31,11 +30,11 @@
 
 <script setup lang="ts" generic="RowType extends VDataRow">
 import VLabel from "@/components/VLabel/index";
-// import { useElementResizer } from "@/composables/UseElementResizer";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { VDataColumn, VDataGridStateType, VDataRow } from "./types";
 import { textFormatter } from "@/formatters";
 import { useI18n } from "vue-i18n";
+import { useElementResizer } from "@/composables/UseElementResizer";
 
 const props = defineProps<{
   data: VDataColumn;
@@ -48,37 +47,18 @@ const column = ref<HTMLElement | null>(null);
 
 const { height } = props.state;
 
-const allowResize = ref(false);
-
 const i18n = useI18n();
 
-// if (props.state) {
-// 	useElementResizer(column, gutter, (width: number) =>
-// 		props.state.updateColumnSize(props.data.id, width)
-// 	);
-// }
+useElementResizer(column, gutter, (width: number) =>
+  props.state.updateColumnSize(props.data.id, width)
+);
 
 const formattedLabel = computed(() => textFormatter(props.data.label, i18n));
 
-onMounted(() => {
-  if (column.value) {
-    column.value.addEventListener("mouseenter", toggleResize);
-    column.value.addEventListener("mouseleave", toggleResize);
-  }
-});
-
-onUnmounted(() => {
-  if (column.value) {
-    column.value.removeEventListener("mouseenter", toggleResize);
-    column.value.removeEventListener("mouseleave", toggleResize);
-  }
-});
-
-function toggleResize(event: MouseEvent) {
-  if (event.type === "mouseenter") {
-    allowResize.value = true;
-  } else {
-    allowResize.value = false;
-  }
-}
+const lockedStyle = computed(
+  () =>
+    `position: sticky; left:${props.state.getLockedColumnPosition(
+      props.data.id
+    )}px;`
+);
 </script>

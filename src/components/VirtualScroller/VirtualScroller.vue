@@ -3,7 +3,7 @@
     :is="wrapperTag"
     :class="[wrapperClass ? wrapperClass : 'w-full']"
     :style="{ height: `${totalHeight}px` }"
-    ref="container"
+    ref="wrapper"
   >
     <template v-for="(item, index) in visibleItems" :key="item">
       <slot
@@ -40,24 +40,25 @@ type Props = {
   renderAhead?: number;
   wrapperTag?: string;
   rowWrapperTag?: string;
+  scrollableContainer: HTMLElement;
 };
 
 const props = withDefaults(defineProps<Props>(), {
-  renderAhead: 6,
+  renderAhead: 10,
   id: "",
   wrapperTag: "div",
   rowWrapperTag: "div",
 });
 
-const container = ref<HTMLElement | null>(null);
+const wrapper = ref<HTMLElement | null>(null);
 
 const { visibleItems, totalHeight, offsetY, startIndex, scrollToIndex } =
   useVirtualList(
     computed(() => props.items),
     props.itemHeight,
-    container,
+    props.scrollableContainer,
     props.renderAhead
   );
 
-defineExpose({ container, scrollToIndex });
+defineExpose({ wrapper, scrollToIndex });
 </script>

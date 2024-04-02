@@ -1,12 +1,14 @@
 import { clamp, useElementSize, watchOnce } from "@vueuse/core";
-import { computed, ref, type Ref } from "vue";
+import { computed, ref, VNode, type Ref, Component, watch } from "vue";
 import {
+  VCellEditor,
   VDataColumn,
   VDataColumnState,
   VDataGridDescriptor,
+  VDataGridEmits,
   VDataRow,
 } from "./types";
-import { VDataType } from "@/enums";
+import { HorizontalAlignment, Position, VDataType } from "@/enums";
 
 function isElementVisible(el: HTMLElement | undefined) {
   return el && !!el.offsetParent;
@@ -16,7 +18,7 @@ function VDataGridState<RowType extends VDataRow>(
   rows: Ref<RowType[]>,
   columns: Ref<VDataColumn[]>,
   descriptor: VDataGridDescriptor<RowType>,
-  emit: {}
+  emit: VDataGridEmits<RowType>
 ) {
   const tableContainerRef = ref<HTMLElement>();
   const columnsContainerRef = ref<HTMLElement>();
@@ -25,6 +27,14 @@ function VDataGridState<RowType extends VDataRow>(
   const initialized = ref(false);
 
   const reactiveRows = ref(rows);
+
+  const selectedRowId = ref<number>(0);
+  const selectedColumnId = ref<string>("");
+  const selectedCellId = ref<string>("");
+
+  const activeCell = ref<HTMLElement>();
+
+  const editMode = ref<boolean>(false);
 
   const { width, height } = useElementSize(tableContainerRef);
   const visible = computed(
@@ -115,8 +125,118 @@ function VDataGridState<RowType extends VDataRow>(
     );
   }
 
+  function updateColumnSize(columnId: string, width: number) {
+    const columnDataIndex: number = columnsDataList.value.findIndex(
+      (column: VDataColumnState) => column.id === columnId
+    );
+
+    if (columnDataIndex !== -1) {
+      const columnData: VDataColumnState =
+        columnsDataList.value[columnDataIndex];
+
+      columnData.size.current = clamp(
+        width,
+        columnData.size.min!,
+        columnData.size.max!
+      );
+
+      const nextColumnData: VDataColumnState =
+        columnsDataList.value[columnDataIndex + 1];
+      if (nextColumnData && nextColumnData.offset) {
+        nextColumnData.offset = columnData.offset! + columnData.size.current!;
+        lockedColumnsMap.value.set(nextColumnData.id, nextColumnData.offset);
+      }
+    }
+  }
+
   function getRow(rowId: number): RowType | undefined {
     return reactiveRows.value.find((row) => row.id === rowId);
+  }
+
+  function getLockedColumnPosition(columnId: string): number {
+    return lockedColumnsMap.value.get(columnId) ?? 0;
+  }
+
+  function getCellBackground(
+    row: RowType,
+    column: VDataColumn
+  ): string | undefined {
+    return descriptor.getCellBackground
+      ? descriptor.getCellBackground(row, column)
+      : undefined;
+  }
+
+  function getCellForeground(row: RowType, column: VDataColumn) {
+    return descriptor.getCellForeground
+      ? descriptor.getCellForeground(row, column)
+      : undefined;
+  }
+
+  function getHorizontalAlignment(
+    row: RowType,
+    column: VDataColumn
+  ): HorizontalAlignment | undefined {
+    return descriptor.getHorizontalAlignment
+      ? descriptor.getHorizontalAlignment(row, column)
+      : undefined;
+  }
+
+  function getIcon(
+    row: RowType,
+    column: VDataColumn
+  ): string | VNode | Component | undefined {
+    return descriptor.getIcon ? descriptor.getIcon(row, column) : undefined;
+  }
+
+  function getIconAlignment(
+    row: RowType,
+    column: VDataColumn
+  ): Position | undefined {
+    return descriptor.getIconAlignment
+      ? descriptor.getIconAlignment(row, column)
+      : undefined;
+  }
+
+  function getTooltip(row: RowType, column: VDataColumn): string | undefined {
+    return descriptor.getTooltip
+      ? descriptor.getTooltip(row, column)
+      : undefined;
+  }
+
+  function isTextVisible(
+    row: RowType,
+    column: VDataColumn
+  ): boolean | undefined {
+    return descriptor.isTextVisible
+      ? descriptor.isTextVisible(row, column)
+      : undefined;
+  }
+
+  function getCellEditor(
+    row: RowType,
+    column: VDataColumn
+  ): VCellEditor | undefined {
+    return descriptor.getCellEditor
+      ? descriptor.getCellEditor(row, column)
+      : {
+          type: VDataType.STRING,
+        };
+  }
+
+  function setSelectedCell(rowId: number, columnId: string, cellId: string) {
+    if (editMode.value) {
+      editMode.value = false;
+      onCellEditEnd();
+    }
+    console.log("changed selection");
+
+    selectedRowId.value = rowId;
+    selectedColumnId.value = columnId;
+    selectedCellId.value = cellId;
+  }
+
+  function setEditMode(value: boolean) {
+    editMode.value = value;
   }
 
   const isString = (row: RowType, column: VDataColumn) =>
@@ -132,6 +252,47 @@ function VDataGridState<RowType extends VDataRow>(
   const isEditableBoolean = (row: RowType, column: VDataColumn) =>
     descriptor &&
     descriptor.getDataType(row, column) === VDataType.EDITABLE_BOOLEAN;
+
+  watch(
+    () => selectedCellId.value,
+    () => {
+      const match = tableContainerRef.value?.querySelector(
+        `.cell-${selectedCellId.value}`
+      );
+      if (match) {
+        (match as HTMLElement).focus();
+        activeCell.value = match as HTMLElement;
+      }
+
+      emit("rowClick", getRow(selectedRowId.value));
+    }
+  );
+
+  function onCellEditEnd() {
+    const column: VDataColumn = columns.value[getColumnIndex()];
+
+    if (column) {
+      const row: RowType | undefined = rows.value.find(
+        (row: RowType) => row.id === selectedRowId.value
+      );
+      if (row) {
+        const newValue = row[column.id];
+        console.log("value changed");
+
+        emit("cellValueChanged", {
+          row,
+          column,
+          newValue,
+        });
+      }
+    }
+  }
+
+  function getColumnIndex() {
+    return columns.value.findIndex(
+      (column: VDataColumn) => column.id === selectedColumnId.value
+    );
+  }
 
   watchOnce(
     () => visible.value,
@@ -149,16 +310,35 @@ function VDataGridState<RowType extends VDataRow>(
 
     getRow,
 
+    getCellEditor,
+    getLockedColumnPosition,
+    getCellBackground,
+    getCellForeground,
+    getHorizontalAlignment,
+    getIcon,
+    getIconAlignment,
+    getTooltip,
+    isTextVisible,
+
+    setSelectedCell,
+    setEditMode,
+
+    updateColumnSize,
+
     // vars
     initialized,
     layout,
     data: reactiveRows,
+
+    editMode,
 
     descriptor,
     height,
 
     columns,
     columnsDataList,
+
+    selectedCellId,
 
     isString,
     isNumber,

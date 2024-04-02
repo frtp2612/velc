@@ -2,14 +2,15 @@
   <ComponentExampleTemplate title="VDataGrid" component-name="VDataGrid">
     <template #usage>
       <ComponentExampleBlockTemplate title="Example 1" example="">
-        <div class="flex flex-col min-w-0 h-full gap-2">
+        <div class="flex flex-col min-w-0 h-full gap-2 w-full">
           <div class="flex gap-4 w-full">
             <VButton :on-click="() => (filterOdd = !filterOdd)"
               >Filter odd</VButton
             >
             <VNumericField
               id="jump-to"
-              @update:model-value="(value: number) => table!.scrollTo(value)"
+              :model-value="0"
+              @update:model-value="scrollToIndex"
             />
           </div>
           <VDataGrid
@@ -29,7 +30,7 @@
 <script lang="ts" setup>
 import VDataGrid from "@/components/VDataGrid/VDataGrid.vue";
 import VNumericField from "@/components/VNumericField/VNumericField.vue";
-import { VDataType } from "@/enums";
+import { HorizontalAlignment, Position, VDataType } from "@/enums";
 import ComponentExampleBlockTemplate from "@/views/templates/ComponentExampleBlockTemplate.vue";
 import ComponentExampleTemplate from "@/views/templates/ComponentExampleTemplate.vue";
 import { computed, ref } from "vue";
@@ -47,7 +48,11 @@ const table = ref<ComponentExposed<typeof VDataGrid<VDataRow>> | null>(null);
 const filterOdd = ref(false);
 
 const columnsAmount = 10;
-const values = Array.from(Array(8)).map((_, i) => ({
+type User = {
+  id: string;
+  name: string;
+};
+const values: User[] = Array.from(Array(8)).map((_, i) => ({
   id: "user" + i,
   name: "user" + Math.floor(Math.random() * Date.now()).toString(36),
 }));
@@ -93,9 +98,11 @@ const getType = (index: number): VDataType => {
   } else if (index === columnsAmount - 3) {
     return VDataType.EDITABLE_BOOLEAN;
   } else if (index === columnsAmount - 4) {
-    return VDataType.SELECT;
+    return VDataType.OBJECT;
   } else if (index === columnsAmount - 5) {
     return VDataType.DATE;
+  } else if (index === columnsAmount - 6) {
+    return VDataType.NUMBER;
   }
   return VDataType.STRING;
 };
@@ -109,6 +116,7 @@ const columns: VDataColumn[] = Array.from(Array(columnsAmount)).map((_, i) => ({
   descriptor: {
     isLocked: i === 0 || i === 1,
   },
+  dataType: getType(i),
 }));
 
 const gridDescriptor: VDataGridDescriptor<VDataRow> = {
@@ -121,10 +129,56 @@ const gridDescriptor: VDataGridDescriptor<VDataRow> = {
     }
     return () => row[column.id];
   },
+  getCellBackground(row, column) {
+    if (row.id % 10 === 0) {
+      return "bg-blue-100";
+    } else if (column.id === "col4") {
+      return row[column.id] < 0 ? "bg-red-100" : "bg-emerald-100";
+    }
+  },
+  getCellForeground(row, column) {
+    if (column.id === "col8" && row[column.id]) {
+      return "text-amber-500";
+    }
+  },
+  getHorizontalAlignment(_row, column) {
+    if (column.dataType === VDataType.NUMBER) {
+      return HorizontalAlignment.RIGHT;
+    } else if (column.id === "col2") {
+      return HorizontalAlignment.CENTER;
+    }
+  },
+  getTooltip(row, column) {
+    if (column.dataType === VDataType.OBJECT) {
+      return (row[column.id] as User).id;
+    }
+  },
+  getIcon(_row, column) {
+    if (column.dataType === VDataType.NUMBER) {
+      return "fa-dollar-sign";
+    } else if (column.id === "col2") {
+      return "fa-bugs";
+    }
+  },
+  getIconAlignment(_row, column) {
+    if (column.dataType === VDataType.NUMBER) {
+      return Position.RIGHT;
+    }
+  },
+  isTextVisible(_row, column) {
+    return column.id !== "col2";
+  },
+  getCellEditor(_row, column) {
+    if (column.dataType === VDataType.NUMBER) {
+      return {
+        type: VDataType.NUMBER,
+      };
+    }
+  },
 };
 
 const rows = ref(
-  Array.from(Array(10)).map((_, i) => {
+  Array.from(Array(1000)).map((_, i) => {
     let row: VDataRow = {
       id: i,
     };
@@ -135,7 +189,12 @@ const rows = ref(
         if (type === VDataType.STRING) {
           row[column.id] =
             i !== 0 ? Math.floor(Math.random() * Date.now()).toString(36) : "";
-        } else if (type === VDataType.SELECT) {
+        } else if (type === VDataType.NUMBER) {
+          row[column.id] =
+            (Math.round(Math.random() * 2) === 0 ? 1 : -1) *
+            Math.random() *
+            2000;
+        } else if (type === VDataType.OBJECT) {
           row[column.id] = values[Math.floor(Math.random() * values.length)];
         } else if (type === VDataType.DATE) {
           row[column.id] =
@@ -156,6 +215,12 @@ const filteredRows = computed(() => {
   );
   return filter;
 });
+
+const scrollToIndex = (index: number) => {
+  if (table.value && table.value.scrollToIndex) {
+    table.value.scrollToIndex(index);
+  }
+};
 
 // const rowsFromTable = computed(() => table.value?.rows);
 </script>

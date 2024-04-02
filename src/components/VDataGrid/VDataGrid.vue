@@ -10,7 +10,7 @@
         >
           <!-- additional header with colspan -->
           <div
-            class="grid divide-x divide-color-border-200"
+            class="grid bg-color-bg border-inherit"
             ref="columnGroupsWrapper"
             v-if="columnGroups"
             :style="{
@@ -19,7 +19,7 @@
           >
             <div
               v-for="columnGroup in columnGroups"
-              class="px-2 py-2"
+              class="px-2 py-2 border-r border-inherit"
               :style="[
                 {
                   gridColumn: `span ${columnGroup.span}`,
@@ -31,7 +31,7 @@
           </div>
           <!-- columns header -->
           <div
-            class="grid divide-x divide-color-border-200"
+            class="grid bg-color-bg border-inherit"
             ref="columnsWrapper"
             :style="{
               gridTemplateColumns: layout,
@@ -42,7 +42,7 @@
               :data="column"
               :index="index"
               :state="state"
-              class="bg-color-bg"
+              class="bg-color-bg border-r border-inherit"
               :style="[
                 columnsDataList[index]
                   ? { width: `${columnsDataList[index].size.current}px` }
@@ -53,10 +53,11 @@
         </div>
         <VirtualScroller
           :items="data"
-          :item-height="30"
-          wrapper-tag="tbody"
-          wrapper-class="min-h-0 h-full divide-y divide-color-border-100"
-          v-if="initialized"
+          :item-height="31"
+          :scrollable-container="table"
+          wrapper-class="min-h-0 h-full divide-y divide-color-border-100 w-fit"
+          v-if="initialized && table"
+          ref="virtualScroller"
         >
           <template
             v-slot="{
@@ -111,6 +112,8 @@ import VDataGridRow from "./VDataGridRow.vue";
 import { StyleValue } from "vue";
 import { VDataGridDescriptor } from "./types";
 import { getDefaultDescriptor } from "./defaultDescriptor";
+import { ComponentInstance } from "vue";
+import { clamp } from "@vueuse/core";
 
 const props = withDefaults(
   defineProps<{
@@ -132,7 +135,9 @@ const emit = defineEmits();
 const table = ref<HTMLElement | null>(null);
 const columnGroupsWrapper = ref<HTMLElement | null>(null);
 const columnsWrapper = ref<HTMLElement | null>(null);
-// const content = ref<InstanceType<typeof VirtualScroller> | null>(null);
+const virtualScroller = ref<ComponentInstance<typeof VirtualScroller> | null>(
+  null
+);
 
 const state: VDataGridStateType<RowType> = VDataGridState(
   computed(() => props.rows),
@@ -146,11 +151,19 @@ const { initialized, layout, data, columnsDataList } = state;
 onMounted(() => {
   requestAnimationFrame(() => {
     if (table.value !== null && columnsWrapper.value !== null) {
-      console.log("init");
-
       state.init(table.value!, columnsWrapper.value!);
     }
   });
+});
+
+defineExpose<{
+  scrollToIndex: ((nodeIndex: number) => void) | undefined;
+}>({
+  scrollToIndex: (value: number) => {
+    value = clamp(value, 0, data.value.length - 1);
+    virtualScroller.value?.scrollToIndex(value);
+    // changeSelectedCell(data.value[value].id, props.columns[0].id);
+  },
 });
 </script>
 
