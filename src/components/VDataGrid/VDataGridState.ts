@@ -203,13 +203,10 @@ function VDataGridState<RowType extends VDataRow>(
       : undefined;
   }
 
-  function isTextVisible(
-    row: RowType,
-    column: VDataColumn
-  ): boolean | undefined {
+  function isTextVisible(row: RowType, column: VDataColumn): boolean {
     return descriptor.isTextVisible
       ? descriptor.isTextVisible(row, column)
-      : undefined;
+      : true;
   }
 
   function getCellEditor(
@@ -240,17 +237,30 @@ function VDataGridState<RowType extends VDataRow>(
   }
 
   const isString = (row: RowType, column: VDataColumn) =>
-    descriptor && descriptor.getDataType(row, column) === VDataType.STRING;
+    !descriptor ||
+    (descriptor && !descriptor.getDataType) ||
+    (descriptor &&
+      descriptor.getDataType &&
+      descriptor.getDataType(row, column) === VDataType.STRING);
   const isNumber = (row: RowType, column: VDataColumn) =>
-    descriptor && descriptor.getDataType(row, column) === VDataType.NUMBER;
+    descriptor &&
+    descriptor.getDataType &&
+    descriptor.getDataType(row, column) === VDataType.NUMBER;
   const isDropdown = (row: RowType, column: VDataColumn) =>
-    descriptor && descriptor.getDataType(row, column) === VDataType.SELECT;
+    descriptor &&
+    descriptor.getDataType &&
+    descriptor.getDataType(row, column) === VDataType.SELECT;
   const isDate = (row: RowType, column: VDataColumn) =>
-    descriptor && descriptor.getDataType(row, column) === VDataType.DATE;
+    descriptor &&
+    descriptor.getDataType &&
+    descriptor.getDataType(row, column) === VDataType.DATE;
   const isBoolean = (row: RowType, column: VDataColumn) =>
-    descriptor && descriptor.getDataType(row, column) === VDataType.BOOLEAN;
+    descriptor &&
+    descriptor.getDataType &&
+    descriptor.getDataType(row, column) === VDataType.BOOLEAN;
   const isEditableBoolean = (row: RowType, column: VDataColumn) =>
     descriptor &&
+    descriptor.getDataType &&
     descriptor.getDataType(row, column) === VDataType.EDITABLE_BOOLEAN;
 
   watch(

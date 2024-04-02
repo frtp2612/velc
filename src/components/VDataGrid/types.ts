@@ -92,7 +92,7 @@ export type VDataGridStateType<RowType extends VDataRow> = {
   ) => string | VNode | Component | undefined;
   getIconAlignment: (row: RowType, column: VDataColumn) => Position | undefined;
   getTooltip: (row: RowType, column: VDataColumn) => string | undefined;
-  isTextVisible: (row: RowType, column: VDataColumn) => boolean | undefined;
+  isTextVisible: (row: RowType, column: VDataColumn) => boolean;
 
   updateColumnSize: (columnId: string, width: number) => void;
   getLockedColumnPosition: (columnId: string) => number;
@@ -127,8 +127,8 @@ export type VDataGridDescriptor<RowType extends VDataRow> = {
     row: RowType,
     column: VDataColumn
   ) => VCellEditor | undefined;
-  getDataType: (row: RowType, column: VDataColumn) => VDataType;
-  getValueFormatter: (row: RowType, column: VDataColumn) => Function;
+  getDataType?: (row: RowType, column: VDataColumn) => VDataType;
+  getValueFormatter?: (row: RowType, column: VDataColumn) => Function;
   getHorizontalAlignment?: (
     row: RowType,
     column: VDataColumn
@@ -142,7 +142,7 @@ export type VDataGridDescriptor<RowType extends VDataRow> = {
     column: VDataColumn
   ) => Position | undefined;
   getTooltip?: (row: RowType, column: VDataColumn) => string | undefined;
-  isTextVisible?: (row: RowType, column: VDataColumn) => boolean | undefined;
+  isTextVisible?: (row: RowType, column: VDataColumn) => boolean;
 };
 
 export type VDataGridEmits<RowType> = {

@@ -157,7 +157,9 @@ function getFormattedValue(row: RowType | undefined, column: VDataColumn) {
         ? d(row[column.id])
         : null;
 
-    return descriptor.getValueFormatter(row, column)();
+    return descriptor.getValueFormatter
+      ? descriptor.getValueFormatter(row, column)()
+      : row[column.id];
   }
   return "";
 }

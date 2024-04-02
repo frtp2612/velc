@@ -47,7 +47,7 @@ import { VDataGridDescriptor } from "../../../components/VDataGrid/types";
 const table = ref<ComponentExposed<typeof VDataGrid<VDataRow>> | null>(null);
 const filterOdd = ref(false);
 
-const columnsAmount = 10;
+const columnsAmount = 20;
 type User = {
   id: string;
   name: string;
@@ -184,7 +184,7 @@ const rows = ref(
     };
 
     columns.forEach((column: VDataColumn) => {
-      const type: VDataType = gridDescriptor.getDataType(row, column);
+      const type: VDataType = column.dataType;
       if (type !== undefined) {
         if (type === VDataType.STRING) {
           row[column.id] =
