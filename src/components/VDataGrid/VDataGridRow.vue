@@ -3,8 +3,8 @@
     class="relative grid border-color-border-50 leading-loose"
     :class="rowClass"
   >
-    <template v-for="column in columns" :key="`${data.id}-${column.id}`">
-      <VDataGridCell :column="column" :state="state" :row="data" />
+    <template v-for="column in columns" :key="`${row.id}-${column.id}`">
+      <VDataGridCell :column="column" :state :row />
     </template>
   </div>
 </template>
@@ -15,7 +15,7 @@ import { VDataGridStateType, VDataRow } from "./types";
 import { computed } from "vue";
 
 const props = defineProps<{
-  data: RowType;
+  row: RowType;
   index: number;
   cellHeight: string;
   state: VDataGridStateType<RowType>;

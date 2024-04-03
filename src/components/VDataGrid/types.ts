@@ -18,7 +18,7 @@ export type VDataRowOptions = {
 export type VDataColumn = {
   id: string;
   label: Translatable;
-  descriptor: VDataColumnDescriptor;
+  descriptor: VDataColumnDescriptor | VDataFilterableColumnDescriptor;
   dataType: VDataType;
 };
 
@@ -26,6 +26,10 @@ export type VDataColumnDescriptor = {
   isLocked?: boolean;
   isFilterable?: boolean;
   size?: BaseElementSize;
+};
+
+export type VDataFilterableColumnDescriptor = VDataColumnDescriptor & {
+  editor: VCellEditor;
 };
 
 export type VCellEditor =
@@ -51,7 +55,7 @@ export type VNumberCellEditor = {
 
 export type VDropdownCellEditor = {
   type: VDataType.SELECT;
-  values: () => any[];
+  values: any[];
   formatter: (value: any) => string;
 };
 
@@ -100,6 +104,10 @@ export type VDataGridStateType<RowType extends VDataRow> = {
   setSelectedCell: (rowId: number, columnId: string, cellId: string) => void;
   setEditMode: (value: boolean) => void;
 
+  sort: (key: string, formatter: Function | undefined) => void;
+  setFilter: (filterKey: string, filterValue: any) => void;
+  resetFilter: (filterKey: string) => void;
+
   layout: ComputedRef<string>;
 
   data: Ref<RowType[]>;
@@ -110,6 +118,10 @@ export type VDataGridStateType<RowType extends VDataRow> = {
   columns: Ref<VDataColumn[]>;
   columnsDataList: Ref<VDataColumnState[]>;
   selectedCellId: Ref<string>;
+
+  filters: Ref<Map<string, any>>;
+  sortKey: Ref<string>;
+  sortOrder: Ref<string>;
 
   isString: (row: RowType, column: VDataColumn) => boolean;
   isNumber: (row: RowType, column: VDataColumn) => boolean;

@@ -1,110 +1,141 @@
+import { nextTick } from "vue";
 import { PopAlignment } from "../enums/index";
 
 export type AutoPopOptions = {
-	align?: PopAlignment;
+  align?: PopAlignment;
 };
 
 const SAFE_MARGIN = 8;
 
 export const useAutoPopDirection = (
-	container: HTMLElement,
-	target: HTMLElement,
-	content?: HTMLElement,
-	arrow?: HTMLElement,
-	options?: AutoPopOptions
+  popover: HTMLElement,
+  target: HTMLElement,
+  content?: HTMLElement,
+  arrow?: HTMLElement,
+  options?: AutoPopOptions
 ) => {
-	function calculatePosition() {
-		const containerRect = container.getBoundingClientRect();
-		const containerWidth = containerRect.width;
-		const containerHeight = containerRect.height;
-		// console.log("CONTAINER RECT", containerRect);
+  function calculatePosition() {
+    popover.style.setProperty("--left", `0px`);
+    popover.style.setProperty("--top", `0px`);
 
-		const targetRect = target.getBoundingClientRect();
-		const targetWidth = targetRect.width;
-		const targetHeight = targetRect.height;
-		// console.log("TARGET RECT", targetRect);
-		// let overflowX = 0;
-		// let overflowY = 0;
+    const popoverRect = popover.getBoundingClientRect();
+    const popoverWidth = popoverRect.width;
+    const popoverHeight = popoverRect.height;
+    // console.log("popover RECT", popoverRect);
 
-		let adjustedPositionX =
-			containerRect.left + (containerWidth - targetWidth) * 0.5;
-		let adjustedPositionY = containerRect.top + containerHeight;
+    const targetRect = target.getBoundingClientRect();
+    const targetWidth = targetRect.width;
+    const targetHeight = targetRect.height;
+    const targetLeft = targetRect.left;
+    const targetRight = targetRect.right;
+    const targetTop = targetRect.top;
+    const targetBottom = targetRect.bottom;
+    // console.log("TARGET RECT", targetRect);
+    // let overflowX = 0;
+    // let overflowY = 0;
 
-		if (options) {
-			if (options.align && options.align === PopAlignment.LEFT) {
-				adjustedPositionX = containerRect.left;
-			} else if (options.align && options.align === PopAlignment.RIGHT) {
-				adjustedPositionX = containerRect.right - targetWidth;
-			}
-		}
+    let centeredPosition = {
+      left: targetLeft + (targetWidth - popoverWidth) * 0.5,
+      top: targetTop + (targetHeight - popoverHeight) * 0.5,
+    };
 
-		// check if overflowing on the right side
-		const overflowsLeft = containerRect.left + adjustedPositionX <= SAFE_MARGIN;
+    // console.log("centered position", centeredPosition);
 
-		const overflowsRight =
-			adjustedPositionX + targetWidth > window.innerWidth - SAFE_MARGIN;
-		const overflowsTop = containerRect.top + adjustedPositionY <= SAFE_MARGIN;
-		const overflowsBottom =
-			adjustedPositionY + targetHeight > window.innerHeight - SAFE_MARGIN;
+    if (options) {
+      if (options.align && options.align === PopAlignment.LEFT) {
+        centeredPosition.left = popoverRect.left;
+      } else if (options.align && options.align === PopAlignment.RIGHT) {
+        centeredPosition.left = popoverRect.right - targetWidth;
+      }
+    } else {
+      centeredPosition.top = targetTop;
+    }
 
-		if (overflowsRight) {
-			// overflowX = containerRect.right + adjustedPositionX;
-			// console.log(overflowX);
+    let finalPosition: {
+      top: number;
+      left: number;
+    } = {
+      top: 0,
+      left: 0,
+    };
 
-			adjustedPositionX = window.innerWidth - targetWidth - SAFE_MARGIN;
-			// console.log(adjustedPositionX);
-		} else if (overflowsLeft) {
-			// overflowX = adjustedPositionX - containerRect.left;
-			adjustedPositionX = containerRect.left;
-		}
+    let overflow = {
+      left: centeredPosition.left < SAFE_MARGIN,
+      right:
+        centeredPosition.left + popoverWidth > window.innerWidth - SAFE_MARGIN,
+      top: centeredPosition.top < SAFE_MARGIN,
+      bottom:
+        centeredPosition.top + targetHeight + popoverHeight + SAFE_MARGIN >
+        window.innerHeight - SAFE_MARGIN,
+    };
 
-		if (overflowsTop) {
-			adjustedPositionY =
-				window.innerHeight - (targetHeight + containerRect.bottom);
-		} else if (overflowsBottom) {
-			adjustedPositionY = containerRect.top - targetHeight;
-		}
+    // console.log("Overflow", overflow);
 
-		// console.log("ADJUSTED POSITION", adjustedPositionX);
+    // centeredPosition.top += targetHeight + SAFE_MARGIN;
 
-		target.style.left = adjustedPositionX + "px";
-		target.style.top = adjustedPositionY + "px";
+    if (overflow.left) {
+      finalPosition.left = SAFE_MARGIN;
+    } else if (overflow.right) {
+      finalPosition.left = window.innerWidth - popoverWidth - SAFE_MARGIN;
+    } else {
+      finalPosition.left = centeredPosition.left;
+    }
 
-		if (arrow && content) {
-			const contentRect = content.getBoundingClientRect();
+    if (overflow.top) {
+      finalPosition.top = SAFE_MARGIN;
+    } else if (overflow.bottom) {
+      finalPosition.top = window.innerHeight - popoverHeight - SAFE_MARGIN;
+    } else {
+      finalPosition.top = targetHeight + SAFE_MARGIN + centeredPosition.top;
+    }
 
-			const arrowRect = arrow.getBoundingClientRect();
-			let arrowX = "";
+    // console.log("finalPosition", finalPosition);
 
-			if (overflowsLeft || overflowsRight) {
-				arrowX =
-					containerRect.left - adjustedPositionX + arrowRect.width + "px";
-			} else {
-				arrowX = (targetWidth - arrowRect.width) * 0.5 + "px";
-			}
+    popover.style.setProperty("--left", `${finalPosition.left}px`);
+    popover.style.setProperty("--top", `${finalPosition.top}px`);
 
-			arrow.style.setProperty("--arrow-x", arrowX + "");
+    if (arrow && content) {
+      arrow.style.setProperty("--arrow-x", 0 + "px");
+      arrow.style.setProperty("--arrow-y", 0 + "px");
 
-			if (overflowsBottom) {
-				arrow.style.setProperty("--arrow-y", contentRect.height + "px");
+      const contentRect = content.getBoundingClientRect();
+      const arrowRect = arrow.getBoundingClientRect();
 
-				if (arrow.classList.contains("arrow-top")) {
-					arrow.classList.replace("arrow-top", "arrow-bottom");
-				} else {
-					arrow.classList.add("arrow-bottom");
-				}
-			} else {
-				arrow.style.setProperty("--arrow-y", "1px");
-				if (arrow.classList.contains("arrow-bottom")) {
-					arrow.classList.replace("arrow-bottom", "arrow-top");
-				} else {
-					arrow.classList.add("arrow-top");
-				}
-			}
-		}
-	}
+      let arrowX = "";
 
-	requestAnimationFrame(() => calculatePosition());
+      if (overflow.left || overflow.right) {
+        arrowX =
+          targetLeft +
+          SAFE_MARGIN -
+          finalPosition.left +
+          arrowRect.width +
+          "px";
+      } else {
+        arrowX = (popoverWidth - arrowRect.width) * 0.5 + "px";
+      }
 
-	return {};
+      arrow.style.setProperty("--arrow-x", arrowX + "");
+
+      if (overflow.bottom) {
+        arrow.style.setProperty("--arrow-y", contentRect.height + "px");
+
+        if (arrow.classList.contains("arrow-top")) {
+          arrow.classList.replace("arrow-top", "arrow-bottom");
+        } else {
+          arrow.classList.add("arrow-bottom");
+        }
+      } else {
+        arrow.style.setProperty("--arrow-y", "1px");
+        if (arrow.classList.contains("arrow-bottom")) {
+          arrow.classList.replace("arrow-bottom", "arrow-top");
+        } else {
+          arrow.classList.add("arrow-top");
+        }
+      }
+    }
+  }
+
+  nextTick(() => calculatePosition());
+
+  return {};
 };

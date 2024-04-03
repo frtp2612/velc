@@ -5,15 +5,16 @@
     :class="[data.descriptor.isLocked ? 'z-[1]' : ' ']"
     :style="data.descriptor.isLocked ? lockedStyle : ''"
   >
-    <div class="flex items-center gap-2 cursor-pointer justify-center">
-      <font-awesome-icon
-        icon="fa-lock"
-        class="w-4 h-4 text-color-text-500"
-        v-if="data.descriptor.isLocked"
-      />
+    <div
+      class="flex items-center gap-2 cursor-pointer justify-center"
+      @click="sort(data.id, undefined)"
+    >
       <VLabel class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{
         formattedLabel
       }}</VLabel>
+      <div v-show="data.id === sortKey">
+        <font-awesome-icon :icon="sortIcon" class="w-4 h-4 text-color-accent" />
+      </div>
     </div>
 
     <div
@@ -45,7 +46,7 @@ const props = defineProps<{
 const gutter = ref<HTMLElement | null>(null);
 const column = ref<HTMLElement | null>(null);
 
-const { height } = props.state;
+const { height, sortKey, sortOrder, sort } = props.state;
 
 const i18n = useI18n();
 
@@ -54,6 +55,12 @@ useElementResizer(column, gutter, (width: number) =>
 );
 
 const formattedLabel = computed(() => textFormatter(props.data.label, i18n));
+
+const sortIcon = computed(() =>
+  sortOrder.value === "asc"
+    ? "fa-arrow-up-short-wide"
+    : "fa-arrow-down-wide-short"
+);
 
 const lockedStyle = computed(
   () =>

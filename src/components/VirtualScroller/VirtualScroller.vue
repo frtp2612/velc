@@ -1,6 +1,5 @@
 <template>
-  <component
-    :is="wrapperTag"
+  <div
     :class="[wrapperClass ? wrapperClass : 'w-full']"
     :style="{ height: `${totalHeight}px` }"
     ref="wrapper"
@@ -25,7 +24,7 @@
         },
       ]"
     ></div>
-  </component>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -38,16 +37,12 @@ type Props = {
   containerClass?: string;
   wrapperClass?: string;
   renderAhead?: number;
-  wrapperTag?: string;
-  rowWrapperTag?: string;
   scrollableContainer: HTMLElement;
 };
 
 const props = withDefaults(defineProps<Props>(), {
   renderAhead: 10,
   id: "",
-  wrapperTag: "div",
-  rowWrapperTag: "div",
 });
 
 const wrapper = ref<HTMLElement | null>(null);
@@ -60,5 +55,5 @@ const { visibleItems, totalHeight, offsetY, startIndex, scrollToIndex } =
     props.renderAhead
   );
 
-defineExpose({ wrapper, scrollToIndex });
+defineExpose({ virtualScroller: wrapper, scrollToIndex });
 </script>

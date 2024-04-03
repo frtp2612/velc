@@ -110,6 +110,8 @@ const cellClass = computed(() => {
 
   if (props.row && getCellBackground(props.row, props.column)) {
     value += getCellBackground(props.row, props.column) + " ";
+  } else if (props.column.descriptor.isLocked) {
+    value += "bg-inherit ";
   }
 
   if (props.row && getCellForeground(props.row, props.column)) {
@@ -125,10 +127,6 @@ const cellClass = computed(() => {
         value += "text-right ";
         break;
     }
-  }
-
-  if (props.column.descriptor.isLocked) {
-    value += "bg-inherit ";
   }
 
   if (selectedCellId.value === cellId) {

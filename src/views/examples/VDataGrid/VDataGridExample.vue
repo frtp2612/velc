@@ -47,7 +47,7 @@ import { VDataGridDescriptor } from "../../../components/VDataGrid/types";
 const table = ref<ComponentExposed<typeof VDataGrid<VDataRow>> | null>(null);
 const filterOdd = ref(false);
 
-const columnsAmount = 20;
+const columnsAmount = 10;
 type User = {
   id: string;
   name: string;
@@ -125,7 +125,7 @@ const gridDescriptor: VDataGridDescriptor<VDataRow> = {
   },
   getValueFormatter(row, column) {
     if (column.id === "col6") {
-      return () => row[column.id].name;
+      return () => (row[column.id] != null ? row[column.id].name : "");
     }
     return () => row[column.id];
   },
@@ -150,7 +150,7 @@ const gridDescriptor: VDataGridDescriptor<VDataRow> = {
   },
   getTooltip(row, column) {
     if (column.dataType === VDataType.OBJECT) {
-      return (row[column.id] as User).id;
+      return row[column.id] != null ? (row[column.id] as User).id : "";
     }
   },
   getIcon(_row, column) {
@@ -172,6 +172,19 @@ const gridDescriptor: VDataGridDescriptor<VDataRow> = {
     if (column.dataType === VDataType.NUMBER) {
       return {
         type: VDataType.NUMBER,
+      };
+    }
+    if (column.dataType === VDataType.STRING) {
+      return {
+        type: VDataType.STRING,
+      };
+    }
+
+    if (column.dataType === VDataType.OBJECT) {
+      return {
+        type: VDataType.SELECT,
+        values: values,
+        formatter: (value: any) => (value != null ? value.name : ""),
       };
     }
   },

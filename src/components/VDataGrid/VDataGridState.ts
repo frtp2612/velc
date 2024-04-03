@@ -1,4 +1,10 @@
-import { clamp, useElementSize, watchOnce } from "@vueuse/core";
+import {
+  clamp,
+  onKeyStroke,
+  onStartTyping,
+  useElementSize,
+  watchOnce,
+} from "@vueuse/core";
 import { computed, ref, VNode, type Ref, Component, watch } from "vue";
 import {
   VCellEditor,
@@ -9,6 +15,8 @@ import {
   VDataRow,
 } from "./types";
 import { HorizontalAlignment, Position, VDataType } from "@/enums";
+import { useSorter } from "@/composables/UseSorter";
+import { useFilter } from "@/composables/UseFilter";
 
 function isElementVisible(el: HTMLElement | undefined) {
   return el && !!el.offsetParent;
@@ -18,12 +26,15 @@ function VDataGridState<RowType extends VDataRow>(
   rows: Ref<RowType[]>,
   columns: Ref<VDataColumn[]>,
   descriptor: VDataGridDescriptor<RowType>,
+  defaultSortKey: string | undefined,
+  defaultSortDirection: string | undefined,
   emit: VDataGridEmits<RowType>
 ) {
   const tableContainerRef = ref<HTMLElement>();
   const columnsContainerRef = ref<HTMLElement>();
   const columnsDataList = ref<VDataColumnState[]>([]);
   const lockedColumnsMap = ref<Map<string, number>>(new Map<string, number>());
+  const selectAllMap = ref<Map<string, Ref<boolean>>>(new Map());
   const initialized = ref(false);
 
   const reactiveRows = ref(rows);
@@ -37,13 +48,29 @@ function VDataGridState<RowType extends VDataRow>(
   const editMode = ref<boolean>(false);
 
   const { width, height } = useElementSize(tableContainerRef);
-  const visible = computed(
-    () => width.value !== 0 && isElementVisible(tableContainerRef.value)
+
+  const { filteredData, filters, setFilter, resetFilter, applyFilters } =
+    useFilter<RowType>(reactiveRows);
+
+  const { sort, sortKey, sortOrder, applySort } = useSorter<RowType>(
+    defaultSortKey,
+    defaultSortDirection
   );
 
   function updateRows(updatedRows: RowType[]) {
     reactiveRows.value = updatedRows;
   }
+
+  const selectedRow = computed(() =>
+    reactiveRows.value.find((row) => row.id === selectedRowId.value)
+  );
+  const selectedColumn = computed(() =>
+    columns.value.find((column) => column.id === selectedColumnId.value)
+  );
+
+  const visible = computed(
+    () => width.value !== 0 && isElementVisible(tableContainerRef.value)
+  );
 
   const layout = computed(() =>
     initialized.value
@@ -57,9 +84,53 @@ function VDataGridState<RowType extends VDataRow>(
       : `repeat(${columns.value.length}, 1fr)`
   );
 
+  const data = ref(applySort(reactiveRows)) as Ref<RowType[]>;
+
+  watch(
+    () => filteredData.value,
+    () => {
+      data.value = filteredData.value;
+      data.value = applySort(data);
+      console.log("Data filtered", data.value);
+    },
+    { immediate: true }
+  );
+
+  watch(
+    () => [sortKey.value, sortOrder.value],
+    () => {
+      data.value = applySort(data);
+    },
+    { immediate: true }
+  );
+
+  watch(
+    () => reactiveRows.value.length,
+    () => {
+      applyFilters();
+    }
+  );
+
   function init(tableContainer: HTMLElement, columnsContainer: HTMLElement) {
     tableContainerRef.value = tableContainer;
     columnsContainerRef.value = columnsContainer;
+  }
+
+  initializeSelectAllMap();
+
+  function initializeSelectAllMap() {
+    columns.value
+      .filter(
+        (column: VDataColumn) => column.dataType === VDataType.EDITABLE_BOOLEAN
+      )
+      .forEach((column: VDataColumn) => {
+        selectAllMap.value.set(
+          column.id,
+          computed(() =>
+            data.value.every((row: RowType) => row[column.id] === true)
+          )
+        );
+      });
   }
 
   function initializeColumnsData() {
@@ -150,12 +221,14 @@ function VDataGridState<RowType extends VDataRow>(
   }
 
   function getRow(rowId: number): RowType | undefined {
-    return reactiveRows.value.find((row) => row.id === rowId);
+    return data.value.find((row) => row.id === rowId);
   }
 
   function getLockedColumnPosition(columnId: string): number {
     return lockedColumnsMap.value.get(columnId) ?? 0;
   }
+
+  // DESCRIPTOR METHODS START
 
   function getCellBackground(
     row: RowType,
@@ -220,12 +293,13 @@ function VDataGridState<RowType extends VDataRow>(
         };
   }
 
+  // DESCRIPTOR METHODS END
+
   function setSelectedCell(rowId: number, columnId: string, cellId: string) {
     if (editMode.value) {
       editMode.value = false;
       onCellEditEnd();
     }
-    console.log("changed selection");
 
     selectedRowId.value = rowId;
     selectedColumnId.value = columnId;
@@ -263,21 +337,6 @@ function VDataGridState<RowType extends VDataRow>(
     descriptor.getDataType &&
     descriptor.getDataType(row, column) === VDataType.EDITABLE_BOOLEAN;
 
-  watch(
-    () => selectedCellId.value,
-    () => {
-      const match = tableContainerRef.value?.querySelector(
-        `.cell-${selectedCellId.value}`
-      );
-      if (match) {
-        (match as HTMLElement).focus();
-        activeCell.value = match as HTMLElement;
-      }
-
-      emit("rowClick", getRow(selectedRowId.value));
-    }
-  );
-
   function onCellEditEnd() {
     const column: VDataColumn = columns.value[getColumnIndex()];
 
@@ -298,11 +357,145 @@ function VDataGridState<RowType extends VDataRow>(
     }
   }
 
+  function getRowIndex() {
+    return data.value.findIndex(
+      (row: RowType) => row.id === selectedRowId.value
+    );
+  }
+
   function getColumnIndex() {
     return columns.value.findIndex(
       (column: VDataColumn) => column.id === selectedColumnId.value
     );
   }
+
+  function isCellFocused() {
+    return (
+      getSelectedCell() !== null && getSelectedCell() === document.activeElement
+    );
+  }
+
+  function getSelectedCell() {
+    return tableContainerRef.value?.querySelector(
+      `.cell-${selectedRowId.value}-${selectedColumnId.value}`
+    );
+  }
+
+  function selectAll(columnId: string, value: boolean) {
+    data.value.forEach((row: VDataRow) => {
+      row[columnId] = value;
+    });
+
+    emit("selectAll", {
+      data: data.value,
+      columnId,
+      value,
+    });
+  }
+
+  onKeyStroke(
+    ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"],
+    (event: KeyboardEvent) => {
+      if (!isCellFocused()) return;
+      if (editMode.value) return;
+      event.preventDefault();
+      event.stopPropagation();
+
+      let direction = {
+        x: +(event.key === "ArrowRight") - +(event.key === "ArrowLeft"),
+        y: +(event.key === "ArrowDown") - +(event.key === "ArrowUp"),
+      };
+
+      jumpToNextCell(direction);
+    },
+    { target: tableContainerRef.value }
+  );
+
+  onKeyStroke(
+    ["Enter"],
+    (event: KeyboardEvent) => {
+      if (!editMode.value) return;
+      event.preventDefault();
+      event.stopPropagation();
+
+      let direction = {
+        x: 1,
+        y: 0,
+      };
+
+      jumpToNextCell(direction);
+    },
+    { target: tableContainerRef.value }
+  );
+
+  onKeyStroke(
+    [" "],
+    (event: KeyboardEvent) => {
+      if (!isCellFocused()) return;
+      if (editMode.value) return;
+      event.preventDefault();
+    },
+    { target: tableContainerRef.value }
+  );
+
+  onStartTyping((event: KeyboardEvent) => {
+    if (!isCellFocused()) return;
+    if (editMode.value) return;
+
+    if (
+      selectedRow.value &&
+      selectedColumn.value &&
+      getCellEditor(selectedRow.value, selectedColumn.value)
+    ) {
+      setEditMode(true);
+      (selectedRow.value as VDataRow)[selectedColumnId.value] = null;
+    }
+  });
+
+  function jumpToNextCell(direction: { x: number; y: number }) {
+    if (getColumnIndex() + direction.x < 0 && getRowIndex() > 0) {
+      direction.x = Infinity;
+      direction.y = -1;
+    } else if (
+      getColumnIndex() + direction.x >= columns.value.length &&
+      getRowIndex() < data.value.length - 1
+    ) {
+      direction.x = -Infinity;
+      direction.y = 1;
+    }
+
+    let nextRowIndex = clamp(
+      getRowIndex() + direction.y,
+      0,
+      data.value.length - 1
+    );
+
+    let nextColumnIndex = clamp(
+      getColumnIndex() + direction.x,
+      0,
+      columns.value.length - 1
+    );
+
+    const rowId = data.value[nextRowIndex].id;
+    const columnId = columns.value[nextColumnIndex].id;
+
+    setSelectedCell(rowId, columnId, `${rowId}-${columnId}`);
+  }
+
+  watch(
+    () => selectedCellId.value,
+    () => {
+      const match = tableContainerRef.value?.querySelector(
+        `.cell-${selectedCellId.value}`
+      );
+      if (match) {
+        (match as HTMLElement).focus();
+        activeCell.value = match as HTMLElement;
+      }
+
+      emit("rowClick", getRow(selectedRowId.value));
+    }
+  );
 
   watchOnce(
     () => visible.value,
@@ -317,6 +510,10 @@ function VDataGridState<RowType extends VDataRow>(
   return {
     // methods
     init,
+
+    sort,
+    setFilter,
+    resetFilter,
 
     getRow,
 
@@ -338,9 +535,13 @@ function VDataGridState<RowType extends VDataRow>(
     // vars
     initialized,
     layout,
-    data: reactiveRows,
+    data,
 
     editMode,
+
+    filters,
+    sortKey,
+    sortOrder,
 
     descriptor,
     height,

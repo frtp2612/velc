@@ -55,6 +55,7 @@
           :items="data"
           :item-height="31"
           :scrollable-container="table"
+          :render-ahead="8"
           wrapper-class="min-h-0 h-full divide-y divide-color-border-100 w-fit"
           v-if="initialized && table"
           ref="virtualScroller"
@@ -73,14 +74,13 @@
             }"
           >
             <VDataGridRow
-              :data="item"
+              :row="item"
               :index="index"
-              :state="state"
+              :state
               :cellHeight="`${height}px`"
               :style="
                 styleBinding.concat([
                   {
-                    height: `${height}px`,
                     gridTemplateColumns: layout,
                   },
                 ])
@@ -121,6 +121,8 @@ const props = withDefaults(
     rows?: RowType[];
     columnGroups?: VDataGroupColumn[];
     descriptor?: VDataGridDescriptor<RowType>;
+    defaultSortKey?: string;
+    defaultSortDirection?: string;
   }>(),
   {
     descriptor: () => getDefaultDescriptor<RowType>(),
@@ -143,6 +145,8 @@ const state: VDataGridStateType<RowType> = VDataGridState(
   computed(() => props.rows),
   computed(() => props.columns),
   props.descriptor,
+  props.defaultSortKey,
+  props.defaultSortDirection,
   emit
 );
 
